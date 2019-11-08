@@ -15,10 +15,12 @@ namespace HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccessNewToken.Sample.Co
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly Settings _settings;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger,Settings settings)
         {
             _logger = logger;
+            _settings = settings;
         }
 
         public IActionResult Index()
@@ -39,10 +41,10 @@ namespace HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccessNewToken.Sample.Co
             var token = await HttpContext.GetTokenAsync("access_token");
 
             var client = new HttpClient();
-            client.SetBearerToken(token); 
+            client.SetBearerToken(token);
             //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token); //Can also be used
 
-            var result = await client.GetStringAsync("http://localhost:5003/api");
+            var result = await client.GetStringAsync(_settings.Api); 
             ViewBag.Json = JArray.Parse(result.ToString());
             ViewBag.AccessToken = new JwtBuilder().Decode(token);
             return View();
@@ -50,7 +52,7 @@ namespace HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccessNewToken.Sample.Co
 
         public IActionResult Logout()
         {
-            return SignOut("Cookies", "oidc");
+            return SignOut(_settings.SignInScheme, _settings.DefaultChallengeScheme);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
