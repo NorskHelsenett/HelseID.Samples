@@ -1,9 +1,7 @@
 # HelseID.Samples
 
-Se beskrivelse under hvert eksempel.
+Description available under each sample.
 
-HelseID tilbyr autentisering av helsepersonell i Norge og skal sørge for at helsepersonell får en enklere hverdag gjennom enklere pålogging, større grad av single sign-on og færre påloggingsløsninger. Vi tilbyr også eID-leverandører en plattform for identiteter som kan brukes i helsesektoren i Norge, og tilbyr funksjonalitet som bidrar til at alle aktører i sektoren har tilgang til nasjonale tjenester.
+HelseID is a national autentication service for the health sector in Norway. These samples are targeted at technical personnel such as application architects and developers.
 
-HelseID bidrar også til at data- og dokumentdeling i helsesektoren kan etableres på juridisk og teknisk forsvarlig vis, og ivaretar de sikkerhetsmessige aspektene ved data- og dokumentdeling slik at det blir mulig å dele helseinformasjon
-
-Se for øvrig informasjon om HelseID på https://nhn.no/helseid/
+More info on https://nhn.no/helseid/
