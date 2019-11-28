@@ -28,6 +28,12 @@ namespace HelseId.Core.MVCHybrid.ClientAuthentication.Sample
         public void ConfigureServices(IServiceCollection services)
         {
 
+            // Settings from appsettings.json
+            Settings settings = new Settings();
+            Configuration.GetSection("Settings").Bind(settings);
+            // Create singleton from instance
+            services.AddSingleton<Settings>(settings);
+
             services.AddMvc(option => option.EnableEndpointRouting = false);
             MvcOptions opt = new MvcOptions();
             opt.EnableEndpointRouting = false;
@@ -43,29 +49,20 @@ namespace HelseId.Core.MVCHybrid.ClientAuthentication.Sample
                 .AddCookie("Cookies")
                 .AddOpenIdConnect("oidc", options =>
                 {
-                    options.SignInScheme = "Cookies";                    
+                 
+                    options.SignInScheme = settings.SignInScheme;
                     options.RequireHttpsMetadata = true;
                     options.SaveTokens = true;
                     options.GetClaimsFromUserInfoEndpoint = true;
 
-                    //Configuration for HelseID - Utvikling enviroment
-                    options.Authority = "https://helseid-sts.utvikling.nhn.no/";
-                    options.ClientId = "NewSample-MVCHybridClientAuthentication";
-                    options.ClientSecret = "vbHwjXlKYILNpafLgOwgrviAn8R3XFkHXNnLSaryqe7I8Y03zSLtmg5FICkHZEHC";
-                    options.ResponseType = "code";
 
-                    //Scopes
-                    options.Scope.Add("openid");
-                    options.Scope.Add("profile");
-                    options.Scope.Add("offline_access");
-                    options.Scope.Add("helseid://scopes/identity/pid");
-                    options.Scope.Add("helseid://scopes/identity/pid_pseudonym");
-                    options.Scope.Add("helseid://scopes/identity/assurance_level");
-                    options.Scope.Add("helseid://scopes/identity/security_level");
-                    options.Scope.Add("helseid://scopes/hpr/hpr_number");
-                    options.Scope.Add("helseid://scopes/identity/network");
-                  
-                 
+                    options.Authority = settings.Authority;
+                    options.ClientId = settings.ClientId;
+                    options.ClientSecret = settings.ClientSecret;
+                    options.ResponseType = settings.ResponseType;
+                    options.Scope.Add(settings.Scope);
+
+
                 });
         }
 

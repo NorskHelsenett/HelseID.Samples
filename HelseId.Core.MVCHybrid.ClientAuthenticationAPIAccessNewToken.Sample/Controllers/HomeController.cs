@@ -17,7 +17,7 @@ namespace HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccessNewToken.Sample.Co
         private readonly ILogger<HomeController> _logger;
         private readonly Settings _settings;
 
-        public HomeController(ILogger<HomeController> logger,Settings settings)
+        public HomeController(ILogger<HomeController> logger, Settings settings)
         {
             _logger = logger;
             _settings = settings;
@@ -44,7 +44,7 @@ namespace HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccessNewToken.Sample.Co
             client.SetBearerToken(token);
             //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token); //Can also be used
 
-            var result = await client.GetStringAsync(_settings.Api); 
+            var result = await client.GetStringAsync(_settings.ApiUrl); 
             ViewBag.Json = JArray.Parse(result.ToString());
             ViewBag.AccessToken = new JwtBuilder().Decode(token);
             return View();

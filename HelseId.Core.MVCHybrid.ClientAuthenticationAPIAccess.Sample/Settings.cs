@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccessNewToken.Sample
+namespace HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccess.Sample
 {
     public class Settings
     {

@@ -29,6 +29,14 @@ namespace HelseId.Core.MVCHybrid.API.Sample
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            // Settings from appsettings.json
+            Settings settings = new Settings();
+            Configuration.GetSection("Settings").Bind(settings);
+            // Create singleton from instance
+            services.AddSingleton<Settings>(settings);
+
+
             services.AddControllers();
 
             services.AddCors();
@@ -42,11 +50,10 @@ namespace HelseId.Core.MVCHybrid.API.Sample
                     options.RequireHttpsMetadata = false;
 
                     //Configuration for HelseID - Utvikling enviroment
-                    options.Authority = "https://helseid-sts.utvikling.nhn.no/";
-                    options.ApiName = "willy:newsampleapi";
-                    options.ApiSecret = "iovF4YkasjdICBQpStt9aViRHRCxDQK0ovL8bO0wdEn4rtwRF7P1lrBUDnzDQk78";
-
-                  
+                    options.Authority = settings.Authority;
+                    options.ApiName = settings.ApiName;
+                    options.ApiSecret = settings.ApiSecret;
+             
 
                     options.JwtBearerEvents = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
                     {
@@ -76,7 +83,7 @@ namespace HelseId.Core.MVCHybrid.API.Sample
             {
                 policy.WithOrigins(
                     
-                    "http://localhost:5003");
+                   "http://localhost:5003");
 
                 policy.AllowAnyHeader();
                 policy.AllowAnyMethod();

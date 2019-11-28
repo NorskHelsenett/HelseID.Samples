@@ -36,7 +36,7 @@ namespace HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccess.Sample.Controller
             
             var client = new HttpClient();
             client.SetBearerToken(accessToken);
-            var response = await client.GetStringAsync(_settings.Api);
+            var response = await client.GetStringAsync(_settings.ApiUrl);
            
             ViewBag.Json = JArray.Parse(response.ToString());
             ViewBag.AccessToken = new JwtBuilder().Decode(accessToken);

@@ -32,10 +32,10 @@ namespace HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccessNewToken.Sample
         public void ConfigureServices(IServiceCollection services)
         {
 
-            //settings from appsettings.json
+            // Settings from appsettings.json
             Settings settings = new Settings();
             Configuration.GetSection("Settings").Bind(settings);
-            //Create singleton from instance
+            // Create singleton from instance
             services.AddSingleton<Settings>(settings);
 
             services.AddMvc(option => option.EnableEndpointRouting = false);

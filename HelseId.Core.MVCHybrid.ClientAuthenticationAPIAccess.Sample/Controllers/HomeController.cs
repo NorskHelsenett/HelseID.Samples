@@ -15,10 +15,12 @@ namespace HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccess.Sample.Controller
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly Settings _settings;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, Settings settings)
         {
             _logger = logger;
+            _settings = settings;
         }
 
         public IActionResult Index()
@@ -42,7 +44,7 @@ namespace HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccess.Sample.Controller
             //client.SetBearerToken(token); //not available, needs IdentityModel.OidcClient
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var result = await client.GetStringAsync("http://localhost:5003/api");
+            var result = await client.GetStringAsync(_settings.ApiUrl);
             ViewBag.Json = JArray.Parse(result.ToString());
 
             return View();
