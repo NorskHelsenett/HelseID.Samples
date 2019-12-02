@@ -11,7 +11,7 @@ HelseId is based on OpenId Connect and uses the nuget package containing the Ope
 
 A client needs to be registered and configured in the HelseId (Identity Server) Configuration before use.
 
-### We add authentication services, using "Cookies" and the OpenID Connect Protcol "oidc":
+#### We add authentication services, using "Cookies" and the OpenID Connect Protcol "oidc":
 
 ```csharp
  services.AddAuthentication(options =>
