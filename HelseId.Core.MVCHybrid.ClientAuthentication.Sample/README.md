@@ -6,7 +6,7 @@
 HelseId is based on OAuth2 and OpenId Connect, it is an Authorization Server that uses identityserver4 as its core component.
 
 
-A client needs to be registered and configured in the HelseId (Identity Server) Configuration before use.
+A client needs to be registered and configured in the HelseId Server Configuration before use.
 
 #### We add authentication services, using "Cookies" and the OpenID Connect Protcol "oidc":
 
