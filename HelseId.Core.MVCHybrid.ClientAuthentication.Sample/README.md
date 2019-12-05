@@ -3,11 +3,8 @@
 
 #### We start with an ASP.NET Core 3.0 MVC Web Application. 
 
-HelseId is based on OpenId Connect and uses the nuget package containing the OpenID Connect handler:
+HelseId is based on OAuth2 and OpenId Connect, it is an Authorization Server that uses identityserver4 as its core component.
 
-```                 
-                    Microsoft.AspNetCore.Authentication.OpenIdConnect (3.0.0)
-```
 
 A client needs to be registered and configured in the HelseId (Identity Server) Configuration before use.
 
