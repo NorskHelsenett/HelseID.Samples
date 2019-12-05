@@ -7,7 +7,9 @@
 
 In this sample we are requesting a new access token before we access our API.
 
-..under construction
+To get our new access token, we first connect to our 'Discovery Endpoint' to get info like the issuer name, key material, supported scopes etc.
+
+We get our request url, and then compose the autorize url.
 
 ```csharp 
   [Authorize]
@@ -19,11 +21,20 @@ In this sample we are requesting a new access token before we access our API.
             var disco = await hc.GetDiscoveryDocumentAsync(_settings.Authority);
 
             var requestUrl = new RequestUrl(disco.AuthorizeEndpoint);
-            var authorizeUrl = requestUrl.CreateAuthorizeUrl(_settings.ApiClientId, _settings.ResponseType, _settings.ApiScope, _settings.RedirectUri, nonce: "3123131313", prompt: "none", responseMode: "form_post");
+            var authorizeUrl = requestUrl.CreateAuthorizeUrl(
+                  _settings.ApiClientId, 
+                  _settings.ResponseType, 
+                  _settings.ApiScope, 
+                  _settings.RedirectUri, 
+                  nonce: "3123131313", 
+                  prompt: "none", responseMode: "form_post");
 
             return Redirect(authorizeUrl);
         }
 ``` 
+When authorized, the server will redirect to our 'RedirectUri', where we ask for a new token.
+
+We set our new token as a 'bearer' token in the authorization header, and connect to our API
 
 ```csharp 
   public async Task<IActionResult> Token(string code)
@@ -32,7 +43,12 @@ In this sample we are requesting a new access token before we access our API.
             var hc = new HttpClient();           
             var disco = await hc.GetDiscoveryDocumentAsync(_settings.Authority);
             
-            var tokenRequest = new AuthorizationCodeTokenRequest { Address = disco.TokenEndpoint, ClientId = _settings.ApiClientId, RedirectUri = _settings.RedirectUri, ClientSecret = _settings.ApiClientSecret, Code = code };
+            var tokenRequest = new AuthorizationCodeTokenRequest { 
+                  Address = disco.TokenEndpoint, 
+                  ClientId = _settings.ApiClientId, 
+                  RedirectUri = _settings.RedirectUri, 
+                  ClientSecret = _settings.ApiClientSecret, 
+                  Code = code };
          
             var tokenResponse = await hc.RequestAuthorizationCodeTokenAsync(tokenRequest);
             var accessToken = tokenResponse.AccessToken;
