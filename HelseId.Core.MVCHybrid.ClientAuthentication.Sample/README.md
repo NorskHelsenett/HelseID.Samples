@@ -22,7 +22,7 @@ A client needs to be registered and configured in the HelseId (Identity Server) 
                 {
 ```
 
-#### By using ClientId and ClientSecret that are know to HelseId (Authority):
+#### We are using Grant Type: 'Authorization code'(ReponseType=code). By using ClientId and ClientSecret that are know to HelseId (Authority..
 
 ```csharp
                     options.Authority = settings.Authority; // "https://helseid-sts.utvikling.nhn.no/"
@@ -30,7 +30,7 @@ A client needs to be registered and configured in the HelseId (Identity Server) 
                     options.ClientSecret = settings.ClientSecret; // "vbHwjXlKYILNpa..."
                     options.ResponseType = settings.ResponseType; // "code"
 ```
-#### We identify the client and send in scopes defining the resources and actions we need access to: 
+#### ..We identify the client and send in scopes defining the resources and actions we need access to: 
 
 ```csharp
                     options.Scope.Add(settings.Scope);  
