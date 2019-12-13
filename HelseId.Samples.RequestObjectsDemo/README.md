@@ -1,71 +1,10 @@
-# HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccessNewToken.Sample
-## Client Authentication And API Access With New Token
+# Request Objects Client Sample
+This sample shows how to use Request Objects for client authentication against HelseID. The client  is ready to run as is.
 
-#### This sample builds upon [Client Authentication Sample](https://github.com/HelseID/HelseID.Samples/tree/master/HelseId.Core.MVCHybrid.ClientAuthentication.Sample) Only API acccess with new access token is different.
 
-#### API Access with new access token
-
-In this sample we are requesting a new access token before we access our API.
-
-To get our new access token, we first connect to our 'Discovery Endpoint' to get info like the issuer name, key material, supported scopes etc.
-
-We get our request url, and then compose the autorize url.
-
-```csharp 
-  [Authorize]
-        public async Task<IActionResult> Index()
-        {
-            
-            var hc = new HttpClient();
-            
-            var disco = await hc.GetDiscoveryDocumentAsync(_settings.Authority);
-
-            var requestUrl = new RequestUrl(disco.AuthorizeEndpoint);
-            var authorizeUrl = requestUrl.CreateAuthorizeUrl(
-                  _settings.ApiClientId, 
-                  _settings.ResponseType, 
-                  _settings.ApiScope, 
-                  _settings.RedirectUri, 
-                  nonce: "3123131313", 
-                  prompt: "none", responseMode: "form_post");
-
-            return Redirect(authorizeUrl);
-        }
-``` 
-When authorized, the server will redirect to our 'RedirectUri', where we ask for a new token.
-
-We set our new token as a 'bearer' token in the authorization header, and connect to our API
-
-```csharp 
-  public async Task<IActionResult> Token(string code)
-        {
-
-            var hc = new HttpClient();           
-            var disco = await hc.GetDiscoveryDocumentAsync(_settings.Authority);
-            
-            var tokenRequest = new AuthorizationCodeTokenRequest { 
-                  Address = disco.TokenEndpoint, 
-                  ClientId = _settings.ApiClientId, 
-                  RedirectUri = _settings.RedirectUri, 
-                  ClientSecret = _settings.ApiClientSecret, 
-                  Code = code };
-         
-            var tokenResponse = await hc.RequestAuthorizationCodeTokenAsync(tokenRequest);
-            var accessToken = tokenResponse.AccessToken;
-            
-            var client = new HttpClient();
-            client.SetBearerToken(accessToken);
-            var response = await client.GetStringAsync(_settings.ApiUrl);
-           
-            ViewBag.Json = JArray.Parse(response.ToString());
-            ViewBag.AccessToken = new JwtBuilder().Decode(accessToken);
-
-            return View();
-        }
-``` 
 
 ## Prerequisites
 
 Visual Studio 2019
 
-.NET Core 3.0
+.NET Core 3.1
