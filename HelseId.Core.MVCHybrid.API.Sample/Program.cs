@@ -43,6 +43,7 @@ namespace HelseId.Core.MVCHybrid.API.Sample
             return WebHost.CreateDefaultBuilder(args)
                     .UseStartup<Startup>()
                     .UseSerilog()
+                    .UseUrls("http://localhost:5003/api")
                     .Build();
         }
     }

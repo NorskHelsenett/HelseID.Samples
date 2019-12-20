@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -37,6 +39,14 @@ namespace HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccessNewToken.Sample
             Configuration.GetSection("Settings").Bind(settings);
             // Create singleton from instance
             services.AddSingleton<Settings>(settings);
+
+            services.AddHttpClient();
+
+            services.AddSingleton<IDiscoveryCache>(r =>
+            {
+                var factory = r.GetRequiredService<IHttpClientFactory>();
+                return new DiscoveryCache(settings.Authority, () => factory.CreateClient());
+            });
 
             services.AddMvc(option => option.EnableEndpointRouting = false);
             MvcOptions opt = new MvcOptions();

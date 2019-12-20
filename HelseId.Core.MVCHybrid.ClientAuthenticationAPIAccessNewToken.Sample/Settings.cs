@@ -19,5 +19,6 @@ namespace HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccessNewToken.Sample
         public string ApiClientSecret { get; set; }
         public string ApiClientId { get; set; }
         public string ApiScope { get; set; }
+        public string Nonce { get; set; }
     }
 }

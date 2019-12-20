@@ -41,8 +41,9 @@ namespace HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccess.Sample.Controller
             var token = await HttpContext.GetTokenAsync("access_token");
 
             var client = new HttpClient();
-            //client.SetBearerToken(token); //not available, needs IdentityModel.OidcClient
+            
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            //client.SetBearerToken(token); //can also use this, depends on: IdentityModel.OidcClient
 
             var result = await client.GetStringAsync(_settings.ApiUrl);
             ViewBag.Json = JArray.Parse(result.ToString());
