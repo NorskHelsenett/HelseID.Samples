@@ -5,10 +5,9 @@
 
 #### API Access with new access token
 
-In this sample we are requesting a new access token before we access our API, we do this to ensure the token has as few scopes/access as possible.
+In this sample we are requesting a new access token before we access our API, we do this to ensure that the token has as few scopes/access as possible.
 
-To get our new access token, we first connect to our 'Discovery Endpoint' to get metadata for the connection.
-
+To get our new access token, we first connect to our 'Discovery Endpoint' (and cache this) to get metadata for the connection.
 
 We get our request url, and then compose the autorize url.
 
