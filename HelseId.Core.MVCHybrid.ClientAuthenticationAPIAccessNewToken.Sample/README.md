@@ -16,8 +16,8 @@ We get our request url, and then compose the autorize url.
         public async Task<IActionResult> Index()
         {
             
-            var cache = new DiscoveryCache(_settings.Authority);
-            var disco = await cache.GetAsync();
+            _cache = new DiscoveryCache(_settings.Authority);
+            var disco = await _cache.GetAsync();
 
             var requestUrl = new RequestUrl(disco.AuthorizeEndpoint);
             var authorizeUrl = requestUrl.CreateAuthorizeUrl(
@@ -43,9 +43,9 @@ We set our new token as a 'bearer' token in the authorization header, and connec
         {
 
             var hc = new HttpClient();
-             
-            var cache = new DiscoveryCache(_settings.Authority);
-            var disco = await cache.GetAsync();
+            
+            _cache = new DiscoveryCache(_settings.Authority);
+            var disco = await _cache.GetAsync();
             
             var tokenRequest = new AuthorizationCodeTokenRequest { 
                   Address = disco.TokenEndpoint, 
