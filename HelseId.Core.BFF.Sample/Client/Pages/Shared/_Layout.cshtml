@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+    <meta name="Description" content="HelseID BFF Sample">
+    <base href="/">
+    <title>HelseID BFF Sample</title>
+</head>
+<body>
+
+<main>
+    @RenderBody()
+</main>
+
+<footer>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="page-content">
+            <a href="/Account/Logout">Logg ut</a>
+        </div>
+    }
+</footer>
+
+</body>
+</html>

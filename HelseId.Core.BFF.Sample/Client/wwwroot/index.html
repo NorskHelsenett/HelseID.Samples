@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+        />
+        <meta name="Description" content="HelseID BFF Sample" />
+        <base href="/" />
+        <title>HelseID BFF Sample</title>
+    </head>
+    <body>
+        <main>
+            <h1>HelseID BFF Sample</h1>
+
+            <button id="current-user-button">Get current user</button>
+            <div>
+                <pre><code id="current-user"></code></pre>
+            </div>
+
+            <button id="sample-button">Get sample</button>
+            <div>
+                <pre><code id="sample"></code></pre>
+            </div>
+        </main>
+
+        <script type="text/javascript">
+            const currentUserButton = document.getElementById('current-user-button');
+            currentUserButton.addEventListener('click', () => {
+                fetch('/api/current-user', { credentials: 'include' })
+                    .then(response => {
+                        return response.json();
+                    })
+                    .then(currentUser => {
+                        const currentUserEl = document.getElementById('current-user');
+                        currentUserEl.innerHTML = JSON.stringify(currentUser, null, '\t');
+                    });
+            });
+
+            const sampleButton = document.getElementById('sample-button');
+            sampleButton.addEventListener('click', () => {
+                fetch('/api/sample', { credentials: 'include' })
+                    .then(response => {
+                        return response.json();
+                    })
+                    .then(sample => {
+                        const sampleEl = document.getElementById('sample');
+                        sampleEl.innerHTML = JSON.stringify(sample, null, '\t');
+                    });
+            });
+        </script>
+    </body>
+</html>
