@@ -31,26 +31,48 @@
 
         <script type="text/javascript">
             const currentUserButton = document.getElementById('current-user-button');
+            const currentUserEl = document.getElementById('current-user');
+
             currentUserButton.addEventListener('click', () => {
+                currentUserEl.innerHTML = 'Loading...';
                 fetch('/api/current-user', { credentials: 'include' })
                     .then(response => {
+                        if (!response.ok) {
+                            throw new Error(
+                                `Response status ${response.status} ${response.statusText}`,
+                            );
+                        }
+
                         return response.json();
                     })
                     .then(currentUser => {
-                        const currentUserEl = document.getElementById('current-user');
                         currentUserEl.innerHTML = JSON.stringify(currentUser, null, '\t');
+                    })
+                    .catch(e => {
+                        currentUserEl.innerHTML = `An error occurred: ${e.message}`;
                     });
             });
 
             const sampleButton = document.getElementById('sample-button');
+            const sampleEl = document.getElementById('sample');
+
             sampleButton.addEventListener('click', () => {
+                sampleEl.innerHTML = 'Loading...';
                 fetch('/api/sample', { credentials: 'include' })
                     .then(response => {
+                        if (!response.ok) {
+                            throw new Error(
+                                `Response status ${response.status} ${response.statusText}`,
+                            );
+                        }
+
                         return response.json();
                     })
                     .then(sample => {
-                        const sampleEl = document.getElementById('sample');
                         sampleEl.innerHTML = JSON.stringify(sample, null, '\t');
+                    })
+                    .catch(e => {
+                        sampleEl.innerHTML = `An error occurred: ${e.message}`;
                     });
             });
         </script>
