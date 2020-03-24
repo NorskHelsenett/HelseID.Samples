@@ -33,7 +33,7 @@ namespace HelseId.Samples.ClientCredentials
                 new Claim(JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N"))
             };
 
-            var token = new JwtSecurityToken(ClientId, TokenEndpoint, claims, DateTime.Now, DateTime.Now.AddMinutes(10), signingCredentials);
+            var token = new JwtSecurityToken(ClientId, TokenEndpoint, claims, DateTime.Now, DateTime.Now.AddMinutes(1), signingCredentials);
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var clientAssertion = tokenHandler.WriteToken(token);
