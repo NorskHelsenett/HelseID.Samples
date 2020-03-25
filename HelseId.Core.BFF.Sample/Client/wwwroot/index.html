@@ -18,11 +18,12 @@
                 <a href="/account/logout">Log out</a>
             </div>
 
-            <button id="current-user-button">Get current user</button>
+            <h3>Current user</h3>
             <div>
                 <pre><code id="current-user"></code></pre>
             </div>
 
+            <h3>Sample API</h3>
             <button id="sample-button">Get sample</button>
             <div>
                 <pre><code id="sample"></code></pre>
@@ -30,28 +31,32 @@
         </main>
 
         <script type="text/javascript">
-            const currentUserButton = document.getElementById('current-user-button');
             const currentUserEl = document.getElementById('current-user');
+            currentUserEl.innerHTML = 'Loading...';
 
-            currentUserButton.addEventListener('click', () => {
-                currentUserEl.innerHTML = 'Loading...';
-                fetch('/api/current-user', { credentials: 'include' })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(
-                                `Response status ${response.status} ${response.statusText}`,
-                            );
-                        }
+            // Fetch current user immediately
+            fetch('/api/current-user', { credentials: 'include' })
+                .then(response => {
+                    // Not authenticated, force login
+                    // May happen if index.html is cached by the browser
+                    if (response.status === 401) {
+                        window.location.href = '/account/login';
+                        return;
+                    }
 
-                        return response.json();
-                    })
-                    .then(currentUser => {
+                    if (!response.ok) {
+                        throw new Error(
+                            `Response status ${response.status} ${response.statusText}`,
+                        );
+                    }
+
+                    return response.json().then(currentUser => {
                         currentUserEl.innerHTML = JSON.stringify(currentUser, null, '\t');
-                    })
-                    .catch(e => {
-                        currentUserEl.innerHTML = `An error occurred: ${e.message}`;
                     });
-            });
+                })
+                .catch(e => {
+                    currentUserEl.innerHTML = `An error occurred: ${e.message}`;
+                });
 
             const sampleButton = document.getElementById('sample-button');
             const sampleEl = document.getElementById('sample');
