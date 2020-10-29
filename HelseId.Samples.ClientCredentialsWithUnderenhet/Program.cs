@@ -104,7 +104,7 @@ namespace HelseId.Samples.ClientCredentialsWithUnderenhet
                 new Claim(JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N"))
             };
 
-            var rsa = new RSACng();
+            var rsa = RSA.Create();
             rsa.FromXmlString(RsaXml);
             var securityKey = new RsaSecurityKey(rsa);
 
