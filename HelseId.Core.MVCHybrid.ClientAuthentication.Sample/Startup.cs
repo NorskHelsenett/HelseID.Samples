@@ -1,17 +1,15 @@
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
+using IdentityModel;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HelseId.Core.MVCHybrid.ClientAuthentication.Sample
 {
@@ -58,11 +56,23 @@ namespace HelseId.Core.MVCHybrid.ClientAuthentication.Sample
 
                     options.Authority = settings.Authority;
                     options.ClientId = settings.ClientId;
-                    options.ClientSecret = settings.ClientSecret;
+                    // Use the following line if using a shared secret for client authentication
+                    //options.ClientSecret = settings.ClientSecret; 
                     options.ResponseType = settings.ResponseType;
                     options.Scope.Add(settings.Scope);
 
+                    // Use the following event handler if using a Signed Jwt for client auhtentication
+                    options.Events.OnAuthorizationCodeReceived = ctx =>
+                    {
+                        var rsa = RSA.Create();
+                        rsa.FromXmlString(settings.ClientSecret);
+                        var securityKey = new RsaSecurityKey(rsa);
 
+                        ctx.TokenEndpointRequest.ClientAssertionType = OidcConstants.ClientAssertionTypes.JwtBearer;
+                        ctx.TokenEndpointRequest.ClientAssertion = ClientAssertion.Generate(settings.ClientId, settings.Authority, securityKey);
+
+                        return Task.CompletedTask;
+                    };
                 });
         }
 
