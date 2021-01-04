@@ -105,7 +105,8 @@ namespace HelseId.RequestObjectsDemo
             var requestObject = BuildRequestObject(clientId, stsUrl, childOrgNo);
             return new Dictionary<string, string>
                 {
-                    { "request", requestObject }
+                    { "request", requestObject },
+                { "prompt", "login" }
                 };
         }
 
