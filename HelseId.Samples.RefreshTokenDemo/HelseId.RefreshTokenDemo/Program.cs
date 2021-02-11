@@ -44,7 +44,7 @@ namespace HelseId.RefreshTokenDemo
                 });
 
                 var state = await oidcClient.PrepareLoginAsync();
-                var response = await AuthorizeWithRequestObjects(Localhost, RedirectUrl, StartPage, state);
+                var response = await RunLocalWebBrowserUntilCallback(Localhost, RedirectUrl, StartPage, state);
 
                 var clientAssertionPayload = GetClientAssertionPayload(ClientId, disco);
                 var loginResult = await oidcClient.ProcessResponseAsync(response, state, clientAssertionPayload);
@@ -113,7 +113,7 @@ namespace HelseId.RefreshTokenDemo
             return new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256);
         }
 
-        private static async Task<string> AuthorizeWithRequestObjects(string localhost, string redirectUrl, string startPage, AuthorizeState state)
+        private static async Task<string> RunLocalWebBrowserUntilCallback(string localhost, string redirectUrl, string startPage, AuthorizeState state)
         {
             // Build a HTML form that does a POST of the data from the url
             // This is a workaround since the url may be too long to pass to the browser directly
