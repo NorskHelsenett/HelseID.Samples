@@ -15,6 +15,7 @@ namespace HelseId.Demo.ClientCredentials.Jwk
     {
         private const string _jwkPrivateKey = @"Add your Jwk Private Key Here";
         private const string _clientId = "Add your client_id here";
+        private const string _scopes = "Add scopes here";
 
         /// <summary>
         /// Simple sample demonstrating client credentials
@@ -34,11 +35,12 @@ namespace HelseId.Demo.ClientCredentials.Jwk
                     throw new Exception(disco.Error);
                 }
 
-                var response = await c.RequestTokenAsync(new IdentityModel.Client.TokenRequest
+                var response = await c.RequestClientCredentialsTokenAsync(new IdentityModel.Client.ClientCredentialsTokenRequest
                 {
                     Address = disco.TokenEndpoint,
                     ClientId = _clientId,
                     GrantType = GrantTypes.ClientCredentials,
+                    Scope = _scopes,
                     ClientAssertion = new ClientAssertion
                     {
                         Type = ClientAssertionTypes.JwtBearer,
@@ -65,7 +67,7 @@ namespace HelseId.Demo.ClientCredentials.Jwk
 
         private static string BuildClientAssertion(DiscoveryDocumentResponse disco, string clientId)
         {
-          
+
 
             var claims = new List<Claim>
             {
