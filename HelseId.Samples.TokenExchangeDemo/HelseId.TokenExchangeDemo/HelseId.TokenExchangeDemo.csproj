@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="IdentityModel" Version="4.6.0" />
+    <PackageReference Include="IdentityModel.OidcClient" Version="3.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="GothamSykehus.p12">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="jwk.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

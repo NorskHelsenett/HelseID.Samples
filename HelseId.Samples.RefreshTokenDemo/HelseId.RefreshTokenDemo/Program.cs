@@ -54,23 +54,39 @@ namespace HelseId.RefreshTokenDemo
                     throw new Exception(loginResult.Error);
                 }
 
-                var refreshTokenRequest = new RefreshTokenRequest
-                {
-                    Address = disco.TokenEndpoint,
-                    ClientId = ClientId,
-                    RefreshToken = loginResult.RefreshToken,
-                    Parameters = GetClientAssertionPayload(ClientId, disco)
-                };
+                var refreshToken = loginResult.RefreshToken;
 
-                var refreshTokenResult = await httpClient.RequestRefreshTokenAsync(refreshTokenRequest);
-                
-                if (refreshTokenResult.IsError)
+                var ok = true;
+
+                while (ok)
                 {
-                    throw new Exception(refreshTokenResult.Error);
+                    Console.WriteLine("Refreshing token");
+
+                    var refreshTokenRequest = new RefreshTokenRequest
+                    {
+                        Address = disco.TokenEndpoint,
+                        ClientId = ClientId,
+                        RefreshToken = refreshToken,
+                        Parameters = GetClientAssertionPayload(ClientId, disco)
+                    };
+
+                    var refreshTokenResult = await httpClient.RequestRefreshTokenAsync(refreshTokenRequest);
+
+                    if (refreshTokenResult.IsError)
+                    {
+                        ok = false;
+                        throw new Exception(refreshTokenResult.Error);
+                    }
+
+                    refreshToken = refreshTokenResult.RefreshToken;
+
+                    Console.WriteLine("Access Token: " + refreshTokenResult.AccessToken);
+                    Console.WriteLine("Refresh Token: " + refreshTokenResult.RefreshToken);
+                    Console.WriteLine();
+
+                    System.Threading.Thread.Sleep(5000);
+
                 }
-
-                Console.WriteLine("Access Token: " + refreshTokenResult.AccessToken);
-                Console.WriteLine("Refresh Token: " + refreshTokenResult.RefreshToken);
 
             }
             catch (Exception e)
