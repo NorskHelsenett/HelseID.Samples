@@ -21,11 +21,11 @@ namespace HelseId.RequestObjectsDemo
             try
             {
                 // These values should go into a configuration file
-                const string clientId = "ro-demo";
+                const string clientId = "bcf9673e-2e77-44de-af53-b7f4e5535b99";
                 const string localhost = "http://localhost:8089";
                 const string redirectUrl = "/callback";
                 const string startPage = "/start";
-                const string stsUrl = "https://helseid-sts.utvikling.nhn.no";
+                const string stsUrl = "https://helseid-sts.test.nhn.no";
 
                 // The child organization number is provided by the EPJ
                 const string childOrgNo = "999977775";
@@ -41,7 +41,7 @@ namespace HelseId.RequestObjectsDemo
                 {
                     Authority = stsUrl,
                     RedirectUri = localhost + redirectUrl,
-                    Scope = "udelt:test-api/api openid profile",
+                    Scope = "openid profile",
                     ClientId = clientId,
                     Flow = OidcClientOptions.AuthenticationFlow.AuthorizationCode,
                     Policy = new Policy { RequireAccessTokenHash = true, RequireAuthorizationCodeHash = true, ValidateTokenIssuerName = true },

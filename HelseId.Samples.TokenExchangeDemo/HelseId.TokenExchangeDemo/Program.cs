@@ -23,7 +23,7 @@ namespace HelseId.RefreshTokenDemo
         const string Localhost = "http://localhost:8089";
         const string RedirectUrl = "/callback";
         const string StartPage = "/start";
-        const string StsUrl = "https://helseid-sts.test.nhn.no";
+        const string StsUrl = "https://localhost:44366";
 
         static DiscoveryDocumentResponse _discoveryDocument;
 

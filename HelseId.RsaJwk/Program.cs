@@ -21,6 +21,15 @@ namespace HelseId.RsaJwk
 
             var rsa = RSA.Create(keySize);
             var rsaKey = new RsaSecurityKey(rsa);
+
+            var rsaXmlPrivate = rsa.ToXmlString(true);
+            var rsaXmlPublic = rsa.ToXmlString(false);
+
+            File.WriteAllText("rsa_xml_private.xml", rsaXmlPrivate);
+            File.WriteAllText("rsa_xml_public.xml", rsaXmlPublic);
+
+
+
             var jwk = JsonWebKeyConverter.ConvertFromRSASecurityKey(rsaKey);
             var privateJwk = new JsonWebKey
             {
