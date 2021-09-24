@@ -14,13 +14,31 @@ using System.Threading.Tasks;
 
 namespace HelseId.RefreshTokenDemo
 {
+    /*
+     * This sample application shows how Resource Indicators 
+     * (https://datatracker.ietf.org/doc/html/rfc8707)
+     * to download multiple Access Tokens without performing multiple
+     * calls to the Authorize endpoint.
+     * This is important when calling national health APIs since most
+     * of these require Access Tokens where they are the only audience.
+     * 
+     * This sample app has access to two APIs: udelt:resource_indicator_api_1
+     * and udelt:resource_indicator_api_2. The app requests scopes from 
+     * both APIs but the first Token-call only requests the first resource.
+     * The second Token-call (using a Refresh Token) requests the second
+     * resource.
+     */
     class Program
     {
         const string ClientId = "resource_indicators_demo_client";
         const string Localhost = "http://localhost:8089";
         const string RedirectUrl = "/callback";
         const string StartPage = "/start";
-        const string StsUrl = "https://localhost:44366";
+        const string StsUrl = "https://helseid-sts.utvikling.nhn.no";
+
+        const string firstResource = "udelt:resource_indicator_api_1";
+        const string secondResource = "udelt:resource_indicator_api_2";
+
 
         static async Task Main()
         {
@@ -45,9 +63,9 @@ namespace HelseId.RefreshTokenDemo
                     Authority = StsUrl,
                     LoadProfile = false,
                     RedirectUri = "http://localhost:8089/callback",
-                    Scope = "openid profile offline_access udelt:resource_indicator_api_2/write udelt:resource_indicator_api_1/read",
+                    Scope = "openid profile offline_access udelt:resource_indicator_api_2/write udelt:resource_indicator_api_2/read udelt:resource_indicator_api_1/read",
                     ClientId = ClientId,
-                    Resource = new List<string> { "udelt:resource_indicator_api_1"},
+                    Resource = new List<string> { firstResource, secondResource },
                     ClientAssertion = clientAssertionPayload,                   
 
                     Policy = new Policy { ValidateTokenIssuerName = true },                    
@@ -62,15 +80,25 @@ namespace HelseId.RefreshTokenDemo
                 ///////////////////////////////////////////////////////////////////////
                 // User login has finished, now we want to request tokens from the /token endpoint
                 // We add a Resource parameter indication that we want scopes for API 1
-                var parameters = new Parameters();
-                parameters.Add("resource", "udelt:resource_indicator_api_1");
+                var parameters = new Parameters
+                {
+                    { "resource", firstResource }
+                };
                 var loginResult = await oidcClient.ProcessResponseAsync(response, state, parameters);
 
                 if (loginResult.IsError)
                 {
                     throw new Exception(loginResult.Error);
                 }
+                var accessToken1 = loginResult.AccessToken;
                 var refreshToken = loginResult.RefreshToken;
+
+
+                Console.WriteLine("First request, resource: " + firstResource);
+                Console.WriteLine("Access Token: " + accessToken1);
+                Console.WriteLine("Refresh Token: " + refreshToken);
+                Console.WriteLine();
+
 
 
                 // 3. Using the refresh token to get an access token for API 2
@@ -83,7 +111,7 @@ namespace HelseId.RefreshTokenDemo
                     Address = disco.TokenEndpoint,
                     ClientId = ClientId,
                     RefreshToken = refreshToken,
-                    Resource = new List<string> { "udelt:resource_indicator_api_2" },
+                    Resource = new List<string> { secondResource },
                     ClientAssertion = GetClientAssertionPayload(ClientId, disco)
                 };
 
@@ -94,7 +122,7 @@ namespace HelseId.RefreshTokenDemo
                     throw new Exception(refreshTokenResult.Error);
                 }
 
-
+                Console.WriteLine("Second request, resource: " + secondResource);
                 Console.WriteLine("Access Token: " + refreshTokenResult.AccessToken);
                 Console.WriteLine("Refresh Token: " + refreshTokenResult.RefreshToken);
                 Console.WriteLine();

@@ -21,7 +21,7 @@ namespace HelseId.RequestObjectsDemo
             try
             {
                 // These values should go into a configuration file
-                const string clientId = "bcf9673e-2e77-44de-af53-b7f4e5535b99";
+                const string clientId = "ro-demo";
                 const string localhost = "http://localhost:8089";
                 const string redirectUrl = "/callback";
                 const string startPage = "/start";
@@ -106,7 +106,7 @@ namespace HelseId.RequestObjectsDemo
             return new Dictionary<string, string>
                 {
                     { "request", requestObject },
-                { "prompt", "login" }
+                //{ "prompt", "login" }
                 };
         }
 
