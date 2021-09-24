@@ -26,7 +26,16 @@ namespace HelseId.RequestObjectsDemo
             _routes = routes;
 
             _host = new WebHostBuilder()
-                .UseKestrel()
+               .UseKestrel(options =>
+               {
+                   /* 
+                    * May enhance out-of-the-box experience when copying code
+                    * or running in .NET5
+                    * See:
+                    * https://stackoverflow.com/questions/47735133/asp-net-core-synchronous-operations-are-disallowed-call-writeasync-or-set-all
+                   */
+                   options.AllowSynchronousIO = true;
+               })
                 .UseUrls(host)
                 .Configure(Configure)
                 .Build();
