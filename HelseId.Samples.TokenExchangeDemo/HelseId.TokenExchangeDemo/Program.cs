@@ -110,7 +110,7 @@ namespace HelseId.RefreshTokenDemo
                 ClientId = ActorClientId,
                 Scope = "e-helse:nasjonalt_api/scope",
                 SubjectToken = subjectToken,
-                SubjectTokenType = "urn:ietf:params:oauth:token-type:access_token"            
+                SubjectTokenType = OidcConstants.TokenTypeIdentifiers.AccessToken
             };
 
             return await new HttpClient().RequestTokenExchangeTokenAsync(request);
