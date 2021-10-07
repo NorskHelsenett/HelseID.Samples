@@ -21,7 +21,7 @@ namespace HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccessNewToken.Sample
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                    webBuilder.UseUrls("https://localhost:44388");
+                    //webBuilder.UseUrls("https://localhost:44388");
                 });
     }
 }
