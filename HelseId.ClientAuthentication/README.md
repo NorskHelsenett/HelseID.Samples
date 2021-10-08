@@ -21,14 +21,14 @@ A client needs to be registered and configured in the HelseId Server Configurati
                 {
 ```
 
-#### We are using Grant Type: 'Authorization code' (ReponseType=code), and a ClientId that is known to HelseId (Authority)..
+We are using Grant Type: 'Authorization code' (ReponseType=code), and a ClientId that is known to HelseId (Authority)..
 
 ```csharp
                     options.Authority = settings.Authority; // "https://helseid-sts.utvikling.nhn.no/"
                     options.ClientId = settings.ClientId; // "NewSample-MVCHybridClientAuthentication"
                     options.ResponseType = settings.ResponseType; // "code"
 ```
-#### ..We send in scopes defining the resources and actions we need access to..: 
+ ..We send in scopes defining the resources and actions we need access to..: 
 
 ```csharp
                     options.Scope.Add(settings.Scope);  
@@ -44,15 +44,16 @@ A client needs to be registered and configured in the HelseId Server Configurati
     
 ```
 
-#### ..A Json Web Key (JWK) pair is used as ClientSecret where the public key is known to HelseId (Authority), while the private key is stored as a json file in the project ("jwk.json")
+ ..A Json Web Key (JWK) pair is used as ClientSecret where the public key is known to HelseId (Authority).  
 
 ```csharp
+                    // In production environment the security key must be protected (stored at a secure location)
                     string fileName = "jwk.json";
                     var securityKey = new JsonWebKey(File.ReadAllText(fileName));
 ```
+<strong> NB! </strong> In this sample the private key is stored as a JSON file in the project ("jwk.json"), but <strong> in production environment the private security key MUST be protected and stored at a secure location. </strong>
 
-
-#### The user is authenticated through one of the federated identity providers. Ex: Id-Porten.
+ The user is authenticated through one of the federated identity providers. Ex: Id-Porten.
 
 #### We get an accsesstoken back to access protected resources:
 
