@@ -2,19 +2,17 @@
 
 HelseID is a national authentication service for the health sector in Norway. These samples are targeted at technical personel such as application architects and developers. 
 
-A client needs be registered in the HelseID Server Configuration before running the samples.
-
 ## Overview of Samples
 1. [Client Authentication](#ClientAuthentication)
 2. [Sample API](#SampleAPI)
 3. [API Access](#APIAccess)
     1. [API Access with new access token](#APIAccessNewToken)
     2. [API Access with resource indicators](#APIAccessResourceIndicators)
-4. [Generate a JSON Web Key (JWK)](#RsaJwk)
-5. [Client Credentials Grant](#ClientCredentials)
+4. [Client Credentials Grant](#ClientCredentials)
     1. [Client Credentials with Child Organization](#ClientCredentials.WithChildOrg)
     2. [Client Credentials with JWK](#ClientCredentials.Jwk)
     3. [Client Credentials with Enterprise Certificate](#ClientCredentials.EnterpriseCertificate)
+5. [Generate a JSON Web Key (JWK)](#RsaJwk)
 6. [Refresh Token](#RefreshToken)
 7. [Token Exchange](#TokenExchange)
 8. [Request Objects](#RequestObjects)
@@ -41,14 +39,9 @@ In this sample one can also access the API with a new access token. This is done
 
 The sample demonstrate how resource indicators are used to download multiple access tokens without performing multiple calls to the authorization endpoint. Each access token can then be used to call a specified API. See [HelseId.Samples.ResourceIndicatorsDemo](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.Samples.ResourceIndicatorsDemo) for more information.
 
-
-### <a name="RsaJwk"></a> Generate a JSON Web Key (JWK)
-
-A command line program to generate a key pair as a JSON Web Key (JWK). The sample creates two files where the first file contains the whole key pair (including the private key), while the second file only contains the public key. See [HelseId.RsaJwk](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.RsaJwk) for a more detailed explanation.
-
 ### <a name="ClientCredentials"></a> Client Credentials Grant
 
-The client credentials grant type is commonly used for server-to-server interactions that must run in the background, without immediate interaction with a user. The sample demonstrates how to generate a signed JSON Web Token (JWT) that is used to request access to a web-server. An access token is returned and written to the console if the request was approved. See [HelseId.Samples.ClientCredentials](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.ClientCredentials).
+Simple demonstration of client credentials grant. See [HelseId.Samples.ClientCredentials](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.ClientCredentials) for more information.
 
 #### <a name="ClientCredentials.WithChildOrg"></a> Client Credentials with Child Organization
 
@@ -56,11 +49,15 @@ A modification of the [HelseId.Samples.ClientCredentials](https://github.com/Nor
 
 #### <a name="ClientCredentials.Jwk"></a> Client Credentials with JWK
 
-The sample uses JWK as secret and is a modification of the [HelseId.Samples.ClientCredentials](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.ClientCredentials) sample. See [HelseId.Samples.ClientCredentials.Jwk](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.ClientCredentials.Jwk).
+A modification of the [HelseId.Samples.ClientCredentials](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.ClientCredentials) sample, where JWK is used as secret. See [HelseId.Samples.ClientCredentials.Jwk](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.ClientCredentials.Jwk) for more information.
 
 #### <a name="ClientCredentials.EnterpriseCertificate"></a> Client Credentials with Enterprise Certificate
 
-The sample uses Enterprise Certificate as secret and is a modification of the [HelseId.Samples.ClientCredentials](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.ClientCredentials) sample. See [HelseId.Samples.EnterpriseCertificate](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.EnterpriseCertificate).
+A modification of the [HelseId.Samples.ClientCredentials](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.ClientCredentials) sample, where Enterprise Certificate is used as secret. See [HelseId.Samples.EnterpriseCertificate](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.EnterpriseCertificate).
+
+### <a name="RsaJwk"></a> Generate a JSON Web Key (JWK)
+
+A command line program to generate a key pair as a JSON Web Key (JWK). The sample creates two files where the first file contains the whole key pair (including the private key), while the second file only contains the public key. See [HelseId.RsaJwk](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.RsaJwk) for a more detailed explanation.
 
 ### <a name="RefreshToken"></a> Refresh Token
 
