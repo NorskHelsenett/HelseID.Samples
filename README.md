@@ -39,7 +39,7 @@ In this sample one can also access the API with a new access token. This is done
 
 #### <a name="APIAccessResourceIndicators"></a> API Access with resource indicators
 
-....
+The sample demonstrate how resource indicators are used to download multiple access tokens without performing multiple calls to the authorization endpoint. Each access token can then be used to call a specified API. See [HelseId.Samples.ResourceIndicatorsDemo](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.Samples.ResourceIndicatorsDemo) for more information.
 
 
 ### <a name="RsaJwk"></a> Generate a JSON Web Key (JWK)
@@ -64,11 +64,11 @@ The sample uses Enterprise Certificate as secret and is a modification of the [H
 
 ### <a name="RefreshToken"></a> Refresh Token
 
-The sample demonstrates refresh tokens in HelseID. See [HelseId.Samples.RefreshTokenDemo](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.RefreshTokenDemo).
+Simple demonstration of refresh tokens. See [HelseId.Samples.RefreshTokenDemo](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.RefreshTokenDemo).
 
 ### <a name="TokenExchange"></a> Token Exchange
 
-The sample demonstrates how a token exchange is performed in HelseID. See [HelseId.Samples.TokenExchangeDemo](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.TokenExchangeDemo).
+Simple demonstration of token exchange. See [HelseId.Samples.TokenExchangeDemo](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.TokenExchangeDemo).
 
 ### <a name="RequestObjects"></a> Request Objects
 
