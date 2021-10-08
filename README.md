@@ -12,8 +12,9 @@ A client needs be registered in the HelseID Server Configuration before running 
     2. [API Access with resource indicators](#APIAccessResourceIndicators)
 4. [Generate a JSON Web Key (JWK)](#RsaJwk)
 5. [Client Credentials Grant](#ClientCredentials)
-    1. [Client Credentials with JWK](#ClientCredentials.Jwk)
-    2. [Client Credentials with Enterprise Certificate](#ClientCredentials.EnterpriseCertificate)
+    1. [Client Credentials with Child Organization](#ClientCredentials.WithChildOrg)
+    2. [Client Credentials with JWK](#ClientCredentials.Jwk)
+    3. [Client Credentials with Enterprise Certificate](#ClientCredentials.EnterpriseCertificate)
 6. [Refresh Token](#RefreshToken)
 7. [Token Exchange](#TokenExchange)
 8. [Request Objects](#RequestObjects)
@@ -48,6 +49,10 @@ A command line program to generate a key pair as a JSON Web Key (JWK). The sampl
 ### <a name="ClientCredentials"></a> Client Credentials Grant
 
 The client credentials grant type is commonly used for server-to-server interactions that must run in the background, without immediate interaction with a user. The sample demonstrates how to generate a signed JSON Web Token (JWT) that is used to request access to a web-server. An access token is returned and written to the console if the request was approved. See [HelseId.Samples.ClientCredentials](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.ClientCredentials).
+
+#### <a name="ClientCredentials.WithChildOrg"></a> Client Credentials with Child Organization
+
+A modification of the [HelseId.Samples.ClientCredentials](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.ClientCredentials) sample, where a child organization is added as well. See [HelseId.Samples.ClientCredentialsWithUnderenhet](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.Samples.ClientCredentialsWithUnderenhet).
 
 #### <a name="ClientCredentials.Jwk"></a> Client Credentials with JWK
 
