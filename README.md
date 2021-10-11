@@ -21,19 +21,19 @@ HelseID is a national authentication service for the health sector in Norway. Th
 
 ### <a name="ClientAuthentication"></a> Client Authentication
 
-The sample demonstrates how a client can be authenticated through HelseID by using a Json Web Key (JWK) pair. See [HelseId.ClientAuthentication](https://github.com/ingvildaadde/Samples/tree/main/ClientAuthentication) for a more detailed explanation of the authentication process.
+The sample demonstrates how a client can be authenticated through HelseID by using a Json Web Key (JWK) pair. See [HelseId.ClientAuthentication](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.ClientAuthentication) for a more detailed explanation of the authentication process.
 
 ### <a name="SampleAPI"></a> Sample API
 
-Some of the HelseID samples demonstrate how a client can access an API. Thus, a sample API have been created such that other HelseID samples can access it. The API requires authentication before the client is granted access. The API should be run locally before trying to connect through another HelseID sample. See [HelseId.SampleAPI](https://github.com/ingvildaadde/Samples/tree/main/SampleAPI) for a more detailed explanation.  
+Some of the HelseID samples demonstrate how a client can access an API. Thus, a sample API have been created such that other HelseID samples can access it. The API requires authentication before the client is granted access. The API should be run locally before trying to connect through another HelseID sample. See [HelseId.SampleAPI](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.SampleAPI) for a more detailed explanation.  
 
 ### <a name="APIAccess"></a> API Access
 
-The sample demonstrate how a client can be authenticated through HelseID and get access to the restricted [Sample API](https://github.com/ingvildaadde/Samples/tree/main/SampleAPI) with one access token. See [HelseId.APIAccess](https://github.com/ingvildaadde/Samples/tree/main/ClientAuthenticationWithAPIAccess) for a more detailed explanation.
+The sample demonstrate how a client can be authenticated through HelseID and get access to the restricted [Sample API](https://github.com/ingvildaadde/Samples/tree//SampleAPI) with one access token. See [HelseId.APIAccess](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.APIAccess) for a more detailed explanation.
 
 #### <a name="APIAccessNewToken"></a> API Access with new access token
 
-In this sample one can also access the API with a new access token. This is done to make sure that the token has as few scopes/accesses as possible. See [HelseId.APIAccessNewToken](https://github.com/ingvildaadde/Samples/tree/main/ClientAuthenticationAPIAccessNewToken) for a more detailed explanation.
+In this sample one can also access the API with a new access token. This is done to make sure that the token has as few scopes/accesses as possible. See [HelseId.APIAccessNewToken](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.APIAccessNewToken) for a more detailed explanation.
 
 #### <a name="APIAccessResourceIndicators"></a> API Access with resource indicators
 
@@ -41,7 +41,7 @@ The sample demonstrate how resource indicators are used to download multiple acc
 
 ### <a name="ClientCredentials"></a> Client Credentials Grant
 
-Simple demonstration of client credentials grant. See [HelseId.Samples.ClientCredentials](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.ClientCredentials) for more information.
+Simple demonstration of client credentials grant. See [HelseId.Samples.ClientCredentials](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.Samples.ClientCredentials) for more information.
 
 #### <a name="ClientCredentials.WithChildOrg"></a> Client Credentials with Child Organization
 
@@ -49,31 +49,31 @@ A modification of the [HelseId.Samples.ClientCredentials](https://github.com/Nor
 
 #### <a name="ClientCredentials.Jwk"></a> Client Credentials with JWK
 
-A modification of the [HelseId.Samples.ClientCredentials](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.ClientCredentials) sample, where JWK is used as secret. See [HelseId.Samples.ClientCredentials.Jwk](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.ClientCredentials.Jwk) for more information.
+A modification of the [HelseId.Samples.ClientCredentials](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.ClientCredentials) sample, where JWK is used as secret. See [HelseId.Samples.ClientCredentials.Jwk](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.Samples.ClientCredentials.Jwk) for more information.
 
 #### <a name="ClientCredentials.EnterpriseCertificate"></a> Client Credentials with Enterprise Certificate
 
-A modification of the [HelseId.Samples.ClientCredentials](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.ClientCredentials) sample, where Enterprise Certificate is used as secret. See [HelseId.Samples.EnterpriseCertificate](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.EnterpriseCertificate).
+A modification of the [HelseId.Samples.ClientCredentials](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.ClientCredentials) sample, where Enterprise Certificate is used as secret. See [HelseId.Samples.EnterpriseCertificate](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.Samples.EnterpriseCertificate).
 
 ### <a name="RsaJwk"></a> Generate a JSON Web Key (JWK)
 
-A command line program to generate a key pair as a JSON Web Key (JWK). The sample creates two files where the first file contains the whole key pair (including the private key), while the second file only contains the public key. See [HelseId.RsaJwk](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.RsaJwk) for a more detailed explanation.
+A command line program to generate a key pair as a JSON Web Key (JWK). The sample creates two files where the first file contains the whole key pair (including the private key), while the second file only contains the public key. See [HelseId.RsaJwk](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.RsaJwk) for a more detailed explanation.
 
 ### <a name="RefreshToken"></a> Refresh Token
 
-Simple demonstration of refresh tokens. See [HelseId.Samples.RefreshTokenDemo](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.RefreshTokenDemo).
+Simple demonstration of refresh tokens. See [HelseId.Samples.RefreshTokenDemo](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.Samples.RefreshTokenDemo).
 
 ### <a name="TokenExchange"></a> Token Exchange
 
-Simple demonstration of token exchange. See [HelseId.Samples.TokenExchangeDemo](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.TokenExchangeDemo).
+Simple demonstration of token exchange. See [HelseId.Samples.TokenExchangeDemo](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.Samples.TokenExchangeDemo).
 
 ### <a name="RequestObjects"></a> Request Objects
 
-The sample demonstrates how to use request objects for client authentication against HelseID. See [HelseId.Samples.RequestObjectsDemo](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Samples.RequestObjectsDemo).
+The sample demonstrates how to use request objects for client authentication against HelseID. See [HelseId.Samples.RequestObjectsDemo](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.Samples.RequestObjectsDemo).
 
 ### <a name="BFF"></a> BFF
 
-...
+... See [HelseId.Core.BFF.Sample](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.Core.BFF.Sample).
 
 ##
 More info on https://nhn.no/helseid/ (Norwegian) and https://dokumentasjon.helseid.no/
