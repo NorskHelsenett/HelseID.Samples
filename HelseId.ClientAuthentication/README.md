@@ -51,11 +51,11 @@ We are using Grant Type: 'Authorization code' (ReponseType=code), and a ClientId
                     string fileName = "jwk.json";
                     var securityKey = new JsonWebKey(File.ReadAllText(fileName));
 ```
-<strong> NB! </strong> In this sample the private key is stored as a JSON file in the project ("jwk.json"), but <strong> in production environment the private security key MUST be protected and stored at a secure location. </strong>
+<strong> NB! </strong> In this sample the private key is stored as a JSON file inside the project ("jwk.json"). <strong> In production environment the private security key MUST be protected and stored at a secure location. </strong>
 
  The user is authenticated through one of the federated identity providers. Ex: Id-Porten.
 
-#### We get an accsesstoken back to access protected resources:
+#### We get an accsess token back to access protected resources:
 
 
 
