@@ -25,7 +25,7 @@ The sample demonstrates how a client can be authenticated through HelseID by usi
 
 ### <a name="SampleAPI"></a> Sample API
 
-Some of the HelseID samples demonstrate how a client can access an API. Thus, a sample API have been created such that other HelseID samples can access it. The API requires authentication before the client is granted access. The API should be run locally before trying to connect through another HelseID sample. See [HelseId.SampleAPI](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.SampleAPI) for a more detailed explanation.  
+Some of the HelseID samples demonstrate how a client can access an API. Thus, a sample API has been created such that other HelseID samples can access it. The API requires authentication before the client is granted access. The API should be run locally before trying to connect through another HelseID sample. See [HelseId.SampleAPI](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.SampleAPI) for a more detailed explanation.  
 
 ### <a name="APIAccess"></a> API Access
 
