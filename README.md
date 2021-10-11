@@ -29,7 +29,7 @@ Some of the HelseID samples demonstrate how a client can access an API. Thus, a 
 
 ### <a name="APIAccess"></a> API Access
 
-The sample demonstrate how a client can be authenticated through HelseID and get access to the restricted [Sample API](https://github.com/ingvildaadde/Samples/tree//SampleAPI) with one access token. See [HelseId.APIAccess](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.APIAccess) for a more detailed explanation.
+The sample demonstrate how a client can be authenticated through HelseID and get access to the restricted [Sample API](https://github.com/ingvildaadde/Samples/tree//SampleAPI) with an access token. See [HelseId.APIAccess](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.APIAccess) for a more detailed explanation.
 
 #### <a name="APIAccessNewToken"></a> API Access with new access token
 
