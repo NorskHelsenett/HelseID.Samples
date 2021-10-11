@@ -21,7 +21,7 @@ HelseID is a national authentication service for the health sector in Norway. Th
 
 ### <a name="ClientAuthentication"></a> Client Authentication
 
-The sample demonstrates how a client can be authenticated through HelseID by using a Json Web Key pair. See [HelseId.ClientAuthentication](https://github.com/ingvildaadde/Samples/tree/main/ClientAuthentication) for a more detailed explanation of the authentication process.
+The sample demonstrates how a client can be authenticated through HelseID by using a Json Web Key (JWK) pair. See [HelseId.ClientAuthentication](https://github.com/ingvildaadde/Samples/tree/main/ClientAuthentication) for a more detailed explanation of the authentication process.
 
 ### <a name="SampleAPI"></a> Sample API
 
