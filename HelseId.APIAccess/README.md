@@ -4,9 +4,9 @@
 
 In order to successfully access the API you need to:
 
-#### 1. Run the [Sample API](https://github.com/HelseID/HelseID.Samples/tree/master/HelseId.Core.MVCHybrid.API.Sample) such that an API is available for access requests.
+#### 1. Run the [Sample API](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.SampleAPI) such that an API is available for access requests.
 
-Use the URL of the API that appears in the browser as input for the ApiUrl in `appsettings.json` of the [API Access](https://github.com/HelseID/HelseID.Samples/tree/master/HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccess.Sample) solution. Remember to add the API to the Scope as well.
+Use the URL of the API that appears in the browser as input for the ApiUrl in `appsettings.json` of the [API Access](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.APIAccess) solution. Remember to add the API to the Scope as well.
 
 ```csharp
          "AllowedHosts": "*",
@@ -21,7 +21,7 @@ Use the URL of the API that appears in the browser as input for the ApiUrl in `a
 
 #### 2. API Access
 
-Next, we can access the [Sample API](https://github.com/HelseID/HelseID.Samples/tree/master/HelseId.Core.MVCHybrid.API.Sample) by running the [API Access](https://github.com/HelseID/HelseID.Samples/tree/master/HelseId.Core.MVCHybrid.ClientAuthenticationAPIAccess.Sample) solution provided here.
+Next, we can access the [Sample API](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.SampleAPI) by running the [API Access](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.APIAccess) solution provided here.
 
 This is done by reusing the access token we got from authentication.
 
