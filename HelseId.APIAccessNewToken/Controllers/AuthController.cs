@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System.Threading.Tasks;
 using IdentityModel;
-using Microsoft.IdentityModel.Tokens;
 using HelseId.APIAccessNewToken.Models;
 using Newtonsoft.Json.Linq;
 using IdentityModel.OidcClient;
@@ -60,7 +59,7 @@ namespace HelseId.APIAccessNewToken.Controllers
                 ClientId = _settings.ClientId,
                 ClientAssertion = new ClientAssertion() {
                     Type = OidcConstants.ClientAssertionTypes.JwtBearer,
-                    Value = BuildClientAssertion.Generate(_settings.ClientId, disco.TokenEndpoint, new JsonWebKey(System.IO.File.ReadAllText("jwk.json")))
+                    Value = BuildClientAssertion.Generate(_settings.ClientId, disco.TokenEndpoint, "jwk.json")
                 }
                 });
 

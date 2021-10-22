@@ -1,4 +1,3 @@
-using HelseId.APIAccessNewToken;
 using IdentityModel;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -8,9 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.IO;
 using System.Threading.Tasks;
 using System.Net.Http;
 using HelseId.APIAccessNewToken.Models;
@@ -87,19 +84,12 @@ namespace HelseId.APIAccessNewToken
                     // The following handler uses a Signed Jwt for client authentication
                     options.Events.OnAuthorizationCodeReceived = ctx =>
                     {
-
-                        // Reads the private Json Web Key (Jwk) given in a json file ("jwk.json")
-                        string fileName = "jwk.json";
-                        // In production environment the security key must be protected (stored at a secure location)
-                        var securityKey = new JsonWebKey(File.ReadAllText(fileName));
-
                         // Sets the client assertion as a Jwt bearer type
                         ctx.TokenEndpointRequest.ClientAssertionType = OidcConstants.ClientAssertionTypes.JwtBearer;
                         // Asserts a client by using the generated Jwt
-                        ctx.TokenEndpointRequest.ClientAssertion = BuildClientAssertion.Generate(settings.ClientId, settings.Authority, securityKey);
+                        ctx.TokenEndpointRequest.ClientAssertion = BuildClientAssertion.Generate(settings.ClientId, settings.Authority, "jwk.json");
 
                         return Task.CompletedTask;
-
                     };
                 });
         }

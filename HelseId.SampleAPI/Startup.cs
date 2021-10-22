@@ -56,7 +56,8 @@ namespace HelseId.SampleAPI
                     });
 
             services.AddAuthorization(options =>
-            {
+            {   
+                // Verify scopes
                 options.AddPolicy("requireScopeAndUser", policy => policy
                 .RequireClaim("scope", "ingvild:sampleapi/api")
                 .RequireClaim("helseid://claims/identity/pid")
