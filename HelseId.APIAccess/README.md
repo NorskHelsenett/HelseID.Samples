@@ -15,7 +15,7 @@ Use the URL of the API that appears in the browser as input for the ApiUrl in `a
                .
                .
        
-               "Scope": "... ingvild:sampleapi/ ..."
+               "Scope": "... ingvild:sampleapi/api ..."
 ```
 
 

@@ -16,7 +16,7 @@ HelseID is a national authentication service for the health sector in Norway. Th
 6. [Refresh Token](#RefreshToken)
 7. [Token Exchange](#TokenExchange)
 8. [Request Objects](#RequestObjects)
-10. [BFF](#BFF)
+10. [Backend for Frontend (BFF)](#BFF)
 ##
 
 ### <a name="ClientAuthentication"></a> Client Authentication
@@ -71,9 +71,9 @@ Simple demonstration of token exchange. See [HelseId.Samples.TokenExchangeDemo](
 
 The sample demonstrates how to use request objects for client authentication against HelseID. See [HelseId.Samples.RequestObjectsDemo](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.Samples.RequestObjectsDemo).
 
-### <a name="BFF"></a> BFF
+### <a name="BFF"></a> Backend for Frontend (BFF)
 
-... See [HelseId.Core.BFF.Sample](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.Core.BFF.Sample).
+See [HelseId.Core.BFF.Sample](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.Core.BFF.Sample).
 
 ##
 More info on https://nhn.no/helseid/ (Norwegian) and https://dokumentasjon.helseid.no/
