@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Linq;
 
-namespace HelseId.SampleAPI
+namespace HelseId.SampleAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -16,6 +17,7 @@ namespace HelseId.SampleAPI
         {
             _logger = logger;
         }
+
 
         [HttpGet]
         public ActionResult Get()

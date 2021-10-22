@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,7 +25,11 @@ namespace HelseId.SampleAPI
             // Create singleton from instance
             services.AddSingleton<Settings>(settings);
 
-            services.AddControllers();
+            services.AddHttpClient();
+
+            services.AddMvc(option => option.EnableEndpointRouting = false);
+            MvcOptions opt = new MvcOptions();
+            opt.EnableEndpointRouting = false;
 
             // Adding Cross Origin Resource Sharing (CORS) to the container.
             // CORS allows a server to make cross-domain calls from specified domains, while rejecting others.
@@ -38,7 +43,6 @@ namespace HelseId.SampleAPI
                     .AddJwtBearer("token", options =>
                     {
                         options.RequireHttpsMetadata = true;
-
                         options.Authority = settings.Authority;
                         options.Audience = settings.ApiName;
 
@@ -78,14 +82,11 @@ namespace HelseId.SampleAPI
             });
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseMvcWithDefaultRoute();
         }
     }
 }
