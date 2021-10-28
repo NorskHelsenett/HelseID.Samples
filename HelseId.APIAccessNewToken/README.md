@@ -1,7 +1,7 @@
 
 ## API Access With New Token
 
-#### This sample builds upon [API Access](https://github.com/NorskHelsenett/HelseID.Samples/tree/Ingvild-samples/HelseId.APIAccess). Only API acccess with new access token is different.
+#### This sample builds upon [API Access](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.APIAccess). Only API acccess with new access token is different.
 
 #### API Access with new access token
 
