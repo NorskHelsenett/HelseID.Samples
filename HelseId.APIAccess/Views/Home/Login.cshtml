@@ -1,0 +1,35 @@
+@using Microsoft.AspNetCore.Authentication
+
+<h2>API Test</h2>
+<p>Click the button to check if the logged in user can access the API. </p>
+
+<div class="panel">
+      <br\>
+        <a class="btn btn-primary" href="~/home/callapi">Call API</a>
+      <br\>
+</div>
+<pre>
+
+
+</pre>
+
+<h2>Claims</h2>
+
+<dl>
+    @foreach (var claim in User.Claims)
+    {
+        <dt>@claim.Type</dt>
+        <dd>@claim.Value</dd>
+    }
+</dl>
+
+
+<h2>Properties</h2>
+
+<d1>
+    @foreach (var prop in (await Context.AuthenticateAsync()).Properties.Items)
+    {
+        <dt>@prop.Key</dt>
+        <dd>@prop.Value</dd>
+    }
+</d1>
