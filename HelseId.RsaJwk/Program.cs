@@ -70,6 +70,7 @@ namespace HelseId.RsaJwk
         {
             var key = RSA.Create(keySize);
             var securityKey = new RsaSecurityKey(key);
+            securityKey.KeyId = Guid.NewGuid().ToString().Replace("-", string.Empty);
             var jwk = JsonWebKeyConverter.ConvertFromRSASecurityKey(securityKey);
             var privateJwk = new JsonWebKey
             {
@@ -82,12 +83,16 @@ namespace HelseId.RsaJwk
                 P = jwk.P,
                 Q = jwk.Q,
                 QI = jwk.QI,
+                Kid = jwk.Kid,
+                Use = "sig",
             };
             var publicJwk = new JsonWebKey
             {
                 Kty = jwk.Kty,
                 N = jwk.N,
                 E = jwk.E,
+                Kid = jwk.Kid,
+                Use = "sig",
             };
 
             return (privateJwk, publicJwk);
@@ -97,6 +102,7 @@ namespace HelseId.RsaJwk
         {
             var key = ECDsa.Create(ECCurve.NamedCurves.nistP521);
             var securityKey = new ECDsaSecurityKey(key);
+            securityKey.KeyId = Guid.NewGuid().ToString().Replace("-", string.Empty);
             var jwk = JsonWebKeyConverter.ConvertFromECDsaSecurityKey(securityKey);
             var privateJwk = new JsonWebKey
             {
@@ -104,14 +110,18 @@ namespace HelseId.RsaJwk
                 D = jwk.D,
                 Crv = jwk.Crv,
                 X = jwk.X,
-                Y = jwk.Y
+                Y = jwk.Y,
+                Kid = jwk.Kid,
+                Use = "sig",
             };
             var publicJwk = new JsonWebKey
             {
                 Kty = jwk.Kty,
                 Crv = jwk.Crv,
                 X = jwk.X,
-                Y = jwk.Y
+                Y = jwk.Y,
+                Kid = jwk.Kid,
+                Use = "sig",
             };
 
             return (privateJwk, publicJwk);
