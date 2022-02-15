@@ -45,7 +45,8 @@ namespace HelseId.Demo.ClientCredentials.Jwk
                     {
                         Type = ClientAssertionTypes.JwtBearer,
                         Value = BuildClientAssertion(disco, _clientId)
-                    }
+                    },
+                    ClientCredentialStyle = ClientCredentialStyle.PostBody
                 });
 
                 if (response.IsError)

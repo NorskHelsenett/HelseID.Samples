@@ -43,7 +43,8 @@ namespace HelseId.Samples.ClientCredentials
                 Address = TokenEndpoint,
                 ClientId = ClientId,
                 Scope = Scope,
-                ClientAssertion = new ClientAssertion { Value = clientAssertion, Type = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer" }
+                ClientAssertion = new ClientAssertion { Value = clientAssertion, Type = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer" },
+                ClientCredentialStyle = ClientCredentialStyle.PostBody
             };
 
             var result = await new HttpClient().RequestClientCredentialsTokenAsync(request);

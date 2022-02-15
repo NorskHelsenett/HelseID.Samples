@@ -55,7 +55,8 @@ namespace HelseId.Samples.EnterpriseCertificate
                 Address = TokenEndpoint,
                 ClientId = ClientId,
                 Scope = Scope,
-                ClientAssertion = new ClientAssertion { Value = clientAssertion, Type = IdentityModel.OidcConstants.ClientAssertionTypes.JwtBearer }
+                ClientAssertion = new ClientAssertion { Value = clientAssertion, Type = IdentityModel.OidcConstants.ClientAssertionTypes.JwtBearer },
+                ClientCredentialStyle = ClientCredentialStyle.PostBody
             };
 
             var result = await new HttpClient().RequestClientCredentialsTokenAsync(request);
