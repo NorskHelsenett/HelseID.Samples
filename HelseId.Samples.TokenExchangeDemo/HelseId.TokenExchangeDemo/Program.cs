@@ -107,6 +107,7 @@ namespace HelseId.RefreshTokenDemo
                     Type = OidcConstants.ClientAssertionTypes.JwtBearer,
                     Value = BuildClientAssertion(ActorClientId, _discoveryDocument, GetEnterpriseCertificateSecurityKey())
                 },
+                ClientCredentialStyle = ClientCredentialStyle.PostBody,
                 ClientId = ActorClientId,
                 Scope = "e-helse:nasjonalt_api/scope",
                 SubjectToken = subjectToken,
