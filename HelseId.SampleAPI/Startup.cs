@@ -76,10 +76,10 @@ namespace HelseId.SampleAPI
             services.AddAuthorization(options =>
             {   
                 // Verify scopes for user
-                options.AddPolicy("requireScopeAndUser", policy => policy
-                .RequireClaim("scope", "ingvild:sampleapi/api")
+                options.AddPolicy("auth_code_policy", policy => policy
+                .RequireClaim("scope", settings.AuthCodeApiScope)
                 .RequireClaim("helseid://claims/identity/pid")
-                .RequireClaim("helseid://claims/identity/assurance_level", "high"));
+                .RequireClaim("helseid://claims/identity/security_level", "4"));
 
                 // Verify scopes for client credentials
                 options.AddPolicy("client_credentials_policy", policy => policy

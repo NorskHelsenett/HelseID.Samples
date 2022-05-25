@@ -7,7 +7,7 @@ namespace HelseId.SampleAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize(Policy="requireScopeAndUser")] // Authentication is needed to access the API
+    [Authorize(Policy= "auth_code_policy")] // Authentication is needed to access the API
     public class ApiController: ControllerBase
     {
         private readonly ILogger<ApiController> _logger;
