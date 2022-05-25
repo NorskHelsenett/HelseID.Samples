@@ -6,5 +6,6 @@ namespace HelseId.SampleAPI
         public string ApiName { get; set; }
         public string ClientCredentialsApiScope { get; set; }
         public string ClientCredentialsApiName { get; set; }
+        public string AuthCodeApiScope { get; set; }
     }
 }
