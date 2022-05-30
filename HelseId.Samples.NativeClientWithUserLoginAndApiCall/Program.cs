@@ -168,7 +168,7 @@ namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
                 new Claim(JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N")),
             };
 
-            var credentials = new JwtSecurityToken(clientId, disco.TokenEndpoint, claims, DateTime.UtcNow, DateTime.UtcNow.AddSeconds(60), GetClientAssertionSigningCredentials());
+            var credentials = new JwtSecurityToken(clientId, disco.Issuer, claims, DateTime.UtcNow, DateTime.UtcNow.AddSeconds(60), GetClientAssertionSigningCredentials());
 
             var tokenHandler = new JwtSecurityTokenHandler();
             return tokenHandler.WriteToken(credentials);
