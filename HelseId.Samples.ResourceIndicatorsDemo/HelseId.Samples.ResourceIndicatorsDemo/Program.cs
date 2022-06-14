@@ -38,7 +38,7 @@ namespace HelseId.RefreshTokenDemo
         const string StsUrl = "https://helseid-sts.test.nhn.no";
 
         const string firstResource = "e-helse:sfm.api";
-        const string secondResource = "kjernejournal.api";
+        const string secondResource = "nhn:kjernejournal";
 
 
         static async Task Main()
@@ -64,7 +64,7 @@ namespace HelseId.RefreshTokenDemo
                     Authority = StsUrl,
                     LoadProfile = false,
                     RedirectUri = "http://localhost:8089/callback",
-                    Scope = "openid profile offline_access e-helse:sfm.api/sfm.api https://ehelse.no/kjernejournal/kj_api",
+                    Scope = "openid profile offline_access e-helse:sfm.api/sfm.api nhn:kjernejournal/api",
                     ClientId = ClientId,
                     Resource = new List<string> { firstResource, secondResource },
                     ClientAssertion = clientAssertionPayload,                   
