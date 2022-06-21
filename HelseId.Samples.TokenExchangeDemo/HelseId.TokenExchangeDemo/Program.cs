@@ -23,7 +23,7 @@ namespace HelseId.RefreshTokenDemo
         const string Localhost = "http://localhost:8089";
         const string RedirectUrl = "/callback";
         const string StartPage = "/start";
-        const string StsUrl = "https://localhost:44366";
+        const string StsUrl = "https://helseid-sts.test.nhn.no/";
 
         static DiscoveryDocumentResponse _discoveryDocument;
 
@@ -49,8 +49,24 @@ namespace HelseId.RefreshTokenDemo
                 // Everything below this line would be done by the API that receives the call from the client (subject)
                 var subjectAccessToken = loginResult.AccessToken;
 
+                Console.WriteLine(loginResult.AccessToken);
+                Console.WriteLine();
+                Console.WriteLine(loginResult.IdentityToken);
+
+
                 // Perform the token exchange process as a separate client
-                var exchangeResponse = await PerformTokenExchange(subjectAccessToken);
+
+                var sw = Stopwatch.StartNew();
+                TokenResponse exchangeResponse = null;
+                for (var n = 0; n < 100; n++)
+                {
+                    exchangeResponse = await PerformTokenExchange(subjectAccessToken);
+                    Console.WriteLine(n);
+                }
+                sw.Stop();
+
+                Console.WriteLine("Average: " + sw.ElapsedMilliseconds / 100f + " ms");
+
                 if (exchangeResponse.IsError)
                 {
                     throw new Exception(exchangeResponse.Error);
@@ -107,6 +123,7 @@ namespace HelseId.RefreshTokenDemo
                     Type = OidcConstants.ClientAssertionTypes.JwtBearer,
                     Value = BuildClientAssertion(ActorClientId, _discoveryDocument, GetEnterpriseCertificateSecurityKey())
                 },
+                ClientCredentialStyle = ClientCredentialStyle.PostBody,
                 ClientId = ActorClientId,
                 Scope = "e-helse:nasjonalt_api/scope",
                 SubjectToken = subjectToken,
@@ -188,8 +205,15 @@ namespace HelseId.RefreshTokenDemo
 
         private static SecurityKey GetEnterpriseCertificateSecurityKey()
         {
-            var certificate = new X509Certificate2(@"GothamSykehus.p12", "bMKXs98yOizPLHVQ");
+            //var certificate = new X509Certificate2(@"GothamSykehus.p12", "bMKXs98yOizPLHVQ");
+            //return new X509SecurityKey(certificate);
+
+            var certificate = new X509Certificate2(@"C:\Temp\sfm seid2\Buypass ID-NORSK HELSENETT SF-serienummer1887555421414519331987773-2022-01-04.p12", "K7uXvp714hGPJJ7H");
             return new X509SecurityKey(certificate);
+            //var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha512);
+
+
+
         }
 
         private static async Task<string> RunLocalWebBrowserUntilCallback(string localhost, string redirectUrl, string startPage, AuthorizeState state)

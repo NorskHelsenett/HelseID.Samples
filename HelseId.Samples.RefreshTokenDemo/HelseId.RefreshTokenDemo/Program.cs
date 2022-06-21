@@ -20,7 +20,7 @@ namespace HelseId.RefreshTokenDemo
         const string Localhost = "http://localhost:8089";
         const string RedirectUrl = "/callback";
         const string StartPage = "/start";
-        const string StsUrl = "https://helseid-sts.test.nhn.no";
+        const string StsUrl = "https://localhost:44366";
 
         static async Task Main()
         {
@@ -37,7 +37,7 @@ namespace HelseId.RefreshTokenDemo
                 {
                     Authority = StsUrl,
                     RedirectUri = "http://localhost:8089/callback",
-                    Scope = "openid profile helseid://scopes/identity/pid offline_access",
+                    Scope = "openid profile helseid://scopes/identity/pid helseid://scopes/identity/security_level udelt:test-api/api offline_access",
                     ClientId = ClientId,
                     Flow = OidcClientOptions.AuthenticationFlow.AuthorizationCode,
                     Policy = new Policy { RequireAccessTokenHash = true, RequireAuthorizationCodeHash = true, ValidateTokenIssuerName = true },                    

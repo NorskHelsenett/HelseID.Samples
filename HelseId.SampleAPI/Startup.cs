@@ -38,7 +38,7 @@ namespace HelseId.SampleAPI
             // Stores items in memory.
             services.AddDistributedMemoryCache();
 
-            // Adds the authentication scheme to be used. In this case an access token is used for authentication.
+            // Adds the authentication scheme to be used for bearer tokens with user information.
             services.AddAuthentication("token")
                     .AddJwtBearer("token", options =>
                     {
@@ -55,13 +55,35 @@ namespace HelseId.SampleAPI
                         options.TokenValidationParameters.RequireAudience = true;
                     });
 
+
+            // Adds the authentication scheme to be used for bearer tokens with NO user information.
+            services.AddAuthentication("client_credentials_scheme")
+                   .AddJwtBearer("client_credentials_scheme", options =>
+                   {
+                       options.RequireHttpsMetadata = true;
+                       options.Authority = settings.Authority;
+                       options.Audience = settings.ClientCredentialsApiName;
+
+                        // Validation parameters in agreement with HelseIDs requirements (https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/284229708/Guidelines+for+using+JSON+Web+Tokens+JWTs)
+                        options.TokenValidationParameters.ValidateLifetime = true;
+                       options.TokenValidationParameters.ValidateIssuer = true;
+                       options.TokenValidationParameters.ValidateAudience = true;
+                       options.TokenValidationParameters.RequireSignedTokens = true;
+                       options.TokenValidationParameters.RequireExpirationTime = true;
+                       options.TokenValidationParameters.RequireAudience = true;
+                   });
+
             services.AddAuthorization(options =>
             {   
-                // Verify scopes
-                options.AddPolicy("requireScopeAndUser", policy => policy
-                .RequireClaim("scope", "ingvild:sampleapi/api")
+                // Verify scopes for user
+                options.AddPolicy("auth_code_policy", policy => policy
+                .RequireClaim("scope", settings.AuthCodeApiScope)
                 .RequireClaim("helseid://claims/identity/pid")
-                .RequireClaim("helseid://claims/identity/assurance_level", "high"));
+                .RequireClaim("helseid://claims/identity/security_level", "4"));
+
+                // Verify scopes for client credentials
+                options.AddPolicy("client_credentials_policy", policy => policy
+                    .RequireClaim("scope", settings.ClientCredentialsApiScope));
             });
         }
 

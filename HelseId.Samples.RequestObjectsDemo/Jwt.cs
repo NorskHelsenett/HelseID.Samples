@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.Json;
 using IdentityModel;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
@@ -29,8 +30,13 @@ namespace HelseId.RequestObjectsDemo
             
             var payload = CreatePayload(clientId, audience, extraClaims);
             var header = new JwtHeader(signingCredentials);
-            UpdateJwtHeader(securityKey, header);
-            
+       //     UpdateJwtHeader(securityKey, header);
+
+            JsonExtensions.Serializer = o => {
+                return Newtonsoft.Json.JsonConvert.SerializeObject(o);
+            };
+         
+
             var tokenHandler = new JwtSecurityTokenHandler();
             return tokenHandler.WriteToken(new JwtSecurityToken(header, payload));
         }
@@ -46,8 +52,11 @@ namespace HelseId.RequestObjectsDemo
 
             if (claims == null)
             {
-                return payload;
+                claims = new List<Claim>();
             }
+
+            claims.Add(new Claim(JwtClaimTypes.Subject, clientId));
+            claims.Add(new Claim(JwtClaimTypes.ClientId, clientId));
 
             var jsonClaims = claims.Where(x => x.ValueType == "json");
             var normalClaims = claims.Except(jsonClaims);

@@ -2,11 +2,13 @@ using IdentityModel;
 using IdentityModel.Client;
 using IdentityModel.OidcClient;
 using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -33,7 +35,7 @@ namespace HelseId.RequestObjectsDemo
 
                 // The child organization number is provided by the EPJ
                 const string childOrgNo = "999977775";
-                               
+
                 var disco = await new HttpClient().GetDiscoveryDocumentAsync(stsUrl);
                 if (disco.IsError)
                 {
@@ -57,13 +59,13 @@ namespace HelseId.RequestObjectsDemo
                 var requestObject = GetRequestObjectsPayload(clientId, stsUrl, childOrgNo);
 
                 // Authenticate with HelseID using the request object via the system browser
-                var state = await oidcClient.PrepareLoginAsync(requestObject);
+                var state = await oidcClient.PrepareLoginAsync();
                 var response = await AuthorizeWithRequestObjects(localhost, redirectUrl, startPage, state);
 
                 // Setup a client assertion - this will authenticate the organization
                 // This request is done from the client to the server without using
                 // a web browser
-                var clientAssertionPayload = GetClientAssertionPayload(clientId, disco);
+                var clientAssertionPayload = GetClientAssertionPayload(clientId, disco, true);
                 var loginResult = await oidcClient.ProcessResponseAsync(response, state, clientAssertionPayload);
 
                 if (loginResult.IsError)
@@ -71,12 +73,35 @@ namespace HelseId.RequestObjectsDemo
                     throw new Exception(loginResult.Error);
                 }
 
-                // The access token can now be used when calling an api
-                // It contains the user id, the security level, the organization number 
+                var token = new JsonWebTokenHandler().ReadJsonWebToken(loginResult.IdentityToken);
+
+                Console.WriteLine("PID: " + token.GetClaim("helseid://claims/identity/pid").Value);
+                Console.WriteLine("SL: " + token.GetClaim("helseid://claims/identity/security_level").Value);
+
+                //The access token can now be used when calling an api
+                //It contains the user id, the security level, the organization number
                 // and the child organization
                 // Copy the access token and paste it at https://jwt.ms to decode it
                 Console.WriteLine("Access token:");
                 Console.WriteLine(loginResult.AccessToken);
+                Console.WriteLine();
+                Console.WriteLine("ID Token:");
+                Console.WriteLine(loginResult.IdentityToken);
+
+                var rt = await new HttpClient().RequestRefreshTokenAsync(new RefreshTokenRequest
+                {
+                    RefreshToken = loginResult.RefreshToken,
+                    Address = disco.TokenEndpoint,
+                    ClientAssertion = new ClientAssertion
+                    {
+                        Type = OidcConstants.ClientAssertionTypes.JwtBearer,
+                        Value = GetClientAssertionPayload(clientId, disco, true)["client_assertion"]
+                    }
+                });
+
+                Console.WriteLine();
+                Console.WriteLine("RT Access Token:");
+                Console.WriteLine(rt.AccessToken);
             }
             catch (Exception ex)
             {
@@ -110,8 +135,9 @@ namespace HelseId.RequestObjectsDemo
             var requestObject = BuildRequestObject(clientId, stsUrl, childOrgNo);
             return new Dictionary<string, string>
                 {
-                    { "request", requestObject },
-                //{ "prompt", "login" }
+                   { "request", requestObject },
+               { "prompt", "login" },
+             //  {"acr_values", "idp:helseplattformen-oidc" }
                 };
         }
 
@@ -148,7 +174,13 @@ namespace HelseId.RequestObjectsDemo
                 //{ "value", "NO:ORGNR:999977774:999977775" }
                 //{ "value", "NO:ORGNR:925820695:999977775" }
             };
-            
+            //            var orgNumberDetails = new Dictionary<string, string>
+            //{
+            //    { "system", "urn:oid:2.16.578.1.12.4.1.2.101" },
+            //    { "type", "ENH" },
+            //    { "value", "999977775" }
+            //};
+
             var identifier = new Dictionary<string, object>
             {
                 { "identifier", orgNumberDetails }
@@ -165,31 +197,89 @@ namespace HelseId.RequestObjectsDemo
                 { "practitioner_role", organization }
             };
 
-            var serialized = JsonConvert.SerializeObject(authorizationDetails);
+
+
+            //var contextRoles = new Dictionary<string, object>
+            //{
+            //    { "type", "amk/context" },
+            //    { "value", new Dictionary<string, object>
+            //        {
+            //            {"name", "role1" },
+            //        }
+            //    }
+            //};
+
+
+            var contextRoles = new
+            {
+                type = "helseid://claims/external/amk-context",
+                value = new
+                {
+                    roles = new[]
+                    {
+                        new { name = "role4"},
+                        new { name = "role5"},
+                        new { name = "role6"},
+                    }
+                }
+            };
+
+            var kjOrg = new
+            {
+                type = "helseid://claims/external/nilar-org",
+                value = new
+                {
+                    parentOrg = "999888777",
+                    childOrg = "999777666"
+                }
+            };
+
+
+
+
+            var serialized = JsonConvert.SerializeObject(new object[] { authorizationDetails, contextRoles, kjOrg });
 
             var claims = new List<Claim>
             {
                 new Claim("authorization_details", serialized, "json")
             };
 
-            var token = Jwt.Generate(clientId, 
-                audience, 
-                GetSecurityKey(), 
+            var token = Jwt.Generate(clientId,
+                audience,
+                GetSecurityKey(),
                 claims);
 
             return token;
         }
 
-        private static Dictionary<string, string> GetClientAssertionPayload(string clientId, DiscoveryDocumentResponse disco)
+        private static Dictionary<string, string> GetClientAssertionPayload(string clientId, DiscoveryDocumentResponse disco, bool include = true)
         {
             var claims = new List<Claim>
             {
-                new Claim(JwtClaimTypes.Subject, clientId),
                 new Claim(JwtClaimTypes.IssuedAt, DateTimeOffset.Now.ToUnixTimeSeconds().ToString()),
                 new Claim(JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N"))
             };
 
-            var clientAssertion = Jwt.Generate(clientId, 
+
+            var kjOrg = new
+            {
+                type = "helseid://claims/external/nilar-org",
+                value = new
+                {
+                    parentOrg = "444444",
+                    childOrg = "333333"
+                }
+            };
+
+            var serialized = JsonConvert.SerializeObject(new object[] { kjOrg });
+
+            if (include)
+            {
+                claims.Add(new Claim("authorization_details", serialized, "json"));
+            }
+
+
+            var clientAssertion = Jwt.Generate(clientId,
                 disco.TokenEndpoint,
                 GetSecurityKey(),
                 claims);
@@ -209,6 +299,7 @@ namespace HelseId.RequestObjectsDemo
             rsa.FromXmlString(rsaPrivateKey);
 
             return new RsaSecurityKey(rsa.ExportParameters(true));
-        }     
+        }
+
     }
 }
