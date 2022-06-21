@@ -21,10 +21,14 @@ namespace HelseId.RequestObjectsDemo
             try
             {
                 // These values should go into a configuration file
-                const string clientId = "ro-demo";
-                const string localhost = "http://localhost:8089";
+                //const string clientId = "7ba9e4de-c2a7-4f9b-9118-f1286b141b72";
+                //const string clientId = "47e44e6e-80d2-4c0b-8d2c-47e3be4663c2";
+                const string clientId = "583c7a2b-c294-4ca8-96cb-6336b7d5e0fe"; // uten validering i test
+                //const string clientId = "af489a58-6764-4571-a724-5aa2fab79b04"; // med validering i test
+                const string localhost = "http://localhost:8090";
                 const string redirectUrl = "/callback";
                 const string startPage = "/start";
+                //const string stsUrl = "https://helseid-int-sts.test.nhn.no";
                 const string stsUrl = "https://helseid-sts.test.nhn.no";
 
                 // The child organization number is provided by the EPJ
@@ -41,7 +45,8 @@ namespace HelseId.RequestObjectsDemo
                 {
                     Authority = stsUrl,
                     RedirectUri = localhost + redirectUrl,
-                    Scope = "openid profile",
+//                    Scope = "openid profile v4ok:v4utentillitmedriktigorgnummer/api",
+                    Scope = "openid profile v4ok:v4medtillitmedriktigorgnummer/api",
                     ClientId = clientId,
                     Flow = OidcClientOptions.AuthenticationFlow.AuthorizationCode,
                     Policy = new Policy { RequireAccessTokenHash = true, RequireAuthorizationCodeHash = true, ValidateTokenIssuerName = true },
@@ -136,9 +141,12 @@ namespace HelseId.RequestObjectsDemo
 
             var orgNumberDetails = new Dictionary<string, string>
             {
-                { "system", "urn:oid:2.16.578.1.12.4.1.2.101" },
+                //{ "system", "urn:oid:2.16.578.1.12.4.1.2.101" },
+                { "system", "urn:oid:1.0.6523"},
                 { "type", "ENH" },
-                { "value", childOrgNo }
+                { "value", "NO:ORGNR:999977773:999977775" }
+                //{ "value", "NO:ORGNR:999977774:999977775" }
+                //{ "value", "NO:ORGNR:925820695:999977775" }
             };
             
             var identifier = new Dictionary<string, object>
