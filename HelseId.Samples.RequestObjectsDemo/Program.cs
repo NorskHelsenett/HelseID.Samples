@@ -20,17 +20,18 @@ namespace HelseId.RequestObjectsDemo
     {
         static async Task Main(string[] args)
         {
+
             try
             {
+                // NOTE: In a production environment you would use your own private key stored somewhere safe (a vault, a certificate store, a secure database or similar).
+                const string jwkPrivateKey = "{'d':'wUJFbzCvRwDlDyVyCmLmXQy0Xod81R5Cwk8U1vW2cJg1E88dQurAkgGAYcISUJKGW1haCVn-WZqmJm2WXLTjNHvGIH-sZapWqINVuwrl1FF_hQ-Cf2hRCyV8P-eU0tn_GH0gCRS2_ER5AbtDw26JfkHy9Y3ZRrL9EXjH_ZEd-7fNM_g_UelGe1a0xBLrCf80HkZaO-U10MV-iu88kqsUFb3RdIsbykGgrYVHmr87Y6K1DLYzJESQU3z_rJmubSELE6-HWw_gf1zb-FXhb1M3i1fbFlB0muom_BnbyOvOFRhGV5ngi8tyRBaz9BMbtyWLEEJzLorjz7C4iKfelefjjaUh-BinhpZ35j_Ki0aY5rwXjcyxQiciUHdfDcntzu815Rq5vu2lcL7VHz4mIp-X7Er4PfKqlrIgBp52SVJpWI1JEL8c7vA2ABGM9hqqY_Akh6YJmdMwNUpqE_Madr_cI2X3R9D0AxeGYrhwwYx41izST9X8dPrJ9X9w2UGlOCweHBi3Ok8gGIYvZzbi6cmXMkzo5J0-qCTQYDS2Lb6h4YKEVN7TQpp3PjXOfeZrc4AW8pHVjnirMoI7GGioGDMMEMA2n60I2qMmX-nyb5K5OsbWPDqMKZLBdTk5mfNfQvQy6cF5BR25QjxFGvXH0ThWjFaUWCgSBa0O3azzkcG1-b0','dp':'Y9CvDg6yfbZGyE-ycLasng1NLT1_cfiYkMLXa4c9TN2L7Ta1R4sBc4vX4IvZ_kSD3ubHD4q3vKSGxEawD7x-3odyrkamLZPHmkvafrkIZPZWcNqGTZAwqCpHxmodJsJIOkPWI_xn2uD2yU9aAaZEoxTqA7Oac-kLdDPjLKsvCRJcilQyD4kvodoK0n4YKINJM-taLIgsxwA7ZkH2GBlV49ZCvKLRZGERhEiunxncx4LNKUd5CBbKCBTZse8EpdhFxbzRgUxOQZujXaVOzdZB_IUkfDPFsN5Fjf6rYQmbyp1W7rUlqJQ5sqRgZngjrCMUdKCzMhVN7X34IMzUDv8ppQ','dq':'zcQhwDxvPDIPUMbIyyWw5G-tnMueZS8KlSmSTzUaLC9QDOU9RbSK6SbNSP-zahG13IJwtAJ9TqYlmj9AbVpdrXtctdcZkUn_wX5P-Qz6J_w-0xODjM_YB3ma_qYsh4yYoEm4lgS0JZN2F7fnc1rOXpzBjm-jsJyRbulD1K908dy6ui9kuO4FfoWpXwX7Jixqfz55koIm1umSVjwI6otz7NOLd8gZcapeBFPrCZnCMIVrGBU0DDVAolEF2GMps4a3259VYPYPkDDs7lwSY8Jk1jFUmdkqwXLwaDzlgnpJJI2boHMOxt1QAuMdToLphah5R3HNLh1NTrLQn0Uehiazhw','e':'AQAB','kty':'RSA','n':'4e76k7QF01kw3hhdHyc3iyUn6c465yrLD9KV7m4gNIc3Tm66Iq3P72xq9w5abAXJG9GJUkbhtTG5isFmXLCU4MOlU5T2a7iBqx2dmao72LSsQ7WZQVtIv5JvWYAXpd4rlgTaJfO3Unv9Tn8v5wWgL9ZbplVmR_GWMY5l-7i44PWwLwGZge_KUVGQmKtx7XXsnezG4JfEAPJbO9zfD4CH6AGtRdcAn2r-2-jqk_-uU1BVoWwDdrCJ_DKOyYNDUfkRneTATY5RDdH5flNd-19XW31L1q3dTMqHbcMzFMfiqwyBYX5kFJrDT-W7poIex7jhZfA5by8K1tfwJqdYRGH4Qp5QtBTs76iuANNBUz3tO0vmV8bYez2AWegvRqrZGHPsMPtA5pCjXw1rueJdH5WqpCHrBsnNkOHNVcd8yHLPmXRokwi3cSanOuquLOI5Qh-pqeuTTJAv8QQ3X5aQRnHmZoyVuOP9Qqq05MGRPp6W-7Vdbi6mslDP-FwUnkHb2C-XenxHesqfcbqBOELa-PD6Fj_usVKPcL9HR_J4IK38XFFOT669_Xhpyaq6iRtvlmj1n_fQNvRcGpZIfIAFgf64cIwLAz2vimj5ywXneyDIRv5Wge8VyhfsAe9S01x0dNq-aR16clayKDn48e6fETeTWJJaPK7lvi1-Oc-tlaA7Pfk','p':'8fDDtrup_sHpmpnAQ6arzA6S2zG23OlRwsrPQu1bByDJSAB6Y0RQDIxQB06NjNCyyoetpiUlblgpcLQpy-R9xAgdvw-gcxNYW4hxkQdbnSP0U9vv8V3tGtxN8szjBEsNz0vhs0Gc4Wz01IYGVY6OJhOg3qshAFrjZie49MsIRw_w0dJA6UAXbx19fvoFtKDSyp-w2FnFQHMnzwsoJULiCPB6R77XJZLx3gyQN4ad-s63E7f89055JNIO8rt-cigkL_ilQh-x9m-oX_nBWb_N4gjVdnyoH2Vjlq2os2l209URLPl4bq6AMCfe7SAnuyLA9U_aTiLOF2eAlbgznmUWjw','q':'7xAWBXurm-Qv60KwKF2dqkGbCyNTrQv1Ep8L2ArTVeTMcQb54dQiwLZb-NDaiRIAyBXOsrkWEyh8tru5fvicn-EdAnajGTxEwwKktaUA-ufDw8vy4HOfATXGuA0DFt1L6nZ_n9lFYxd09iEUj0GwvaRM21A7nbOz3Qf6JThCaP8JOK3doOYsr7fufD8E9gcE7CiTcbbpm8BOa6-h2fY3tENCOV76a9_G2RfPOrvIu-tgVPU_2K-r8vSWQobXhGELOYc0XAipUxEAPxGLOq3T-OTQk2SvPnom2mEG_-5V1PG1sxH0WGf53XpUjjsUW1Zj9bidmuhLPqbMBf-ZhbLm9w','qi':'3h-0vyBkKf0WsPhCiIWXm8yPU-J_qgM4JjkrBzwWOU6CpnQyIdoSfStXhas7ehoODnb7sAQ2PEh4RBls2kJrXmzqC_0wsUEFdnfSERsf8eb8Sgu1NF5JgqRU9UBe9-4bvLZAcFpBG_PJyMg8QhCEuqFbjrjNjg9r3EVfeRHyjl7dPEGF5RwIUiGbkyLmXmcqf0L4GhuvqGdd56krht_kvwI-lppMB4OoZDgwfOH0fcKuHJUyc0RyfZ-iS9YZTQI-1AO2gA-RsjCjvtZB2QBdhvqPp2OujkYlcGXukSBtoBsU3elGBqFPRqlPsDMN8dj0bw_xjNxue7fKh9a68CPedA','kid':'B2C61A07EE0661237D19BEE1E0A1463C'}";
+                // Corresponding public key is: {'e':'AQAB','kty':'RSA','n':'4e76k7QF01kw3hhdHyc3iyUn6c465yrLD9KV7m4gNIc3Tm66Iq3P72xq9w5abAXJG9GJUkbhtTG5isFmXLCU4MOlU5T2a7iBqx2dmao72LSsQ7WZQVtIv5JvWYAXpd4rlgTaJfO3Unv9Tn8v5wWgL9ZbplVmR_GWMY5l-7i44PWwLwGZge_KUVGQmKtx7XXsnezG4JfEAPJbO9zfD4CH6AGtRdcAn2r-2-jqk_-uU1BVoWwDdrCJ_DKOyYNDUfkRneTATY5RDdH5flNd-19XW31L1q3dTMqHbcMzFMfiqwyBYX5kFJrDT-W7poIex7jhZfA5by8K1tfwJqdYRGH4Qp5QtBTs76iuANNBUz3tO0vmV8bYez2AWegvRqrZGHPsMPtA5pCjXw1rueJdH5WqpCHrBsnNkOHNVcd8yHLPmXRokwi3cSanOuquLOI5Qh-pqeuTTJAv8QQ3X5aQRnHmZoyVuOP9Qqq05MGRPp6W-7Vdbi6mslDP-FwUnkHb2C-XenxHesqfcbqBOELa-PD6Fj_usVKPcL9HR_J4IK38XFFOT669_Xhpyaq6iRtvlmj1n_fQNvRcGpZIfIAFgf64cIwLAz2vimj5ywXneyDIRv5Wge8VyhfsAe9S01x0dNq-aR16clayKDn48e6fETeTWJJaPK7lvi1-Oc-tlaA7Pfk','kid':'B2C61A07EE0661237D19BEE1E0A1463C'}
+
                 // These values should go into a configuration file
-                //const string clientId = "7ba9e4de-c2a7-4f9b-9118-f1286b141b72";
-                //const string clientId = "47e44e6e-80d2-4c0b-8d2c-47e3be4663c2";
-                const string clientId = "583c7a2b-c294-4ca8-96cb-6336b7d5e0fe"; // uten validering i test
-                //const string clientId = "af489a58-6764-4571-a724-5aa2fab79b04"; // med validering i test
+                const string clientId = "helseid-sample-request-objects-console";
                 const string localhost = "http://localhost:8090";
                 const string redirectUrl = "/callback";
                 const string startPage = "/start";
-                //const string stsUrl = "https://helseid-int-sts.test.nhn.no";
                 const string stsUrl = "https://helseid-sts.test.nhn.no";
 
                 // The child organization number is provided by the EPJ
@@ -47,8 +48,7 @@ namespace HelseId.RequestObjectsDemo
                 {
                     Authority = stsUrl,
                     RedirectUri = localhost + redirectUrl,
-//                    Scope = "openid profile v4ok:v4utentillitmedriktigorgnummer/api",
-                    Scope = "openid profile v4ok:v4medtillitmedriktigorgnummer/api",
+                    Scope = "openid profile offline_access nhn:helseid-public-samplecode/authorization-code",
                     ClientId = clientId,
                     Flow = OidcClientOptions.AuthenticationFlow.AuthorizationCode,
                     Policy = new Policy { RequireAccessTokenHash = true, RequireAuthorizationCodeHash = true, ValidateTokenIssuerName = true },
@@ -56,7 +56,7 @@ namespace HelseId.RequestObjectsDemo
                 });
 
                 // Build the request object - this will authenticate the user and validate the child organization
-                var requestObject = GetRequestObjectsPayload(clientId, stsUrl, childOrgNo);
+                var requestObject = GetRequestObjectsPayload(clientId, stsUrl, jwkPrivateKey);
 
                 // Authenticate with HelseID using the request object via the system browser
                 var state = await oidcClient.PrepareLoginAsync();
@@ -65,7 +65,7 @@ namespace HelseId.RequestObjectsDemo
                 // Setup a client assertion - this will authenticate the organization
                 // This request is done from the client to the server without using
                 // a web browser
-                var clientAssertionPayload = GetClientAssertionPayload(clientId, disco, true);
+                var clientAssertionPayload = GetClientAssertionPayload(clientId, disco, jwkPrivateKey);
                 var loginResult = await oidcClient.ProcessResponseAsync(response, state, clientAssertionPayload);
 
                 if (loginResult.IsError)
@@ -75,18 +75,16 @@ namespace HelseId.RequestObjectsDemo
 
                 var token = new JsonWebTokenHandler().ReadJsonWebToken(loginResult.IdentityToken);
 
-                Console.WriteLine("PID: " + token.GetClaim("helseid://claims/identity/pid").Value);
-                Console.WriteLine("SL: " + token.GetClaim("helseid://claims/identity/security_level").Value);
 
-                //The access token can now be used when calling an api
-                //It contains the user id, the security level, the organization number
+                // The access token can now be used when calling an api
+                // It contains the user id, the security level, the organization number
                 // and the child organization
                 // Copy the access token and paste it at https://jwt.ms to decode it
-                Console.WriteLine("Access token:");
-                Console.WriteLine(loginResult.AccessToken);
-                Console.WriteLine();
                 Console.WriteLine("ID Token:");
                 Console.WriteLine(loginResult.IdentityToken);
+                Console.WriteLine();
+                Console.WriteLine("Access token:");
+                Console.WriteLine(loginResult.AccessToken);
 
                 var rt = await new HttpClient().RequestRefreshTokenAsync(new RefreshTokenRequest
                 {
@@ -95,12 +93,12 @@ namespace HelseId.RequestObjectsDemo
                     ClientAssertion = new ClientAssertion
                     {
                         Type = OidcConstants.ClientAssertionTypes.JwtBearer,
-                        Value = GetClientAssertionPayload(clientId, disco, true)["client_assertion"]
+                        Value = GetClientAssertionPayload(clientId, disco, jwkPrivateKey)["client_assertion"]
                     }
                 });
 
                 Console.WriteLine();
-                Console.WriteLine("RT Access Token:");
+                Console.WriteLine("New Access Token after using Refresh Token:");
                 Console.WriteLine(rt.AccessToken);
             }
             catch (Exception ex)
@@ -130,14 +128,13 @@ namespace HelseId.RequestObjectsDemo
             return await listener.WaitForCallbackAsync();
         }
 
-        private static Dictionary<string, string> GetRequestObjectsPayload(string clientId, string stsUrl, string childOrgNo)
+        private static Dictionary<string, string> GetRequestObjectsPayload(string clientId, string stsUrl, string jwkPrivateKey)
         {
-            var requestObject = BuildRequestObject(clientId, stsUrl, childOrgNo);
+            var requestObject = BuildRequestObject(clientId, stsUrl, jwkPrivateKey);
             return new Dictionary<string, string>
                 {
                    { "request", requestObject },
-               { "prompt", "login" },
-             //  {"acr_values", "idp:helseplattformen-oidc" }
+                   { "prompt", "login" }, // Disables single sign-on
                 };
         }
 
@@ -148,7 +145,7 @@ namespace HelseId.RequestObjectsDemo
             Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
         }
 
-        private static string BuildRequestObject(string clientId, string audience, string childOrgNo)
+        private static string BuildRequestObject(string clientId, string audience, string jwkPrivateKey)
         {
             // Builds a request object containing the authorization details claim with
             // the following structure:
@@ -167,19 +164,10 @@ namespace HelseId.RequestObjectsDemo
 
             var orgNumberDetails = new Dictionary<string, string>
             {
-                //{ "system", "urn:oid:2.16.578.1.12.4.1.2.101" },
-                { "system", "urn:oid:1.0.6523"},
+                { "system", "urn:oid:2.16.578.1.12.4.1.2.101" },
                 { "type", "ENH" },
-                { "value", "NO:ORGNR:999977773:999977775" }
-                //{ "value", "NO:ORGNR:999977774:999977775" }
-                //{ "value", "NO:ORGNR:925820695:999977775" }
+                { "value", "999977775" } // Client configuration in HelseID contains a orgnumber whitelist with this number
             };
-            //            var orgNumberDetails = new Dictionary<string, string>
-            //{
-            //    { "system", "urn:oid:2.16.578.1.12.4.1.2.101" },
-            //    { "type", "ENH" },
-            //    { "value", "999977775" }
-            //};
 
             var identifier = new Dictionary<string, object>
             {
@@ -197,47 +185,7 @@ namespace HelseId.RequestObjectsDemo
                 { "practitioner_role", organization }
             };
 
-
-
-            //var contextRoles = new Dictionary<string, object>
-            //{
-            //    { "type", "amk/context" },
-            //    { "value", new Dictionary<string, object>
-            //        {
-            //            {"name", "role1" },
-            //        }
-            //    }
-            //};
-
-
-            var contextRoles = new
-            {
-                type = "helseid://claims/external/amk-context",
-                value = new
-                {
-                    roles = new[]
-                    {
-                        new { name = "role4"},
-                        new { name = "role5"},
-                        new { name = "role6"},
-                    }
-                }
-            };
-
-            var kjOrg = new
-            {
-                type = "helseid://claims/external/nilar-org",
-                value = new
-                {
-                    parentOrg = "999888777",
-                    childOrg = "999777666"
-                }
-            };
-
-
-
-
-            var serialized = JsonConvert.SerializeObject(new object[] { authorizationDetails, contextRoles, kjOrg });
+            var serialized = JsonConvert.SerializeObject(new object[] { authorizationDetails });
 
             var claims = new List<Claim>
             {
@@ -246,60 +194,35 @@ namespace HelseId.RequestObjectsDemo
 
             var token = Jwt.Generate(clientId,
                 audience,
-                GetSecurityKey(),
+                GetSecurityKey(jwkPrivateKey),
                 claims);
 
             return token;
         }
 
-        private static Dictionary<string, string> GetClientAssertionPayload(string clientId, DiscoveryDocumentResponse disco, bool include = true)
+        private static Dictionary<string, string> GetClientAssertionPayload(string clientId, DiscoveryDocumentResponse disco, string jwkPrivateKey)
         {
             var claims = new List<Claim>
             {
                 new Claim(JwtClaimTypes.IssuedAt, DateTimeOffset.Now.ToUnixTimeSeconds().ToString()),
                 new Claim(JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N"))
             };
-
-
-            var kjOrg = new
-            {
-                type = "helseid://claims/external/nilar-org",
-                value = new
-                {
-                    parentOrg = "444444",
-                    childOrg = "333333"
-                }
-            };
-
-            var serialized = JsonConvert.SerializeObject(new object[] { kjOrg });
-
-            if (include)
-            {
-                claims.Add(new Claim("authorization_details", serialized, "json"));
-            }
-
-
+        
             var clientAssertion = Jwt.Generate(clientId,
                 disco.TokenEndpoint,
-                GetSecurityKey(),
+                GetSecurityKey(jwkPrivateKey),
                 claims);
-
+            
             return new Dictionary<string, string>
             {
                 { "client_assertion", clientAssertion},
-                { "client_assertion_type", OidcConstants.ClientAssertionTypes.JwtBearer },
+                { "client_assertion_type", OidcConstants.ClientAssertionTypes.JwtBearer }
             };
         }
 
-        private static SecurityKey GetSecurityKey()
+        private static SecurityKey GetSecurityKey(string jwkPrivateKey)
         {
-            // TODO: Store the RSA key in a secure location!!
-            const string rsaPrivateKey = "<RSAKeyValue><Modulus>sHNMAYJkqAj9970orrqHgjPD0l+PgqVnureLgOvYffUs0NzkQXAlg1L8Kj3eZkldVdW7aTUnvBDtJfw/Ad0XxH00OkV9Lha9ewpJAGchz/bIp6j+GkzYajys6du9d8MJg8VQY3X+9MTjtAH6Kf1wzXE+7fRGFT2PkN/DedwT2KDTwWNOYk9uILka4QLrzonu2TL2Hme82fn744JuPIsV7DTJ9zEoxD2dziywsFz0Rg4KNNQaL+O4HI9tuQx9ivO7hdcgGOy4lCI2U8Kf27O3txW/Jkh7SMgpGL3k+Xb+uvQKuSgeqtpQublm78A3c1vLqepGD4ccuCZ+XSCzqKCn/4CmpFRL8psT1WsWGYbuCU4Ih18viKgOqxaFOHgOC4NnRR0FoUXBdPK1Q3HLHGoPoUV47PNDaasJRVwZWBA7MQICC2mrvPpkcmoDwrsAAcGvY9YOb2e04tMjHvTYUsP+9pk1kfy1N/3hjWCpJDX8i44pWD6eSmTkpQX9lK6HigEPq414tOd4EzfxcNRAfMkg/OKLkaORdG1WKsrOoo8pCPUqTdq72JhYFJ0/vYDzRIWAphm9VM0KDP5lnK2fXku5Kn+5m8u6NJHWxBlm47OEhyWo6r1Z9hdvhXUREti+RnqQsqRzeDn46XCwuKaVIhrShXoViiiFs82DslMDDExUjm0=</Modulus><Exponent>AQAB</Exponent><P>yubldftOSBBcQEXizaxjK2aHwnGOiz4obUT9+mepWe1G/Ev3iG627rA8l2+MSvP/DJEyhypDk5sx7BLpW4oQqBJcUoigaD13OWuUQe52vDcTQlkTrAPSS0xOODISEJ4nAgzAPgoYDvcCYDF61S83LMudQnwmxgdkpkspcfbgiZeNFCPo3W2CKh2GXuvNpk9XDmJ72Vl9g9+rTJl6P2XnjHBy5knSBKWDJI3Zt+waBoQzAkgjsAi9wncc7rxx/eurwp8B7lqoX/Nne+oHZZ3OvRHn5ht10r3qsyQEUfz/TQ74li17IS5o0Sqf5jSFaBUUkhGJiu2AsTkuv2nPtYEyIw==</P><Q>3qBRpO/614MI8zuSl7RvIIaFW+HLNXf3dWC2h32WFLD384BzjD3avyjeTSWsGV+poVevpixnwM7KGK4FtKakynSKHPeIa8twcE+4kOIIVjmwbz4zGOW81Mnfvh8Ee1iLKP81IsaG+nPAZKkTbE5hjEvCP8bLb1gRbNjWOAc+mtPUx4WSjUoTcdbPY3ktO7ZSTD8tsdJ2sTN2ZEwdQ22+BftFTxcOC1J+rAbDeIkk31V2Hf0a8V9RZK15I8jUxH4EtErZ018Ay+tG+tegVSzKcsyyfx1FfHLwqcASfNT1JMS3iFZ7LEacN/IK3drnBhu/d5NCvFOWhHePbFrJHHbeLw==</Q><DP>xqtyviUFL1alnWFQhCZpK9PG1kMuWXTRTLyjGo5pqd3FBcC0bOhLQkdZ7MWSTsm+T+XT3bkqVds99HNH/xOe35Kqxz10It0cYiLOFgiSRhR/TRW/R0yumn/qjuen/JF+jGlDyvtDN1PxBZMtPJRwp/Hu12yM4pXWnWU2/ZnHnbHAt5m5pyZUrzwdl8+3m0JQcYtIzTbsyTU2m1gj9POo10A7oPVjKJ2PXTlvlsEdcof7Eh7korbMZx8OO0xVKVWa5oOe9m3aM6k3CIPMHll4VnSz5gG5SlIe/q0jdcwNhrxD93gs+f5hL31W96cxgQozDBsT2+5VdjIRbecDNCt+lQ==</DP><DQ>Q5X4M1KHnJWzSeR0BIpKkl1EbziFMJ5TCddqkoeV4II5RDti2NiOaCpIErO1I57fKJQuRwyEEwy0Xfm20bklnjDzHQgo6lDAudf5+EImtcadwafoa06TnSYMPvO7sJaY6MFRqFUM9UvexLBvrRm+k5EMT8BSUmMyJxFNN4U7hFV663epnis27ACCxXgsO0yGf49OmAWE8xbkgl55I9dVMQuvZutg4B8TRbZn8VfxUbvoOAJ3A4AkfaQMesilj2GSnAl9R6Y337B1xAFiM3l9nIx4RA7m4XkjhuVAt5UPNzJhZYqbqj1lf7aDhgbGzBvwbKTQRcw6jcyeRg7przKHEQ==</DQ><InverseQ>C8z88QY93r/05id2daU9obsIEe7R1bjUHNj+3rKo8T+L8PUoXuWQTm/NsQryoSgi5/JwZL7gyh7IQDPDFbf4jWg6nZ8ZfJs0Qisjih3cPjPMIxYvi0bG38Z1RECysNqBDTNrULMHIScOA+BhvnSPoXGQU8vJTO4yjH7V4wFcE6J9qcPPAUSy/KtgWRd91JWH/oX7PUgUDMVWc3hQ8RTyPCl60G7pFjeKhSqhRzfXIF45AmfSlOTY2l9aO1swp/cQsebym96AkYA71q2c+08KZvERvUuS0FGpZ7VQSgZ+sUe8WZb9XzJXdirtuU/sz74BFwTiT9YkoGC9hH1aMDBiFA==</InverseQ><D>sGNxtYiN6tSiXUeBJbpdwDDTLrhMlAOZgDP/hu89Sh0PofNPUoMzXOZWIjwa2RG59hZk9LUodX5OM0zIB6rnGYs37JCOpMYiwJ71fyuZx3Uh/UiYS95J8VmaWWVLMC+OkWVsCSFpr3IrVkUruVIbs6PjjqhEbvNNUzv9AxKX3FRZmtcVAn34z0l7rzfmVl/YntOs6ZQ2W4jk3vgCDw/S6H+U7kD8ScB2wiY2svcZUfazCUCGtRzlbdeLjhMIZSFlclQtR/1MPvk8adsDRvOPUbyxiyml5IoDWzJpdWAZIPbYyWNr1MvNKvxGBKGYTP+UxtTlGJyufwAsDhikwItpo/2q8tsK4CIPsR4+vxyzOCwpH7s64MBv6Sf/5sDq46hblIscyCmkgdTSaM9Q8hMxZz7LxZk6IsQhE4X3YW+jCwXRypMzgTQfCsNRLFzhMbjR1/DcFYk3zQIOi9NFiVNSIGYnvuCwUp7/KWc7yvfQ+Bs7jfVtMui+MMKf87HHVUYgDXNsfkFRg7+t86OUVXWcAZK6p0PMI7MagDyglGTN7z5E2v+jwxNBR0nGP9V3RVPl8LnJ7A/OLh1CacIfASxIgOvSEl1tUeyrZaVjnGH2LAUrK8oN3d9TlWH5hjK9RPxrRdxyIuU2q9tHS+IIXCaotOJ8MbTBi/DR9zRL39CQKZk=</D></RSAKeyValue>";
-            var rsa = RSA.Create();
-            rsa.FromXmlString(rsaPrivateKey);
-
-            return new RsaSecurityKey(rsa.ExportParameters(true));
+            return new JsonWebKey(jwkPrivateKey);
         }
-
     }
 }
