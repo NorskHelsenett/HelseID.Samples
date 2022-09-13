@@ -12,7 +12,7 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace HelseId.RefreshTokenDemo
+namespace HelseId.ResourceIndicatorsDemo
 {
     /*
      * This sample application shows how Resource Indicators 

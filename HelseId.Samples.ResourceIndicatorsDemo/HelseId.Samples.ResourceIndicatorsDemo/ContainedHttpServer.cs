@@ -7,7 +7,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HelseId.RefreshTokenDemo
+namespace HelseId.ResourceIndicatorsDemo
 {
     public class ContainedHttpServer : IDisposable
     {

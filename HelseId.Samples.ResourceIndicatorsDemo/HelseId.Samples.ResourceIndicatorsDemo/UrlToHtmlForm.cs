@@ -2,7 +2,7 @@
 using System;
 using System.Text;
 
-namespace HelseId.RefreshTokenDemo
+namespace HelseId.ResourceIndicatorsDemo
 {
     /// <summary>
     /// Converts a url into a html form that posts the same data
