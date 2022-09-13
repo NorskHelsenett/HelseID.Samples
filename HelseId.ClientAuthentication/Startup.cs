@@ -8,9 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace HelseId.ClientAuthentication
@@ -46,7 +44,7 @@ namespace HelseId.ClientAuthentication
             // The following section configures the authentication scheme to be used when authenticating a user
             // The scheme uses OpenID Connect ("oidc") and Cookies ("Cookies") as authentication mechanisms
             // If a cookie does not exist the OpenID Connect is challenged to authenticate the user
-            // A Json Web Key (Jwk) pair is used as client secret 
+            // A private key formatted as a Json Web Key (Jwk) is used as client secret 
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;

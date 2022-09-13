@@ -31,6 +31,7 @@ namespace HelseId.ClientAuthentication.Models
             var signingCredentials = GetClientAssertionSigningCredentials(privateJwkFilename);
             var credentials = new JwtSecurityToken(clientId, authority, claims, DateTime.UtcNow, DateTime.UtcNow.AddSeconds(10), signingCredentials);
 
+
             // The tokenhandler serializes the credentials into a Jwt
             var tokenhandler = new JwtSecurityTokenHandler();
             var jwt = tokenhandler.WriteToken(credentials);
