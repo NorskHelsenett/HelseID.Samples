@@ -8,10 +8,8 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Net.Http;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace HelseId.RequestObjectsDemo
@@ -34,8 +32,6 @@ namespace HelseId.RequestObjectsDemo
                 const string startPage = "/start";
                 const string stsUrl = "https://helseid-sts.test.nhn.no";
 
-                // The child organization number is provided by the EPJ
-                const string childOrgNo = "999977775";
 
                 var disco = await new HttpClient().GetDiscoveryDocumentAsync(stsUrl);
                 if (disco.IsError)
@@ -133,8 +129,7 @@ namespace HelseId.RequestObjectsDemo
             var requestObject = BuildRequestObject(clientId, stsUrl, jwkPrivateKey);
             return new Dictionary<string, string>
                 {
-                   { "request", requestObject },
-                   { "prompt", "login" }, // Disables single sign-on
+                   { "request", requestObject }
                 };
         }
 
