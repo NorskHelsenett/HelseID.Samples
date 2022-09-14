@@ -1,4 +1,5 @@
-﻿using IdentityModel;
+﻿using HelseId.SamplesRefreshTokenDemo;
+using IdentityModel;
 using IdentityModel.Client;
 using IdentityModel.OidcClient;
 using Microsoft.AspNetCore.Http;
@@ -16,11 +17,11 @@ namespace HelseId.RefreshTokenDemo
 {
     class Program
     {
-        const string ClientId = "388a8c48-7889-4ead-b453-cda6dfdd10f4";
+        const string ClientId = "helseid-sample-refresh-token";
         const string Localhost = "http://localhost:8089";
         const string RedirectUrl = "/callback";
         const string StartPage = "/start";
-        const string StsUrl = "https://localhost:44366";
+        const string StsUrl = "https://helseid-sts.test.nhn.no";
 
         static async Task Main()
         {
@@ -37,10 +38,10 @@ namespace HelseId.RefreshTokenDemo
                 {
                     Authority = StsUrl,
                     RedirectUri = "http://localhost:8089/callback",
-                    Scope = "openid profile helseid://scopes/identity/pid helseid://scopes/identity/security_level udelt:test-api/api offline_access",
+                    Scope = "openid profile helseid://scopes/identity/pid helseid://scopes/identity/security_level offline_access nhn:helseid-public-samplecode/authorization-code",
                     ClientId = ClientId,
                     Flow = OidcClientOptions.AuthenticationFlow.AuthorizationCode,
-                    Policy = new Policy { RequireAccessTokenHash = true, RequireAuthorizationCodeHash = true, ValidateTokenIssuerName = true },                    
+                    Policy = new Policy { RequireAccessTokenHash = true, RequireAuthorizationCodeHash = true, ValidateTokenIssuerName = true },
                 });
 
                 var state = await oidcClient.PrepareLoginAsync();
@@ -78,10 +79,22 @@ namespace HelseId.RefreshTokenDemo
                         throw new Exception(refreshTokenResult.Error);
                     }
 
+
                     refreshToken = refreshTokenResult.RefreshToken;
 
+
+                    var accessTokenExpiresIn = refreshTokenResult.Json["expires_in"].ToString();
+                    var refreshTokenExpiresIn = refreshTokenResult.Json["rt_expires_in"].ToString();
+
+
+
                     Console.WriteLine("Access Token: " + refreshTokenResult.AccessToken);
+                    Console.WriteLine($"Access Token expires in {accessTokenExpiresIn} seconds");
+
                     Console.WriteLine("Refresh Token: " + refreshTokenResult.RefreshToken);
+                    Console.WriteLine($"Refresh Token expires in {refreshTokenExpiresIn} seconds");
+                    Console.WriteLine();
+                    Console.WriteLine("Waiting 5 seconds before refreshing...");
                     Console.WriteLine();
 
                     System.Threading.Thread.Sleep(5000);
