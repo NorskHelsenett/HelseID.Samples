@@ -182,6 +182,9 @@ namespace HelseId.RequestObjectsDemo
 
             var serialized = JsonConvert.SerializeObject(new object[] { authorizationDetails });
 
+            // TEST 
+            serialized = "{\"type\":\"helseid_authorization\",\"practitioner_role\":{\"organization\":{\"identifier\":{\"system\":\"urn:oid:2.16.578.1.12.4.1.2.101\",\"type\":\"ENH\",\"value\":\"999944701\"}}}}";
+
             var claims = new List<Claim>
             {
                 new Claim("authorization_details", serialized, "json")
