@@ -3,7 +3,6 @@ using IdentityModel.Client;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Security.Claims;
@@ -13,45 +12,49 @@ using System.Threading.Tasks;
 
 namespace HelseId.Samples.EnterpriseCertificate
 {
+    /// <summary>
+    /// DEPRECATED
+    /// DEPRECATED
+    /// DEPRECATED
+    /// 
+    /// Note that the use of "virksomhetssertifikater" is deprecated in HelseID, and not supported by Selvbetjening.
+    ///
+    /// The Private Keys stored in virksomhetssertifikater may still be used for signing JWTs as shown in the client assertion samples,
+    /// but the organization number of the virksomhet is deducted using other mechanisms.
+    /// 
+    /// DEPRECATED
+    /// DEPRECATED
+    /// DEPRECATED
+    /// </summary>
+
     class Program
     {
         private const string ClientId = "e1fd8e62-b32d-4043-bdb2-fbefcda3ecdf";
         private const string Scope = "udelt:test-api/api";
         private const string TokenEndpoint = "https://helseid-sts.test.nhn.no/connect/token";
+        private const string PathToP12File = @"some_path\some_certificate.p12";
+        private const string CertificatePassword = @"some_path\some_certificate.p12";
+
 
         static async Task Main(string[] args)
         {
-            var certificate = new X509Certificate2(@"C:\Temp\sfm seid2\Buypass ID-NORSK HELSENETT SF-serienummer1887555421414519331987773-2022-01-04.p12", "K7uXvp714hGPJJ7H");
+            var certificate = new X509Certificate2(PathToP12File, CertificatePassword);
             var securityKey = new X509SecurityKey(certificate);
             var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha512);
 
-            long totalMs = 0;
-            const int num = 1000;
-            for (var i = 0; i < num; i++)
+            TokenResponse result = await GetTokenResponse(certificate, securityKey, signingCredentials);
+
+            if (result.IsError)
             {
-                var sw = Stopwatch.StartNew();
-                TokenResponse result = await GetTokenResponse(certificate, securityKey, signingCredentials);
-                sw.Stop();
-                totalMs += sw.ElapsedMilliseconds;
-                Console.WriteLine(i);
+                Console.Error.WriteLine("Error:");
+                Console.Error.WriteLine(result.Error);
             }
-
-            var average = totalMs / num;
-
-            Console.WriteLine($"Average time over {num} iterations: " + average);
-
-
-            //if (result.IsError)
-            //{
-            //    Console.Error.WriteLine("Error:");
-            //    Console.Error.WriteLine(result.Error);
-            //}
-            //else
-            //{
-            //    Console.WriteLine("Access token:");
-            //    Console.WriteLine(result.AccessToken);
-            //    Console.WriteLine("Copy/paste the access token at https://jwt.ms to see the contents");
-            //}
+            else
+            {
+                Console.WriteLine("Access token:");
+                Console.WriteLine(result.AccessToken);
+                Console.WriteLine("Copy/paste the access token at https://jwt.ms to see the contents");
+            }
         }
 
         private static async Task<TokenResponse> GetTokenResponse(X509Certificate2 certificate, X509SecurityKey securityKey, SigningCredentials signingCredentials)
