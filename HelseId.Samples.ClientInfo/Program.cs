@@ -9,7 +9,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using static IdentityModel.OidcConstants;
 
-namespace HelseId.Demo.ClientCredentials.Jwk
+namespace HelseId.Samples.ClientInfo
 {
     class Program
     {
@@ -31,9 +31,9 @@ namespace HelseId.Demo.ClientCredentials.Jwk
     'n': 'lsUj2L89bYfU-ilbOFXKgxTV1cRYhdDUmWwbulOVFLd_q51Tt2zzIeBJUqNY_-9offUM2enz9MpvAi7-UOjxGNwiKp6Ob0PLFswFhPi6Vv1mCiPx9BtIyDFSjHzYW1y3l7BmGtHyeNeF-uT-hf73Z8SCJTxhzhu29fTrSzYUF1jQ4nuWoGa2W-TJxs6OH71Sp-wsODlU99oqbjzu1AcKC24ro4xO_Sn3BDj66B_y51EpV63pBj9hKAiC_DGdEU95_TWMFOVEjvhcl3DeCKDcqbqTO-8AdUBZwQSIFe6I9NbS8QOhCYBZNsxkCPpRsmsiZ9gVAKCXckiMFH1u8G99ZQ'
 }";
 
-        private const string _clientId = "17140d58-8f80-40ef-b8d1-eb20f898f60b";
+        private const string _clientId = "helseid-sample-client-info";
         private const string _scopes = "helseid://scopes/client/info";
-        private const string _sts = "https://localhost:44366";
+        private const string _sts = "https://helseid-sts.test.nhn.no";
 
         /// <summary>
         /// Simple sample demonstrating client credentials
@@ -51,7 +51,7 @@ namespace HelseId.Demo.ClientCredentials.Jwk
                     throw new Exception(disco.Error);
                 }
 
-                var response = await c.RequestClientCredentialsTokenAsync(new IdentityModel.Client.ClientCredentialsTokenRequest
+                var response = await c.RequestClientCredentialsTokenAsync(new ClientCredentialsTokenRequest
                 {
                     Address = disco.TokenEndpoint,
                     ClientId = _clientId,
@@ -78,10 +78,10 @@ namespace HelseId.Demo.ClientCredentials.Jwk
                 var clientInfoUrl = disco.TryGet(clientInfoEndpointName);
                 if (string.IsNullOrEmpty(clientInfoUrl))
                 {
-                    throw new Exception($"Unable to get URL of clientInfo. Looking for '{clientInfoEndpointName}'");                       
+                    throw new Exception($"Unable to get URL of clientInfo. Looking for '{clientInfoEndpointName}'");
                 }
 
-                var token = response.AccessToken;               
+                var token = response.AccessToken;
                 c.SetBearerToken(token);
 
 
