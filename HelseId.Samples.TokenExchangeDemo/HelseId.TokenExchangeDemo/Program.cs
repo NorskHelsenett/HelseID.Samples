@@ -14,7 +14,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace HelseId.RefreshTokenDemo
+namespace HelseId.TokenExchangeDemo
 {
     class Program
     {
@@ -55,18 +55,7 @@ namespace HelseId.RefreshTokenDemo
 
 
                 // Perform the token exchange process as a separate client
-
-                var sw = Stopwatch.StartNew();
-                TokenResponse exchangeResponse = null;
-                for (var n = 0; n < 100; n++)
-                {
-                    exchangeResponse = await PerformTokenExchange(subjectAccessToken);
-                    Console.WriteLine(n);
-                }
-                sw.Stop();
-
-                Console.WriteLine("Average: " + sw.ElapsedMilliseconds / 100f + " ms");
-
+                var exchangeResponse = await PerformTokenExchange(subjectAccessToken);
                 if (exchangeResponse.IsError)
                 {
                     throw new Exception(exchangeResponse.Error);
@@ -98,21 +87,21 @@ namespace HelseId.RefreshTokenDemo
                 RedirectUri = Localhost + RedirectUrl,
                 Scope = "openid profile helseid://scopes/identity/pid helseid://scopes/identity/security_level udelt:token_exchange_actor_api/scope",
                 ClientId = SubjectClientId,
-                Flow = OidcClientOptions.AuthenticationFlow.AuthorizationCode,
-                Policy = new Policy { RequireAccessTokenHash = true, RequireAuthorizationCodeHash = true, ValidateTokenIssuerName = true },
+                Policy = new Policy {ValidateTokenIssuerName = true },
             });
 
             var state = await oidcClient.PrepareLoginAsync();
             var response = await RunLocalWebBrowserUntilCallback(Localhost, RedirectUrl, StartPage, state);
 
             var clientAssertionPayload = GetClientAssertionPayload(SubjectClientId, _discoveryDocument, GetClientAssertionSecurityKey());
-            var loginResult = await oidcClient.ProcessResponseAsync(response, state, clientAssertionPayload);
+            var parameters = new Parameters(clientAssertionPayload);
+            var loginResult = await oidcClient.ProcessResponseAsync(response, state, parameters);
             return loginResult;
         }
 
         private static async Task<TokenResponse> PerformTokenExchange(string subjectToken)
         {
-            // Perform the token exchange 
+            // Perform the token exchange   
             // To do a token exchange HelseID requires that an enterprise certificate is used as the client secret
             // Also note the SubjectToken and SubjectTokenType parameters
             var request = new TokenExchangeTokenRequest
@@ -121,11 +110,11 @@ namespace HelseId.RefreshTokenDemo
                 ClientAssertion = new ClientAssertion
                 {
                     Type = OidcConstants.ClientAssertionTypes.JwtBearer,
-                    Value = BuildClientAssertion(ActorClientId, _discoveryDocument, GetEnterpriseCertificateSecurityKey())
+                    Value = BuildClientAssertion(ActorClientId, _discoveryDocument, GetClientAssertionSecurityKey())
                 },
                 ClientCredentialStyle = ClientCredentialStyle.PostBody,
                 ClientId = ActorClientId,
-                Scope = "e-helse:nasjonalt_api/scope",
+                Scope = "udelt:test-api/api",
                 SubjectToken = subjectToken,
                 SubjectTokenType = OidcConstants.TokenTypeIdentifiers.AccessToken
             };

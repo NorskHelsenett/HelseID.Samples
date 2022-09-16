@@ -2,7 +2,7 @@
 using System;
 using System.Text;
 
-namespace HelseId.RefreshTokenDemo
+namespace HelseId.TokenExchangeDemo
 {
     /// <summary>
     /// Converts a url into a html form that posts the same data
@@ -14,7 +14,7 @@ namespace HelseId.RefreshTokenDemo
         public static string Parse(string urlWithQueryString)
         {
             var uri = new Uri(urlWithQueryString);
-
+             
             var action = uri.GetLeftPart(UriPartial.Path);
 
             var parameters = QueryHelpers.ParseQuery(uri.Query);

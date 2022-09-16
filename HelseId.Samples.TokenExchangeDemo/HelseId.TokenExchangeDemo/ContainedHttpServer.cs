@@ -7,7 +7,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HelseId.RefreshTokenDemo
+namespace HelseId.TokenExchangeDemo
 {
     public class ContainedHttpServer : IDisposable
     {
@@ -26,7 +26,16 @@ namespace HelseId.RefreshTokenDemo
             _routes = routes;
 
             _host = new WebHostBuilder()
-                .UseKestrel()
+                .UseKestrel(options =>
+                {
+                    /* 
+                     * May enhance out-of-the-box experience when copying code
+                     * or running in .NET6
+                     * See:
+                     * https://stackoverflow.com/questions/47735133/asp-net-core-synchronous-operations-are-disallowed-call-writeasync-or-set-all
+                    */
+                    options.AllowSynchronousIO = true;
+                })
                 .UseUrls(host)
                 .Configure(Configure)
                 .Build();
@@ -88,6 +97,7 @@ namespace HelseId.RefreshTokenDemo
         {
             try
             {
+                ctx.Response.Headers.Add("Date", DateTimeOffset.UtcNow.ToString());
                 ctx.Response.StatusCode = 200;
                 ctx.Response.ContentType = "text/html";
                 ctx.Response.WriteAsync("<h1>You can now return to the application.</h1>");
