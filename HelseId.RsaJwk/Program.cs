@@ -29,6 +29,12 @@ namespace HelseId.RsaJwk
 
         private static int GenerateKey(Options options)
         {
+            if (options.RsaKeySize < 2048)
+            {
+                Console.WriteLine("RSA key size must be at least 2048");
+                return 1;
+            }
+
             var keyType = options.KeyType;
             var prefix = options.Prefix;
 
@@ -52,8 +58,7 @@ namespace HelseId.RsaJwk
             switch (keyType)
             {
                 case KeyType.Rsa:
-                    const int rsaKeySize = 4096;
-                    (privateJwk, publicJwk) = GenerateRsaKey(rsaKeySize, options);
+                    (privateJwk, publicJwk) = GenerateRsaKey(options);
                     break;
                 case KeyType.Ec:
                     (privateJwk, publicJwk) = GenerateEcdsaKey(options);
@@ -71,8 +76,9 @@ namespace HelseId.RsaJwk
             return 0;
         }
 
-        private static (JsonWebKey privateJwk, JsonWebKey publicJwk) GenerateRsaKey(int keySize, Options options)
+        private static (JsonWebKey privateJwk, JsonWebKey publicJwk) GenerateRsaKey(Options options)
         {
+            var keySize = options.RsaKeySize ?? 4096;
             var key = RSA.Create(keySize);
             var securityKey = new RsaSecurityKey(key);
             securityKey.KeyId = Guid.NewGuid().ToString().Replace("-", string.Empty);

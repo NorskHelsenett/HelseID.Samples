@@ -13,9 +13,13 @@ public class Options
 
     [Option('a', "alg", HelpText = "Algorithm intended for use with the key. Defaults to RS512 for RSA, and ES256 for ECDSA")]
     public string Alg { get; set; }
+
+    [Option('s', "rsa-size", HelpText = "Key size in bits for RSA key. Default 4096. Min 2048.")]
+    public int? RsaKeySize { get; set; }
 }
 
-public enum KeyType {
+public enum KeyType
+{
     Rsa,
     Ec,
 }
