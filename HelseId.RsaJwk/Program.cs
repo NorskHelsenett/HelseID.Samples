@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using CommandLine;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IO;
 using System.Security.Cryptography;
@@ -9,23 +10,33 @@ namespace HelseId.RsaJwk
 {
     static class Program
     {
-        static int Main(string[] args)
+        static void Main(string[] args)
         {
             var fileName = AppDomain.CurrentDomain.FriendlyName;
 
-            if (args.Length < 1)
+            new Parser(with =>
+                {
+                    with.HelpWriter = Console.Out;
+                    with.AutoHelp = true;
+                    with.CaseInsensitiveEnumValues = true;
+                })
+                .ParseArguments<Options>(args)
+                .MapResult(
+                    options => GenerateKey(options),
+                    errors => 1
+                );
+        }
+
+        private static int GenerateKey(Options options)
+        {
+            if (options.RsaKeySize < 2048)
             {
-                Console.WriteLine($"Usage: {fileName} rsa|ecdsa [name]");
+                Console.WriteLine("RSA key size must be at least 2048");
                 return 1;
             }
 
-            var keyType = args[0];
-
-            string prefix = null;
-            if (args.Length >= 2)
-            {
-                prefix = args[1];
-            }
+            var keyType = options.KeyType;
+            var prefix = options.Prefix;
 
             var serializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
             {
@@ -44,14 +55,13 @@ namespace HelseId.RsaJwk
             }
 
             JsonWebKey privateJwk, publicJwk;
-            switch (keyType.ToLower())
+            switch (keyType)
             {
-                case "rsa":
-                    const int rsaKeySize = 4096;
-                    (privateJwk, publicJwk) = GenerateRsaKey(rsaKeySize);
+                case KeyType.Rsa:
+                    (privateJwk, publicJwk) = GenerateRsaKey(options);
                     break;
-                case "ecdsa":
-                    (privateJwk, publicJwk) = GenerateEcdsaKey();
+                case KeyType.Ec:
+                    (privateJwk, publicJwk) = GenerateEcdsaKey(options);
                     break;
                 default:
                     Console.WriteLine($"Unsupported key type '{keyType}'");
@@ -66,12 +76,17 @@ namespace HelseId.RsaJwk
             return 0;
         }
 
-        private static (JsonWebKey privateJwk, JsonWebKey publicJwk) GenerateRsaKey(int keySize)
+        private static (JsonWebKey privateJwk, JsonWebKey publicJwk) GenerateRsaKey(Options options)
         {
+            var keySize = options.RsaKeySize ?? 4096;
             var key = RSA.Create(keySize);
             var securityKey = new RsaSecurityKey(key);
             securityKey.KeyId = Guid.NewGuid().ToString().Replace("-", string.Empty);
+
             var jwk = JsonWebKeyConverter.ConvertFromRSASecurityKey(securityKey);
+            jwk.Use = "sig";
+            jwk.Alg = options.Alg ?? SecurityAlgorithms.RsaSha512;
+
             var privateJwk = new JsonWebKey
             {
                 D = jwk.D,
@@ -84,7 +99,8 @@ namespace HelseId.RsaJwk
                 Q = jwk.Q,
                 QI = jwk.QI,
                 Kid = jwk.Kid,
-                Use = "sig",
+                Use = jwk.Use,
+                Alg = jwk.Alg,
             };
             var publicJwk = new JsonWebKey
             {
@@ -92,18 +108,23 @@ namespace HelseId.RsaJwk
                 N = jwk.N,
                 E = jwk.E,
                 Kid = jwk.Kid,
-                Use = "sig",
+                Use = jwk.Use,
+                Alg = jwk.Alg,
             };
 
             return (privateJwk, publicJwk);
         }
 
-        private static (JsonWebKey privateJwk, JsonWebKey publicJwk) GenerateEcdsaKey()
+        private static (JsonWebKey privateJwk, JsonWebKey publicJwk) GenerateEcdsaKey(Options options)
         {
             var key = ECDsa.Create(ECCurve.NamedCurves.nistP521);
             var securityKey = new ECDsaSecurityKey(key);
             securityKey.KeyId = Guid.NewGuid().ToString().Replace("-", string.Empty);
+
             var jwk = JsonWebKeyConverter.ConvertFromECDsaSecurityKey(securityKey);
+            jwk.Use = "sig";
+            jwk.Alg = options.Alg ?? SecurityAlgorithms.EcdsaSha256;
+
             var privateJwk = new JsonWebKey
             {
                 Kty = jwk.Kty,
@@ -112,7 +133,8 @@ namespace HelseId.RsaJwk
                 X = jwk.X,
                 Y = jwk.Y,
                 Kid = jwk.Kid,
-                Use = "sig",
+                Use = jwk.Use,
+                Alg = jwk.Alg,
             };
             var publicJwk = new JsonWebKey
             {
@@ -121,7 +143,8 @@ namespace HelseId.RsaJwk
                 X = jwk.X,
                 Y = jwk.Y,
                 Kid = jwk.Kid,
-                Use = "sig",
+                Use = jwk.Use,
+                Alg = jwk.Alg,
             };
 
             return (privateJwk, publicJwk);
