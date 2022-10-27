@@ -71,8 +71,6 @@ namespace HelseId.ResourceIndicatorsDemo
                     ClientId = ClientId,
                     Resource = new List<string> { firstResource, secondResource },
                     ClientAssertion = clientAssertionPayload,                   
-
-                    Policy = new Policy { ValidateTokenIssuerName = true },                    
                 });
 
                 var state = await oidcClient.PrepareLoginAsync();

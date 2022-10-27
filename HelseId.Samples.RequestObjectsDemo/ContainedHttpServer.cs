@@ -18,24 +18,15 @@ namespace HelseId.RequestObjectsDemo
         private readonly string _callbackUrl;
         private readonly Dictionary<string, Action<HttpContext>> _routes;
 
-        public ContainedHttpServer(string host, 
-            string callbackUrl, 
+        public ContainedHttpServer(string host,
+            string callbackUrl,
             Dictionary<string, Action<HttpContext>> routes)
         {
             _callbackUrl = callbackUrl;
             _routes = routes;
 
             _host = new WebHostBuilder()
-               .UseKestrel(options =>
-               {
-                   /* 
-                    * May enhance out-of-the-box experience when copying code
-                    * or running in .NET5
-                    * See:
-                    * https://stackoverflow.com/questions/47735133/asp-net-core-synchronous-operations-are-disallowed-call-writeasync-or-set-all
-                   */
-                   options.AllowSynchronousIO = true;
-               })
+                .UseKestrel()
                 .UseUrls(host)
                 .Configure(Configure)
                 .Build();
@@ -59,7 +50,8 @@ namespace HelseId.RequestObjectsDemo
                 {
                     _routes[ctx.Request.Path.Value](ctx);
                 }
-                else if (ctx.Request.Path.Equals(_callbackUrl)) {
+                else if (ctx.Request.Path.Equals(_callbackUrl))
+                {
 
                     if (ctx.Request.Method == "GET")
                     {
@@ -83,7 +75,7 @@ namespace HelseId.RequestObjectsDemo
                     else
                     {
                         ctx.Response.StatusCode = 405;
-                    } 
+                    }
                 }
                 else
                 {
@@ -99,11 +91,11 @@ namespace HelseId.RequestObjectsDemo
                 ctx.Response.StatusCode = 200;
                 ctx.Response.ContentType = "text/html";
                 ctx.Response.WriteAsync("<h1>You can now return to the application.</h1>");
-                ctx.Response.Body.Flush();
+                ctx.Response.Body.FlushAsync();
 
                 _source.TrySetResult(value);
             }
-            catch
+            catch (Exception e)
             {
                 ctx.Response.StatusCode = 400;
                 ctx.Response.ContentType = "text/html";
