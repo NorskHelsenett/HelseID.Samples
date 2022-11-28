@@ -1,6 +1,7 @@
 
 namespace HelseId.ClienAuthentication
 {
+
     public class Settings
     {
         public string Authority { get; set; }

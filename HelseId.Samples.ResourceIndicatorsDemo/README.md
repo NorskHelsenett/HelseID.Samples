@@ -13,3 +13,14 @@ This sample has access to two APIs
 The sample requests scopes from both APIs but the first token-call only requests the first resource, while the second token-call requests the second resource (by using a refresh token).
 
 The access token and refresh token is then written to the console for each resource.
+
+
+### Requirements
+
+The [.NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) is required to build the program.
+
+#### To run the sample:
+```
+dotnet build
+dotnet run
+```

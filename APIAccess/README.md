@@ -2,32 +2,35 @@
 
 #### This sample builds upon [Client Authentication Sample](https://github.com/HelseID/HelseID.Samples/tree/master/HelseId.ClientAuthentication). Only API acccess is different.
 
-In order to successfully access the API you need to:
+### Requirements
+
+The [.NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) is required to build the program.
+
+### Building and running the program
+
+In order to successfully access the API you will need to
+
 
 #### 1. Run the [Sample API](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.SampleAPI) such that an API is available for access requests.
 
-Use the URL of the API that appears in the browser as input for the ApiUrl in `appsettings.json` of the [API Access](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.APIAccess) solution. Remember to add the API to the Scope as well.
+Go to the `SampleAPI` folder and run `dotnet run`.
+
+Check that the URL of the API that appears in the console (for example `https://localhost:5181` matches the value for 'ApiUrl' in `appsettings.json` in the [API Access](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/APIAccess) application.
 
 ```csharp
          "AllowedHosts": "*",
             "Settings": {
-               "ApiUrl": "https://localhost:5003/api",
-               .
-               .
-       
-               "Scope": "... ingvild:sampleapi/api ..."
+               "ApiUrl": "https://localhost:5081/api",
 ```
 
 
 #### 2. API Access
 
-Next, we can access the [Sample API](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.SampleAPI) by running the [API Access](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.APIAccess) solution provided here.
+Next, we can get access to the [Sample API](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.SampleAPI) by running the [API Access](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/APIAccess) application provided here.
 
-This is done by reusing the access token we got from authentication.
+This is done by sending the access token we got from authentication process as a bearer token when accessing the Sample API.
 
-This access token is set as a ``Bearer`` token in the Authorization Header.
-
-Then, we call the API and retrive the result.
+The access token is set as a ``Bearer`` token in the Authorization Header, after which we call the API and retrive the result. You can find this code in the `HomeController.cs` file:
 
 ```csharp 
         // The action calls the Sample API, authenticates the user and loads the API data if the user is authenticated
@@ -52,11 +55,5 @@ Then, we call the API and retrive the result.
             return View();
         }
 ``` 
-
-## Prerequisites
-
-Visual Studio 2019
-
-.NET Core 5.0
 
 

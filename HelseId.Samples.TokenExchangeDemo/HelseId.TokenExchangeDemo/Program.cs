@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -227,9 +228,31 @@ namespace HelseId.TokenExchangeDemo
 
         private static void RunBrowser(string url)
         {
-            // Thanks Brock! https://brockallen.com/2016/09/24/process-start-for-urls-on-net-core/
-            url = url.Replace("&", "^&");
-            Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
+            try
+            {
+                Process.Start(url);
+            }
+            catch
+            {
+                // Thanks Brock! https://brockallen.com/2016/09/24/process-start-for-urls-on-net-core/
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    url = url.Replace("&", "^&");
+                    Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    Process.Start("xdg-open", url);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    Process.Start("open", url);
+                }
+                else
+                {
+                    throw new Exception("Unrecognized operating system");
+                }
+            }
         }
     }
 }

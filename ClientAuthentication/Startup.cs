@@ -26,9 +26,14 @@ namespace HelseId.ClientAuthentication
         public void ConfigureServices(IServiceCollection services)
         {
 
-            // Settings from appsettings.json
-            Settings settings = new Settings();
-            Configuration.GetSection("Settings").Bind(settings);
+            var settings = new Settings {
+                Authority = "https://helseid-sts.test.nhn.no/",
+                ClientId = "helseid-sample-client-authentication",
+                ResponseType = "code",
+                DefaultChallengeScheme = "oidc",
+                Scope = "openid profile helseid://scopes/identity/pid helseid://scopes/identity/security_level",
+                SignInScheme = "Cookies",
+            };
 
             // Create singleton from instance
             services.AddSingleton(settings);
