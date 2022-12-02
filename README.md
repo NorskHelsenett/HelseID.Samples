@@ -1,6 +1,10 @@
 # HelseID Samples
 
-HelseID is a national authentication service for the health sector in Norway. These samples are targeted at technical personel such as application architects and developers. 
+HelseID is a national authentication service for the health sector in Norway. 
+These samples are targeted at technical personel such as application architects and developers.  
+
+If you have trouble checking out this repository because of long paths, update your git config by running:  
+`git config --global core.longpaths true`
 
 ## Overview of Samples
 1. [Client Authentication](#ClientAuthentication)
@@ -17,6 +21,7 @@ HelseID is a national authentication service for the health sector in Norway. Th
 7. [Token Exchange](#TokenExchange)
 8. [Request Objects](#RequestObjects)
 10. [Backend for Frontend (BFF)](#BFF)
+11. [Persontjenesten Samples](#PersontjenestenSamples)
 ##
 
 ### <a name="ClientAuthentication"></a> Client Authentication
@@ -74,6 +79,14 @@ The sample demonstrates how to use request objects for client authentication aga
 ### <a name="BFF"></a> Backend for Frontend (BFF)
 
 See [HelseId.Core.BFF.Sample](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Core.BFF.Sample).
+
+### <a name="PersontjenestenSamples"></a> Persontjenesten Samples
+
+Running samples for Persontjenesten API clients that exchange valid tokens with HelseID.
+
+Implementations:
+1. [.NET](Persontjenesten.Samples/.NET/PersontjenestenDotNetDemo/README.md)
+2. [Java](Persontjenesten.Samples/Java/demo/README.md)
 
 ##
 More info on https://nhn.no/helseid/ (Norwegian) and https://dokumentasjon.helseid.no/
