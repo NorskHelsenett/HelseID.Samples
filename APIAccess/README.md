@@ -1,6 +1,6 @@
 ## API Access
 
-#### This sample builds upon [Client Authentication Sample](https://github.com/HelseID/HelseID.Samples/tree/master/HelseId.ClientAuthentication). Only API acccess is different.
+#### This sample builds upon [Client Authentication Sample](../ClientAuthentication/README.md). Only the API acccess is different.
 
 ### Requirements
 

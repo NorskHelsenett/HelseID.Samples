@@ -11,6 +11,7 @@ If you have trouble checking out this repository because of long paths, update y
 * [API Access](#APIAccess)
     * [API Access with resource indicators](#APIAccessResourceIndicators)
 * [Client Credentials Grant](#ClientCredentials)
+    * [Client Credentials Grant with child access](#ClientCredentialsWithChildAccess)
 * [Refresh Token](#RefreshToken)
 * [Token Exchange](#TokenExchange)
 * [Request Objects](#RequestObjects)
@@ -39,11 +40,13 @@ The sample demonstrate how resource indicators are used to download multiple acc
 
 ### <a name="ClientCredentials"></a> Client Credentials Grant
 
-Simple demonstration of client credentials grant. See [HelseId.Samples.ClientCredentials/README.md](HelseId.Samples.ClientCredentials/README.md) for more information.
+A simple demonstration of the client credentials grant. See [ClientCredentials/README.md](HelseId.Samples.ClientCredentials/README.md) for more information.
 
-#### <a name="ClientCredentials.WithChildOrg"></a> Client Credentials with Child Organization
+This sample also contains a method for adding a child organization to the call to HelseID.
 
-A modification of the [HelseId.Samples.ClientCredentials](HelseId.Samples.ClientCredentials/README.md) sample, where a child organization is added as well. See [HelseId.Samples.ClientCredentialsWithUnderenhet/README.md](HelseId.Samples.ClientCredentialsWithUnderenhet/README.md).
+### <a name="ClientCredentialsWithChildAccess"></a> Client Credentials Grant
+
+A modification of the ClientCredentials sample, where a child organization is added as well. See [ClientCredentialsWithUnderenhet/README.md](HelseId.Samples.ClientCredentials/README.md) for more information.
 
 ### <a name="RefreshToken"></a> Refresh Token
 

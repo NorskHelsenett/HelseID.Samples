@@ -23,7 +23,7 @@
     @foreach (var prop in (await Context.AuthenticateAsync()).Properties.Items)
     {
         if (prop.Key == ".Token.access_token" || prop.Key == ".Token.id_token") {
-            <dt>@prop.Key <a href="https://jwt.ms/#id_token=@(prop.Value)">(klick here to view the token)</a></dt>
+            <dt>@prop.Key <a href="https://jwt.ms/#id_token=@(prop.Value)" target="_blank">(klick here to view the token)</a></dt>
             <dd>@prop.Value</dd>
         }
         else 
