@@ -1,0 +1,32 @@
+@model HelseId.Samples.ApiAccess.ViewModels.ApiResponseViewModel
+
+<div class="container">
+    <div class="row">
+        <partial name="_ApiTest" />
+    </div>
+
+    @if (@Model.IsSuccess)
+    {
+        <div class="row">
+            <partial name="_ApiResult"/>
+        </div>
+    }
+    else if (@Model.ErrorMessage.Length > 0)
+    {
+        <div class="row">
+            <partial name="_ApiError"/>
+        </div>
+    } 
+
+    <div class="row">
+        <partial name="_UserSession" />
+    </div>
+
+    <div class="row">
+        <partial name="_UserClaimsListing" />
+    </div>
+    
+    <div class="row">
+        <partial name="_OtherProperties" />
+    </div>
+</div>

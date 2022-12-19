@@ -1,44 +1,58 @@
-﻿using IdentityModel.Client;
-using System;
-using System.Net.Http;
-using System.Threading.Tasks;
-using HelseID.Samples.Configuration;
-using HelseID.Samples.Extensions;
+﻿using System.CommandLine;
+using HelseId.Samples.ClientCredentials.Client;
+using HelseId.Samples.ClientCredentials.Configuration;
 
 namespace HelseId.Samples.ClientCredentials;
 
 /// <summary>
-/// This sample shows how to use the client credential grant to get an access token from HelseID.
+/// This sample shows how to use the client credential grant to get an access token from HelseID
+/// and the use this access token to consume a sample API.
 /// </summary>
 static class Program
 {
-    static async Task Main()
+    static async Task Main(string[] args)
     {
-        var configuration = HelseIdSamplesConfiguration.ConfigurationForClientCredentialsClient;
+        // The Main method uses the System.Commandline library to parse the command line parameters:
+        var useChildOrgNumberOption = new Option<bool>(
+            aliases: new [] {"--use-child-org-number", "-uc"},
+            description: "If set, the application will request an child organization (underenhet) claim for the access token.",
+            getDefaultValue: () => false);
 
-        // Two builder classes are used (each in its own file in this directory):
-        //   * ClientCredentialsClientAssertionsBuilder, which creates the token request that is used against
-        //     the HelseID service, and also finds the token endpoint for this request
-        //   * ClientCredentialsClientAssertionsBuilder, which creates a client assertion that will be used
-        //     inside the token request to HelseID in order to authenticate this client
-        var clientCredentialsTokenRequestBuilder =
-            new ClientCredentialsTokenRequestBuilder(
-                new ClientCredentialsClientAssertionsBuilder(configuration),
-                configuration);
+        var useClientInfoEndpointOption = new Option<bool>(
+            aliases: new [] {"--use-client-info-endpoint", "-ci"},
+            description: "If set, the application will use the access token to access the client info endpoint on the HelseID service.",
+            getDefaultValue: () => false);
 
-        using var client = new HttpClient();
-
-        var request = await clientCredentialsTokenRequestBuilder.CreateClientCredentialsTokenRequest(client);
-
-        var result = await client.RequestClientCredentialsTokenAsync(request);
-
-        if (result.IsError)
+        var rootCommand = new RootCommand("A client credentials usage sample")
         {
-            await result.WriteErrorToConsole();
-        }
-        else
+            useChildOrgNumberOption, useClientInfoEndpointOption
+        };
+
+        rootCommand.SetHandler(async (useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue) =>
         {
-            result.WriteAccessTokenFromTokenResult();
-        }
+            var clientConfigurator = new ClientConfigurator();
+            var client = clientConfigurator.ConfigureClient(useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue);
+            var repeatCall = true;
+            while (repeatCall)
+            {
+                repeatCall = await CallApiWithToken(client);
+            }
+        }, useChildOrgNumberOption, useClientInfoEndpointOption);
+
+        await rootCommand.InvokeAsync(args);
+    }
+
+    private static async Task<bool> CallApiWithToken(Machine2MachineClient client)
+    {
+        await client.CallApiWithToken();
+        return ShouldCallAgain();
+    }
+
+    private static bool ShouldCallAgain()
+    {
+        Console.WriteLine("Type 'a' to call the API again, or any other key to exit:");
+        var input = Console.ReadKey();
+        Console.WriteLine();
+        return input.Key == ConsoleKey.A;
     }
 }
