@@ -28,7 +28,7 @@ namespace HelseId.RequestObjectsDemo
                 // Corresponding public key is: {'e':'AQAB','kty':'RSA','n':'4e76k7QF01kw3hhdHyc3iyUn6c465yrLD9KV7m4gNIc3Tm66Iq3P72xq9w5abAXJG9GJUkbhtTG5isFmXLCU4MOlU5T2a7iBqx2dmao72LSsQ7WZQVtIv5JvWYAXpd4rlgTaJfO3Unv9Tn8v5wWgL9ZbplVmR_GWMY5l-7i44PWwLwGZge_KUVGQmKtx7XXsnezG4JfEAPJbO9zfD4CH6AGtRdcAn2r-2-jqk_-uU1BVoWwDdrCJ_DKOyYNDUfkRneTATY5RDdH5flNd-19XW31L1q3dTMqHbcMzFMfiqwyBYX5kFJrDT-W7poIex7jhZfA5by8K1tfwJqdYRGH4Qp5QtBTs76iuANNBUz3tO0vmV8bYez2AWegvRqrZGHPsMPtA5pCjXw1rueJdH5WqpCHrBsnNkOHNVcd8yHLPmXRokwi3cSanOuquLOI5Qh-pqeuTTJAv8QQ3X5aQRnHmZoyVuOP9Qqq05MGRPp6W-7Vdbi6mslDP-FwUnkHb2C-XenxHesqfcbqBOELa-PD6Fj_usVKPcL9HR_J4IK38XFFOT669_Xhpyaq6iRtvlmj1n_fQNvRcGpZIfIAFgf64cIwLAz2vimj5ywXneyDIRv5Wge8VyhfsAe9S01x0dNq-aR16clayKDn48e6fETeTWJJaPK7lvi1-Oc-tlaA7Pfk','kid':'B2C61A07EE0661237D19BEE1E0A1463C'}
 
                 // These values should go into a configuration file
-                const string clientId = "helseid-sample-request-objects-console";
+                const string clientId = "f7cd1256-0526-4b5a-b4c3-f054c984ace8";
                 const string localhost = "http://localhost:8090";
                 const string redirectUrl = "/callback";
                 const string startPage = "/start";
@@ -160,9 +160,9 @@ namespace HelseId.RequestObjectsDemo
 
             var orgNumberDetails = new Dictionary<string, string>
             {
-                { "system", "urn:oid:2.16.578.1.12.4.1.2.101" },
+                { "system", "urn:oid:1.0.6523" },
                 { "type", "ENH" },
-                { "value", "999977775" } // Client configuration in HelseID contains a orgnumber whitelist with this number
+                { "value", "NO:ORGNR:994598759:123456789" } // Client configuration in HelseID contains a orgnumber whitelist with this number
             };
 
             var identifier = new Dictionary<string, object>
@@ -177,7 +177,7 @@ namespace HelseId.RequestObjectsDemo
 
             var authorizationDetails = new Dictionary<string, object>
             {
-                { "type", "helseid_authorization" },
+                { "type", "helseid_authorization" }, 
                 { "practitioner_role", organization }
             };
 
