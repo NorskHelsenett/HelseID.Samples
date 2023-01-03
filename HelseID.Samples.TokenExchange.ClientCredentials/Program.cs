@@ -26,13 +26,19 @@ namespace HelseId.TokenExchangeDemo
 
                 // Subject Client system requests a initial access token 
                 // Here the client system calls the api and the api picks up the token
-                // Everything below this line would be done by the API that receives the call from the client (subject)
                 var subjectAccessToken = await GetSubjectAccessTokenUsingClientCredentials();
                 if(string.IsNullOrEmpty(subjectAccessToken))
                 {
                     return;
                 }
+                
+                // At this point, the client would use the subjectAccessToken as a bearer token to call the API.
 
+                ///////////////////////////////////////////////////////////////////
+                // Everything below this line would be done by the API (the actor)
+                // that receives the call from the client (our subject)
+                ///////////////////////////////////////////////////////////////////
+                
                 // Perform the token exchange process as a separate client
                 var exchangeResponse = await PerformTokenExchange(subjectAccessToken);
                 if (exchangeResponse.IsError)
