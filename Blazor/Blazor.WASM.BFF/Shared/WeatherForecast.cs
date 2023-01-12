@@ -1,4 +1,4 @@
-namespace Blazor_WASM_BFF.Shared
+namespace Blazor.WASM.BFF.Shared
 {
     public class WeatherForecast
     {

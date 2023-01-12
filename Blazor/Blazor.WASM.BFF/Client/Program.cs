@@ -1,4 +1,4 @@
-using Blazor_WASM_BFF.Client;
+using Blazor.WASM.BFF.Client;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 

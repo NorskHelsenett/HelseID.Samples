@@ -1,7 +1,7 @@
-using Blazor_WASM_BFF.Shared;
+using Blazor.WASM.BFF.Shared;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Blazor_WASM_BFF.Server.Controllers
+namespace Blazor.WASM.BFF.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
