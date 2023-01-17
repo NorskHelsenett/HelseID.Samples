@@ -1,17 +1,17 @@
 ﻿@page "/fetchdata"
-@using Blazor.WASM.Api.Access.Shared
+@using Blazor.WASM.Api.Access.Shared.AdminApiModels
 @inject HttpClient Http
 
 <AuthorizeView>
     <Authorized>
-<PageTitle>Weather forecast</PageTitle>
+<PageTitle>Admin Api</PageTitle>
 
-<h1>Weather forecast</h1>
+<h1>Admin Client:</h1>
 
 <p>This component demonstrates fetching data from the server.</p>
 
 
-    @if (forecasts == null)
+        @if (client == null)
     {
         <p><em>Loading...</em></p>
     }
@@ -20,42 +20,41 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Temp. (C)</th>
-                    <th>Temp. (F)</th>
-                    <th>Summary</th>
+                        <th>ClientName</th>
+                        <th>ConfigurationOwnerName</th>
+                        <th>ProtocolType</th>
+                        <th>Updated</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach (var forecast in forecasts)
-                {
+            <tbody>          
                     <tr>
-                        <td>@forecast.Date.ToShortDateString()</td>
-                        <td>@forecast.TemperatureC</td>
-                        <td>@forecast.TemperatureF</td>
-                        <td>@forecast.Summary</td>
-                    </tr>
-                }
+                        <td>@client.ClientName</td>
+                        <td>@client.ConfigurationOwnerName</td>
+                        <td>@client.ProtocolType</td>
+                        <td>@client.Updated</td>
+                    </tr>                
             </tbody>
         </table>
     }
 
 
 @code {
-    private WeatherForecast[]? forecasts;
+    private HelseIdClient? client;
 
     protected override async Task OnInitializedAsync()
     {
-      
+
         try
             {
-                forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast");
+                client = await Http.GetFromJsonAsync<HelseIdClient>("AdminApi/?id=BlazorWasmBff");
             }
-            catch (Exception)
-            {
-
+        catch (Exception)
+            {                
                 
             }
+            
+          
+         
         
 
     }
@@ -63,7 +62,8 @@
 
     </Authorized>
     <NotAuthorized>
-        <p><em>Log In To get Access To Weather </em></p>
-        <a href="bff/login">Log in</a>
+        <p><em>Redirecting to Login.. </em></p>
+      @*  <a href="bff/login">Log in</a>*@
+        <RedirectToLogin></RedirectToLogin>
     </NotAuthorized>
 </AuthorizeView>

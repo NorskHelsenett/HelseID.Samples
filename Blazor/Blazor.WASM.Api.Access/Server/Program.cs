@@ -1,6 +1,7 @@
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
+using System.Net;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -29,6 +30,12 @@ try
     builder.Services.AddRazorPages();
     builder.Services.AddBff();
 
+    // registers HTTP client that uses the managed user access token
+    builder.Services.AddUserAccessTokenHttpClient("apiClient", configureClient: client =>
+    {
+        client.BaseAddress = new Uri("https://helseid-admin.utvikling.nhn.no/");
+    });
+
     builder.Services.AddAuthentication(options =>
     {
         options.DefaultScheme = "cookie";
@@ -45,8 +52,8 @@ try
             options.Authority = "https://helseid-sts.utvikling.nhn.no/";
             // options.Authority = "https://localhost:5001";
 
-            options.ClientId = "BlazorWasmBff";
-            options.ClientSecret = "M9sMSMbNJDWJZLZoDGubA9UJ1DAJ5Gs9f0l_fwUBwBGMltYl8qFlO_SPAlou_fCR";
+            options.ClientId = "BlazorWasmApiAccess";
+            options.ClientSecret = "rbwzNdV5jVFPMm1n5Z8coGwiY6VUBRaGrfNc-uAM1DExShWSIv36iNUSw_sBhm6y";
 
             options.ResponseType = "code";
             options.ResponseMode = "query";
@@ -59,6 +66,7 @@ try
             options.Scope.Clear();
             options.Scope.Add("openid");
             options.Scope.Add("profile");
+            options.Scope.Add("helseid://scopes/client/sts_configuration_admin");
 
         });
 
