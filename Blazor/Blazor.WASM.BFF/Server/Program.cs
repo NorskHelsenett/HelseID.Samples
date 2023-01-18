@@ -50,22 +50,17 @@ try
         })
         .AddOpenIdConnect("oidc", options =>
         {
-            options.Authority = "https://helseid-sts.utvikling.nhn.no/";
             // options.Authority = "https://localhost:5001";
+            options.Authority = "https://helseid-sts.utvikling.nhn.no/";            
             options.RequireHttpsMetadata = true;
             options.ClientId = "BlazorWasmBff";
-           // options.ClientSecret = "M9sMSMbNJDWJZLZoDGubA9UJ1DAJ5Gs9f0l_fwUBwBGMltYl8qFlO_SPAlou_fCR";
+            // options.ClientSecret = "M9sMSMbNJDWJZLZoDGubA9UJ1DAJ5Gs9f0l_fwUBwBGMltYl8qFlO_SPAlou_fCR";
             
             options.ResponseType = "code";
-           // options.ResponseMode = "query";
 
-           // options.MapInboundClaims = false;
-          //  options.GetClaimsFromUserInfoEndpoint = true;
             options.SaveTokens = true;
-
-            //
+                      
             options.AuthenticationMethod = Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectRedirectBehavior.FormPost;
-
 
             // request scopes + refresh tokens
             options.Scope.Clear();
