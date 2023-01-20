@@ -6,12 +6,12 @@
     <Authorized>
 <PageTitle>Admin Api</PageTitle>
 
-<h1>Admin Client:</h1>
-
-<p>This component demonstrates fetching data from the server.</p>
+<h1>Configuration Owners:</h1>
 
 
-        @if (client == null)
+
+
+        @if (confOwners == null)
     {
         <p><em>Loading...</em></p>
     }
@@ -20,33 +20,36 @@
         <table class="table">
             <thead>
                 <tr>
-                        <th>ClientName</th>
-                        <th>ConfigurationOwnerName</th>
-                        <th>ProtocolType</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>OrgNr</th>
                         <th>Updated</th>
                 </tr>
             </thead>
-            <tbody>          
+            <tbody>
+                    @foreach (var confOwner in confOwners)
+                {
                     <tr>
-                        <td>@client.ClientName</td>
-                        <td>@client.ConfigurationOwnerName</td>
-                        <td>@client.ProtocolType</td>
-                        <td>@client.Updated</td>
-                    </tr>                
+                            <td>@confOwner.Name</td>
+                            <td>@confOwner.Description</td>
+                            <td>@confOwner.OrgNr</td>
+                            <td>@confOwner.Updated</td>
+                    </tr>
+                    }
             </tbody>
         </table>
     }
 
 
 @code {
-    private HelseIdClient? client;
+        private HelseIdConfigurationOwner[]? confOwners;
 
     protected override async Task OnInitializedAsync()
     {
 
         try
             {
-                client = await Http.GetFromJsonAsync<HelseIdClient>("AdminApi/?id=BlazorWasmBff");
+                confOwners = await Http.GetFromJsonAsync<HelseIdConfigurationOwner[]>("AdminApi");
             }
         catch (Exception)
             {                

@@ -20,7 +20,7 @@ namespace Blazor.WASM.Api.Access.Server.Controllers
             _httpClientFactory = httpClientFactory;
         }
         [HttpGet]
-        public async Task<HelseIdClient> Get(string id)
+        public async Task<HelseIdConfigurationOwner[]> Get()
         {
             // create HTTP client
             var httpClient = _httpClientFactory.CreateClient("apiClient");
@@ -31,15 +31,17 @@ namespace Blazor.WASM.Api.Access.Server.Controllers
                     
 
             // call remote API
-            var response = await httpClient.GetAsync($"/api/search?t={id}");
+            var response = await httpClient.GetAsync($"/api/ConfigurationOwnersApi");
             response.EnsureSuccessStatusCode();
             string responseBody = await response.Content.ReadAsStringAsync();
 
-            JObject obj = JObject.Parse(responseBody.ToString());
-            var stringResult = obj.SelectToken("clients.result").First.ToString();
-            HelseIdClient client = JsonConvert.DeserializeObject<HelseIdClient>(stringResult);
 
-            return client;
+
+            JArray obj = JArray.Parse(responseBody.ToString());
+            var stringResult = obj.SelectToken("").ToString();
+            HelseIdConfigurationOwner[] confOwners = JsonConvert.DeserializeObject<HelseIdConfigurationOwner[]>(stringResult);
+
+            return confOwners;
         }
     }
 }
