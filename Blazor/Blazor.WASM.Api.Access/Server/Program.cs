@@ -1,4 +1,7 @@
 using IdentityModel;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
@@ -38,17 +41,16 @@ try
     builder.Services.AddRazorPages();
     builder.Services.AddBff();
 
+
     // registers HTTP client that uses the managed user access token
-    builder.Services.AddUserAccessTokenHttpClient("apiClient", configureClient: client =>
-    {
-        client.BaseAddress = new Uri("https://helseid-admin.utvikling.nhn.no/");
-    });
+
 
     builder.Services.AddAuthentication(options =>
     {
         options.DefaultScheme = "cookie";
         options.DefaultChallengeScheme = "oidc";
         options.DefaultSignOutScheme = "oidc";
+
     })
         .AddCookie("cookie", options =>
         {
@@ -57,13 +59,13 @@ try
         })
         .AddOpenIdConnect("oidc", options =>
         {
-            // options.Authority = "https://localhost:5001";
-            options.Authority = "https://helseid-sts.utvikling.nhn.no/";
+            options.Authority = "https://localhost:44366/";
+            //options.Authority = "https://helseid-sts.utvikling.nhn.no/";
             options.RequireHttpsMetadata = true;
             options.ClientId = "BlazorWasmApiAccess";
             // options.ClientSecret = "rbwzNdV5jVFPMm1n5Z8coGwiY6VUBRaGrfNc-uAM1DExShWSIv36iNUSw_sBhm6y";
 
-            options.ResponseType = "code";            
+            options.ResponseType = "code";
 
             options.SaveTokens = true;
 
@@ -74,6 +76,7 @@ try
             options.Scope.Add("openid");
             options.Scope.Add("profile");
             options.Scope.Add("helseid://scopes/client/sts_configuration_admin");
+            options.Scope.Add("offline_access");
 
             options.Events.OnAuthorizationCodeReceived = ctx =>
             {
@@ -87,6 +90,11 @@ try
 
         });
 
+    builder.Services.AddUserAccessTokenHttpClient("apiClient", configureClient: client =>
+    {
+        // client.BaseAddress = new Uri("https://helseid-admin.utvikling.nhn.no/");
+        client.BaseAddress = new Uri("https://localhost:44356/");
+    });
     var app = builder.Build();
 
     app.UseSerilogRequestLogging();
