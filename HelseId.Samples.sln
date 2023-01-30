@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelseId.Samples.ApiAccess", "ApiAccess\HelseId.Samples.ApiAccess.csproj", "{FA23EA9E-7E1E-4F6A-8BF1-369919D0BEEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelseId.Samples.ClientCredentials", "ClientCredentials\HelseId.Samples.ClientCredentials.csproj", "{117CC087-E6CB-4DEA-88AF-DB1DFEC2ECCC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelseId.Samples.Common", "Common\HelseId.Samples.Common.csproj", "{2A054025-503A-405B-BD3E-75F43B3B0BC6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelseId.Samples.Configuration", "Configuration\HelseId.Samples.Configuration.csproj", "{36266DA1-AB27-4D38-B14C-4B3742321636}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelseId.Samples.SampleApi", "SampleApi\HelseId.Samples.SampleApi.csproj", "{B6D9D670-9857-496A-A02A-0909C09FF7B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelseId.Samples.SampleApiForTokenExchange", "SampleApiForTokenExchange\HelseId.Samples.SampleApiForTokenExchange.csproj", "{8F6B8902-A09D-450A-80FE-0E3D555EF34B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FA23EA9E-7E1E-4F6A-8BF1-369919D0BEEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA23EA9E-7E1E-4F6A-8BF1-369919D0BEEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA23EA9E-7E1E-4F6A-8BF1-369919D0BEEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA23EA9E-7E1E-4F6A-8BF1-369919D0BEEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{117CC087-E6CB-4DEA-88AF-DB1DFEC2ECCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{117CC087-E6CB-4DEA-88AF-DB1DFEC2ECCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{117CC087-E6CB-4DEA-88AF-DB1DFEC2ECCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{117CC087-E6CB-4DEA-88AF-DB1DFEC2ECCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A054025-503A-405B-BD3E-75F43B3B0BC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A054025-503A-405B-BD3E-75F43B3B0BC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A054025-503A-405B-BD3E-75F43B3B0BC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A054025-503A-405B-BD3E-75F43B3B0BC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36266DA1-AB27-4D38-B14C-4B3742321636}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36266DA1-AB27-4D38-B14C-4B3742321636}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36266DA1-AB27-4D38-B14C-4B3742321636}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36266DA1-AB27-4D38-B14C-4B3742321636}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6D9D670-9857-496A-A02A-0909C09FF7B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6D9D670-9857-496A-A02A-0909C09FF7B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6D9D670-9857-496A-A02A-0909C09FF7B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6D9D670-9857-496A-A02A-0909C09FF7B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F6B8902-A09D-450A-80FE-0E3D555EF34B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F6B8902-A09D-450A-80FE-0E3D555EF34B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F6B8902-A09D-450A-80FE-0E3D555EF34B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F6B8902-A09D-450A-80FE-0E3D555EF34B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
