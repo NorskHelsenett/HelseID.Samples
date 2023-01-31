@@ -10,6 +10,11 @@ public class Program
     public static async Task Main(string[] args)
     {
         // The Main method uses the System.Commandline library to parse the command line parameters:
+        var userLoginOnlyOption = new Option<bool>(
+            aliases: new [] {"--user-login-only", "-ul"},
+            description: "If set, the application will only log on a user with no API call",
+            getDefaultValue: () => false);
+
         var useTokenExchangeOption = new Option<bool>(
             aliases: new [] {"--use-token-exchange", "-te"},
             description: "If set, the application will use a client that can be used for a token exchange flow",
@@ -27,24 +32,25 @@ public class Program
 
         var rootCommand = new RootCommand("An authorization code flow usage sample")
         {
-            useTokenExchangeOption, useRequsetObjects, useRequestIndicatorsOption
+            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useRequestIndicatorsOption
         };
 
-        rootCommand.SetHandler((useTokenExchange, useRequestObjects, useRequestIndicators) =>
+        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useRequestIndicators) =>
         {
-            var settings = CreateSettings(useTokenExchange, useRequestObjects, useRequestIndicators);
+            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useRequestIndicators);
             new Startup(settings).BuildWebApplication().Run();
-        }, useTokenExchangeOption, useRequsetObjects, useRequestIndicatorsOption);
+        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useRequestIndicatorsOption);
 
         await rootCommand.InvokeAsync(args);
     }
 
     private static Settings CreateSettings(
+        bool userLoginOnly,
         bool useTokenExchange,
         bool useRequestObjects,
         bool useRequestIndicators)
     {
-        var clientType = GetClientType(useTokenExchange, useRequestObjects, useRequestIndicators);
+        var clientType = GetClientType(userLoginOnly, useTokenExchange, useRequestObjects, useRequestIndicators);
 
         return new Settings
         {
@@ -58,10 +64,16 @@ public class Program
     }
 
     private static ClientType GetClientType(
+        bool userLoginOnly,
         bool useTokenExchange,
         bool useRequestObjects,
         bool useRequestIndicators)
     {
+        if (userLoginOnly)
+        {
+            return ClientType.UserLoginOnly;
+        }
+
         if (useTokenExchange)
         {
             return ClientType.ApiAccessWithTokenExchange;
@@ -118,10 +130,11 @@ public class Program
     {
         return clientType switch
         {
-            ClientType.ApiAccessWithTokenExchange => HelseIdSamplesConfiguration.ConfigurationForApiAccessWithTokenExchange,
-            ClientType.ApiAccessWithRequestObject => HelseIdSamplesConfiguration.ConfigurationForApiAccessWithRequestObject,
-            ClientType.ApiAccessWithResourceIndicators => HelseIdSamplesConfiguration.ConfigurationForResourceIndicatorsClient,
-            _ => HelseIdSamplesConfiguration.ConfigurationForApiAccess
+            ClientType.ApiAccessWithTokenExchange => HelseIdSamplesConfiguration.ApiAccessWithTokenExchange,
+            ClientType.ApiAccessWithRequestObject => HelseIdSamplesConfiguration.ApiAccessWithRequestObject,
+            ClientType.ApiAccessWithResourceIndicators => HelseIdSamplesConfiguration.ResourceIndicatorsClient,
+            ClientType.UserLoginOnly => HelseIdSamplesConfiguration.UserAuthenticationClient,
+            _ => HelseIdSamplesConfiguration.ApiAccess
         };
     }
 }

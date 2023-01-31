@@ -20,43 +20,50 @@ public class HelseIdSamplesConfiguration : HelseIdConfiguration
                 resourceIndicators) {}
 
     // Configuration for the 'plain' client credentials application
-    public static HelseIdSamplesConfiguration ConfigurationForClientCredentialsClient =>
+    public static HelseIdSamplesConfiguration ClientCredentialsClient =>
         new(
             ConfigurationValues.ClientCredentialsSampleRsaPrivateKeyJwk,
             ConfigurationValues.ClientCredentialsSampleClientId,
             ConfigurationValues.ClientCredentialsSampleScope);
 
     // Configuration for the client credentials application with underenhet
-    public static HelseIdSamplesConfiguration ConfigurationForClientCredentialsWithUnderenhetClient =>
+    public static HelseIdSamplesConfiguration ClientCredentialsWithUnderenhetClient =>
         new(
             ConfigurationValues.ClientCredentialsWithUnderenhetSamplePrivateKeyJwk,
             ConfigurationValues.ClientCredentialsWithUnderenhetSampleClientId,
             ConfigurationValues.ClientCredentialsSampleScope);
 
-    // The configuration for the ApiAccess project (accesing the sample API)
-    public static HelseIdSamplesConfiguration ConfigurationForApiAccess =>
+    // The configuration for the ApiAccess project in logon only (no API access) mode
+    public static HelseIdSamplesConfiguration UserAuthenticationClient =>
+        new(
+            ConfigurationValues.UserAuthenticationPrivateKeyJwk,
+            ConfigurationValues.UserAuthenticationClientId,
+            ConfigurationValues.UserAuthenticationClientScope);
+
+    // The configuration for the ApiAccess project (accessing the sample API)
+    public static HelseIdSamplesConfiguration ApiAccess =>
         new(
             ConfigurationValues.ApiAccessSampleRsaPrivateKeyJwk,
             ConfigurationValues.ApiAccessSampleClientId,
             ConfigurationValues.ApiAccessSampleScope);            
 
-    // The configuration for the ApiAccess project with request objects (accesing the sample API)
-    public static HelseIdSamplesConfiguration ConfigurationForApiAccessWithRequestObject =>
+    // The configuration for the ApiAccess project with request objects (accessing the sample API)
+    public static HelseIdSamplesConfiguration ApiAccessWithRequestObject =>
         new(
             ConfigurationValues.ApiAccessWithRequestObjectSampleRsaPrivateKeyJwk,
             ConfigurationValues.ApiAccessSampleClientIdWithRequestObject,
             ConfigurationValues.ApiAccessWithRequestObjectSampleScope); 
             
-    // The configuration for the ApiAccess project (accesing the token exchange client)
-    public static HelseIdSamplesConfiguration ConfigurationForApiAccessWithTokenExchange =>
+    // The configuration for the ApiAccess project (accessing the token exchange client)
+    public static HelseIdSamplesConfiguration ApiAccessWithTokenExchange =>
         new(
             ConfigurationValues.TokenExchangeSubjectRsaPrivateKeyJwk,
             ConfigurationValues.TokenExchangeSubjectClientId,
             ConfigurationValues.TokenExchangeSubjectClientScope);            
     
     // The configuration for the the ApiAccess project with resource indicators
-    // We add the audiences for the two APIs that this project will call as resource indicators
-    public static HelseIdSamplesConfiguration ConfigurationForResourceIndicatorsClient =>
+    // We add the audiences for the two APIs that this project will use as resource indicators
+    public static HelseIdSamplesConfiguration ResourceIndicatorsClient =>
         new(
             ConfigurationValues.ApiAccessResourceIndicatorRsaPrivateKeyJwk,
             ConfigurationValues.ApiAccessResourceIndicatorClientId,
@@ -68,10 +75,9 @@ public class HelseIdSamplesConfiguration : HelseIdConfiguration
             });
 
     // The configuration for the SampleApiForTokenExchange project (used for accessing the SampleApi with the token exchange grant)
-    public static HelseIdSamplesConfiguration ConfigurationForTokenExchangeClient =>
+    public static HelseIdSamplesConfiguration TokenExchangeClient =>
         new(
             ConfigurationValues.TokenExchangActorRsaPrivateKeyJwk,
             ConfigurationValues.TokenExchangeActorClientId,
             ConfigurationValues.TokenExchangeActorClientScope);
-
 }

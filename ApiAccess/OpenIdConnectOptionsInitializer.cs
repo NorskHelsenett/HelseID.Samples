@@ -245,9 +245,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         var userSessionData = new UserSessionData();
 
         // The 'rt_expires_in' parameter is specific for HelseID, and is not present in the common library:
-        var refreshTokenExpiresAtUtc =
-            _expirationTimeCalculator.CalculateTokenExpirationTimeUtc(
-                int.Parse(openIdConnectMessage.Parameters[HelseIdConstants.RefreshTokenExpiresIn]));
+        var refreshTokenExpiresAtUtc = GetRefreshTokenExpiration(openIdConnectMessage);
 
         userSessionData.IdToken = openIdConnectMessage.IdToken;
         userSessionData.RefreshToken = openIdConnectMessage.RefreshToken;
@@ -263,6 +261,16 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         }
         
         await _userSessionDataStore.UpsertUserSessionData(sessionId, userSessionData);
+    }
+
+    private DateTime GetRefreshTokenExpiration(OpenIdConnectMessage openIdConnectMessage)
+    {
+        if (!openIdConnectMessage.Parameters.ContainsKey(HelseIdConstants.RefreshTokenExpiresIn))
+        {
+            return DateTime.MinValue;
+        }
+        return _expirationTimeCalculator.CalculateTokenExpirationTimeUtc(
+                int.Parse(openIdConnectMessage.Parameters[HelseIdConstants.RefreshTokenExpiresIn]));
     }
 
     private void StoreAccessTokenInUserSession(OpenIdConnectMessage openIdConnectMessage, UserSessionData userSessionData)

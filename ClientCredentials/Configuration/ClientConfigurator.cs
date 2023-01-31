@@ -75,9 +75,9 @@ public class ClientConfigurator
     {
         return useChildOrganizationNumberOptionValue ?
             // This is done when the '--use-child-org-number' option is used on the command line:
-            HelseIdSamplesConfiguration.ConfigurationForClientCredentialsWithUnderenhetClient :
+            HelseIdSamplesConfiguration.ClientCredentialsWithUnderenhetClient :
             // Sets up the configuration for a "normal" client:
-            HelseIdSamplesConfiguration.ConfigurationForClientCredentialsClient;
+            HelseIdSamplesConfiguration.ClientCredentialsClient;
     }
     
     private  IPayloadClaimsCreatorForClientAssertion SetUpPayloadClaimsCreator(bool useChildOrganizationNumberOptionValue)

@@ -14,7 +14,7 @@ If you want to use HelseID not only to log on as a user, but also to connect to 
 
 The client application is based on [ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/?view=aspnetcore-6.0). You can find relevant code in:
 * The `Startup` class: this is the initial configuration of the project
-* The `OpenIdConnectOptionsInitializer` class sets up the OpenID Connect user logon, using IClientAssertionsBuilder from the `Common` project
+* The `OpenIdConnectOptionsInitializer` class sets up the OpenID Connect user login, using IClientAssertionsBuilder from the `Common` project
 * The `IUserSessionDataStore` interface abstracts the persisting of user tokens
 * The `AccessTokenUpdater` class updates access tokens when they have expired
 
@@ -23,9 +23,9 @@ have a *client* registered and configured in the HelseID Server Configuration. T
 present in the development environment for HelseID. The configuration for these clients are configured in the `Configuration` project located elsewhere
 in this repo.
 
-### User logon
+### User login
 
-If you start the sample with `dotnet run` on the command line, you'll need to connect a web browser to the address that shows up in the console:
+When you start the sample with `dotnet run` on the command line, you'll need to connect a web browser to the address that shows up in the console:
 ```
 Now listening on: https://localhost:5151
 Application started. Press Ctrl+C to shut down.
@@ -33,7 +33,6 @@ Application started. Press Ctrl+C to shut down.
 the default is `https://localhost:5151`, but you can change the port number in the file `ConfigurationValues.cs`in the `Configuration` folder in the hieararchy above this folder. If you want to change the port number, change the `ApiAccessWebServerPort`constant in that file.
 
 Click "Login", and use the "Test IDP". Then log in as a well known test person. You should be redirected back to the application at `https://localhost:5151`.
-
 
 ### API Access
 
@@ -49,9 +48,17 @@ The [.NET 7 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) is requ
 
 If you need to use this sample to access an API, you will need to start the [Sample API project](../SampleAPI/README.md) in a separate terminal. Then, you can run this application. 
 
-### To run the sample in standard mode, enter the following on the command line inside this folder:
+### Standard mode (user logon with API access)
+
+To run the sample in standard mode (user logon with API access), enter the following on the command line inside this folder:
 ```
 dotnet run
+```
+
+### User login only
+To run the sample as a user login only application, start the application with the extra option: 
+```
+dotnet run --user-login-only
 ```
 
 ### Use of request objects (for use of an underenhet):
