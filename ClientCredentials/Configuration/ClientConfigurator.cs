@@ -75,7 +75,7 @@ public class ClientConfigurator
     {
         return useChildOrganizationNumberOptionValue ?
             // This is done when the '--use-child-org-number' option is used on the command line:
-            HelseIdSamplesConfiguration.ClientCredentialsWithUnderenhetClient :
+            HelseIdSamplesConfiguration.ClientCredentialsWithChildOrgNumberClient :
             // Sets up the configuration for a "normal" client:
             HelseIdSamplesConfiguration.ClientCredentialsClient;
     }

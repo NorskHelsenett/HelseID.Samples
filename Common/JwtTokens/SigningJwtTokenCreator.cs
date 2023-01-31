@@ -49,7 +49,7 @@ public class SigningJwtTokenCreator : ISigningJwtTokenCreator
 
     private SigningCredentials GetClientAssertionSigningCredentials()
     {
-        var securityKey = new JsonWebKey(_configuration.RsaPrivateKeyJwk);
-        return new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha512);
+        var securityKey = new JsonWebKey(_configuration.RsaPrivateKeyJwk.JwkValue);
+        return new SigningCredentials(securityKey, _configuration.RsaPrivateKeyJwk.Algorithm);
     }
 }

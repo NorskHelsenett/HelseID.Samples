@@ -8,7 +8,7 @@ namespace HelseID.Samples.Configuration;
 public class HelseIdSamplesConfiguration : HelseIdConfiguration
 {
     public HelseIdSamplesConfiguration(
-                string rsaPrivateKeyJwk,
+                SecurityKey rsaPrivateKeyJwk,
                 string clientId,
                 string scope,
                 List<string>? resourceIndicators = null) :
@@ -26,11 +26,11 @@ public class HelseIdSamplesConfiguration : HelseIdConfiguration
             ConfigurationValues.ClientCredentialsSampleClientId,
             ConfigurationValues.ClientCredentialsSampleScope);
 
-    // Configuration for the client credentials application with underenhet
-    public static HelseIdSamplesConfiguration ClientCredentialsWithUnderenhetClient =>
+    // Configuration for the client credentials application with child organization number
+    public static HelseIdSamplesConfiguration ClientCredentialsWithChildOrgNumberClient =>
         new(
-            ConfigurationValues.ClientCredentialsWithUnderenhetSamplePrivateKeyJwk,
-            ConfigurationValues.ClientCredentialsWithUnderenhetSampleClientId,
+            ConfigurationValues.ClientCredentialsWithChildOrgNumberSamplePrivateKeyJwk,
+            ConfigurationValues.ClientCredentialsWithChildOrgNumberSampleClientId,
             ConfigurationValues.ClientCredentialsSampleScope);
 
     // The configuration for the ApiAccess project in logon only (no API access) mode
