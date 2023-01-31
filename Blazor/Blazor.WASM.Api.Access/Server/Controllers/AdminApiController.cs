@@ -33,7 +33,6 @@ namespace Blazor.WASM.Api.Access.Server.Controllers
             // call remote API
             var response = await httpClient.GetAsync($"/api/ConfigurationOwnersApi");
             response.EnsureSuccessStatusCode();
-
             string responseBody = await response.Content.ReadAsStringAsync();
 
 
