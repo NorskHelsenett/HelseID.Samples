@@ -1,42 +1,24 @@
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Duende.Bff;
-using IdentityModel;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Duende.AccessTokenManagement;
 
 namespace Blazor.WASM.Api.Access.Server
 {
     public class OidcEvents : BffOpenIdConnectEvents
     {
-        private readonly AssertionService _assertionService;
-        private AssertionService? assertionService;
+        private readonly IClientAssertionService _clientAssertionService;
 
-        public OidcEvents(ILogger<BffOpenIdConnectEvents> logger, AssertionService assertionService) : base(logger)
+        public OidcEvents(IClientAssertionService clientAssertionService, ILogger<BffOpenIdConnectEvents> logger) : base(logger)
         {
-            _assertionService = assertionService;
-        }
-   
-
-
-        public override Task AuthorizationCodeReceived(AuthorizationCodeReceivedContext context)
-        {
-            context.TokenEndpointRequest.ClientAssertionType = OidcConstants.ClientAssertionTypes.JwtBearer;
-            context.TokenEndpointRequest.ClientAssertion = _assertionService.CreateClientToken();
-
-            return Task.CompletedTask;
+            _clientAssertionService = clientAssertionService;
         }
 
-        public override Task RedirectToIdentityProvider(RedirectContext context)
+        public override async Task AuthorizationCodeReceived(AuthorizationCodeReceivedContext context)
         {
-            var request = _assertionService.SignAuthorizationRequest(context.ProtocolMessage);
-            var clientId = context.ProtocolMessage.ClientId;
-            var redirectUri = context.ProtocolMessage.RedirectUri;
-            
-            context.ProtocolMessage.Parameters.Clear();
-            context.ProtocolMessage.ClientId = clientId;
-            context.ProtocolMessage.RedirectUri = redirectUri;
-            context.ProtocolMessage.SetParameter("request", request);
+            var clientAssertion = await _clientAssertionService.GetClientAssertionAsync();
 
-            return Task.CompletedTask;
+            context.TokenEndpointRequest!.ClientAssertionType = clientAssertion!.Type;
+            context.TokenEndpointRequest.ClientAssertion = clientAssertion.Value;
         }
     }
 }
