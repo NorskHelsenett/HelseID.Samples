@@ -27,7 +27,8 @@ public class ClientConfigurator
         bool useChildOrganizationNumberOptionValue,
         bool useClientInfoEndpointOptionValue)
     {
-        var endpointDiscoverer = new HelseIdEndpointDiscoverer(ConfigurationValues.StsUrl);
+        var discoveryDocumentGetter = new DiscoveryDocumentGetter(ConfigurationValues.StsUrl);
+        var endpointDiscoverer = new HelseIdEndpointsDiscoverer(discoveryDocumentGetter);
         var apiConsumer = new ApiConsumer();
         var tokenRequestBuilder = CreateTokenRequestBuilder(useChildOrganizationNumberOptionValue, endpointDiscoverer);
         var clientInfoRetriever = SetUpClientInfoRetriever(useClientInfoEndpointOptionValue, endpointDiscoverer);
@@ -44,7 +45,7 @@ public class ClientConfigurator
             tokenRequestParameters);
     }
 
-    private ITokenRequestBuilder CreateTokenRequestBuilder(bool useChildOrganizationNumberOptionValue, IHelseIdEndpointDiscoverer endpointDiscoverer)
+    private ITokenRequestBuilder CreateTokenRequestBuilder(bool useChildOrganizationNumberOptionValue, IHelseIdEndpointsDiscoverer endpointsDiscoverer)
     {
         // This sets up the building of a token request for the client credentials grant
         var configuration = SetUpHelseIdConfiguration(useChildOrganizationNumberOptionValue);
@@ -59,14 +60,14 @@ public class ClientConfigurator
         //  The instance of this may or may not create a structured claim for the purpose of
         //  getting back an access token with an underenhet (child organization). 
         var clientAssertionsBuilder = new ClientAssertionsBuilder(signingJwtTokenCreator);
-        return new TokenRequestBuilder(clientAssertionsBuilder, endpointDiscoverer, configuration);
+        return new TokenRequestBuilder(clientAssertionsBuilder, endpointsDiscoverer, configuration);
     }
 
-    private static IClientInfoRetriever SetUpClientInfoRetriever(bool useClientInfoEndpointOptionValue, IHelseIdEndpointDiscoverer endpointDiscoverer)
+    private static IClientInfoRetriever SetUpClientInfoRetriever(bool useClientInfoEndpointOptionValue, IHelseIdEndpointsDiscoverer endpointsDiscoverer)
     {
         return useClientInfoEndpointOptionValue ?
             // We need the "special" client info retriever if the '--use-client-info-endpoint' option is used on the command line:
-            new ClientInfoRetriever(endpointDiscoverer) :
+            new ClientInfoRetriever(endpointsDiscoverer) :
             // Normal flow: we don't need a client info retriever, and set the null (do nothing) version here:
             new NullClientInfoRetriever();
     }

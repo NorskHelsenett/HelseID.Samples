@@ -10,11 +10,11 @@ namespace HelseId.Samples.ClientCredentials.ClientInfoEndpoint;
 /// </summary>
 public class ClientInfoRetriever : IClientInfoRetriever
 {
-    private readonly IHelseIdEndpointDiscoverer _helseIdEndpointDiscoverer;
+    private readonly IHelseIdEndpointsDiscoverer _helseIdEndpointsDiscoverer;
 
-    public ClientInfoRetriever(IHelseIdEndpointDiscoverer helseIdEndpointDiscoverer)
+    public ClientInfoRetriever(IHelseIdEndpointsDiscoverer helseIdEndpointsDiscoverer)
     {
-        _helseIdEndpointDiscoverer = helseIdEndpointDiscoverer;
+        _helseIdEndpointsDiscoverer = helseIdEndpointsDiscoverer;
     }
 
     /// <summary>
@@ -24,7 +24,7 @@ public class ClientInfoRetriever : IClientInfoRetriever
     /// </summary>
     public async Task ConsumeClientinfoEndpoint(HttpClient httpClient, string accessToken) {
 
-        var clientInfoUrl = await _helseIdEndpointDiscoverer.GetClientInfoEndpointFromHelseId();
+        var clientInfoUrl = await _helseIdEndpointsDiscoverer.GetClientInfoEndpointFromHelseId();
 
         var clientInfo = await GetClientInfoFromHelseId(httpClient, accessToken, clientInfoUrl);
 

@@ -28,7 +28,7 @@ public static class ConfigurationValues
     public const string SampleApiForResourceIndicators2Scope = $"{SampleApiForResourceIndicators2Audience}/some-scope";
 
     // The scope that is needed for access to the clientinfo_endpoint on HelseID:
-    public const string ClientInfoScope = "helseid://scopes/client/info";
+    private const string ClientInfoScope = "helseid://scopes/client/info";
 
     // Port numbers for the different sample APIs
     public const int SampleApiPort = 5081;
@@ -80,9 +80,11 @@ public static class ConfigurationValues
     private const string EllipticCurvePrivateKey = "{ 'kty': 'EC', 'd': 'BG3mkAdvG0rWnahVtIaCfj2yOH-m0FZbbEOlwXOEIeiBRwYFQEPAII_dVSYNZX-l', 'use': 'sig', 'crv': 'P-384', 'x': 'khAS2R2atO0i7Y7O257HsDeXkp7Rt_D-4HWv5Q3kJBuWw43I9NcTCmGEQZjoP5EL', 'y': '3NxlAKU0SNfnKgvse4NhUz-Bqy7yONtDBxWBxvw1ZtQ82P6jdBFIPrO5u8UMPb7Y', 'alg': 'ES384'}";
     public static readonly SecurityKey UserAuthenticationPrivateKeyJwk                        = new(EllipticCurvePrivateKey, SecurityAlgorithms.EcdsaSha384);
 
-    // --------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
     // Client IDs:
-    // --------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
+    // In HelseID, these are normally set as GUIDS, here we have named them for better readability 
+    // -----------------------------------------------------------------------------------------------------------------
     public const string ClientCredentialsSampleClientId                   = "helseid-sample-client-credentials";
     public const string ClientCredentialsWithChildOrgNumberSampleClientId = "helseid-sample-client-credentials-with-underenhet";   
     public const string ApiAccessSampleClientId                           = "helseid-sample-api-access";
@@ -92,11 +94,12 @@ public static class ConfigurationValues
     public const string ApiAccessResourceIndicatorClientId                = "helseid-sample-resource-indicators";
     public const string UserAuthenticationClientId                        = "helseid-sample-client-authentication";
 
-    // --------------------------------
+    // -----------------------------------------------------------------------------------------------------------------
     // Client scopes:
-    // --------------------------------
-
-    public const string ClientCredentialsSampleScope    = $"{ClientCredentialsScopeForSampleApi} {ClientInfoScope}"; // Sets both the client credential scope and the client info scope for use against the client info endpoint
+    // -----------------------------------------------------------------------------------------------------------------
+    
+    // Sets both the client credential scope (for claims that the sample API needs) and the client info scope for use against the client info endpoint:
+    public const string ClientCredentialsSampleScope    = $"{ClientCredentialsScopeForSampleApi} {ClientInfoScope}"; 
     public const string ApiAccessSampleScope            = $"openid profile offline_access {AuthorizationCodeScopeForSampleApi} helseid://scopes/identity/pid helseid://scopes/identity/pid_pseudonym helseid://scopes/identity/assurance_level helseid://scopes/identity/security_level helseid://scopes/hpr/hpr_number helseid://scopes/identity/network";
     public const string TokenExchangeSubjectClientScope = $"openid profile offline_access {TokenExchangeApiScope} helseid://scopes/identity/pid helseid://scopes/identity/pid_pseudonym helseid://scopes/identity/assurance_level helseid://scopes/identity/pid helseid://scopes/identity/security_level ";
     public const string TokenExchangeActorClientScope   = $"{ClientCredentialsScopeForSampleApi}"; 

@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Interfaces.TokenExpiration;
+using HelseId.Samples.Common.JwtTokens;
 using HelseId.Samples.Common.Models;
 using Microsoft.IdentityModel.Tokens;
 
@@ -12,7 +13,6 @@ namespace HelseId.Samples.Common.PayloadClaimsCreators;
 public class RequestObjectPayloadClaimsCreator : IPayloadClaimsCreatorForRequestObjects
 {
     private readonly IDateTimeService _dateTimeService;
-    private const int TokenExpirationTimeInSeconds = 30;
     
     public RequestObjectPayloadClaimsCreator(IDateTimeService dateTimeService)
     {
@@ -36,7 +36,7 @@ public class RequestObjectPayloadClaimsCreator : IPayloadClaimsCreatorForRequest
             // "aud" (audience): the audience for our client assertion is the HelseID server
             new(JwtRegisteredClaimNames.Aud, configuration.StsUrl),
             // "exp" (expires at): this describes the end of the token usage period
-            new(JwtRegisteredClaimNames.Exp, tokenIssuedAtEpochTime + TokenExpirationTimeInSeconds),
+            new(JwtRegisteredClaimNames.Exp, tokenIssuedAtEpochTime + JwtPayloadCreator.TokenExpirationTimeInSeconds),
             // "nbf" (not before): this describes the start of the token usage period
             new(JwtRegisteredClaimNames.Nbf, tokenIssuedAtEpochTime),
             // "client_id": the value of the current client ID

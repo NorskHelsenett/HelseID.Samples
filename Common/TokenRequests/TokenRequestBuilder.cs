@@ -19,16 +19,16 @@ namespace HelseId.Samples.Common.TokenRequests;
 public class TokenRequestBuilder : ITokenRequestBuilder
 {
     private readonly IClientAssertionsBuilder _clientAssertionsBuilder;
-    private readonly IHelseIdEndpointDiscoverer _endpointDiscoverer;
+    private readonly IHelseIdEndpointsDiscoverer _endpointsDiscoverer;
     private readonly HelseIdConfiguration _configuration;
 
     public TokenRequestBuilder(
         IClientAssertionsBuilder clientAssertionsBuilder,
-        IHelseIdEndpointDiscoverer endpointDiscoverer,
+        IHelseIdEndpointsDiscoverer endpointsDiscoverer,
         HelseIdConfiguration configuration)
     {
         _clientAssertionsBuilder = clientAssertionsBuilder;
-        _endpointDiscoverer = endpointDiscoverer;
+        _endpointsDiscoverer = endpointsDiscoverer;
         _configuration = configuration;
     }
 
@@ -107,7 +107,7 @@ public class TokenRequestBuilder : ITokenRequestBuilder
 
     private async Task<string> FindTokenEndpoint()
     {
-        return await _endpointDiscoverer.GetTokenEndpointFromHelseId();
+        return await _endpointsDiscoverer.GetTokenEndpointFromHelseId();
     }
 
     private ClientAssertion BuildClientAssertion(IPayloadClaimsCreator payloadClaimsCreator, PayloadClaimParameters payloadClaimParameters)

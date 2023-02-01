@@ -10,6 +10,8 @@ public interface IPayloadClaimsCreator
         HelseIdConfiguration configuration);
 }
 
+// Instances of this interface create a payload for use in a client assertion
 public interface IPayloadClaimsCreatorForClientAssertion : IPayloadClaimsCreator { }
 
+// Instances of this interface create a payload for use in a request object
 public interface IPayloadClaimsCreatorForRequestObjects : IPayloadClaimsCreator { }

@@ -9,6 +9,8 @@ namespace HelseId.Samples.Common.JwtTokens;
 // This class creates a JwtPayload instance for use in a token request or a request object
 public class JwtPayloadCreator : IJwtPayloadCreator
 {
+    public const int TokenExpirationTimeInSeconds = 30;
+
     public JwtPayload CreateJwtPayload(
         IPayloadClaimsCreator payloadClaimsCreator,
         PayloadClaimParameters payloadClaimParameters,

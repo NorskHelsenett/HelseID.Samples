@@ -48,11 +48,11 @@ public static class Program
     private static void AddServices(WebApplicationBuilder webApplicationBuilder)
     {
         var settings = new Settings();
-        // Create singleton from instance
         webApplicationBuilder.Services.AddSingleton(settings);
         webApplicationBuilder.Services.AddSingleton<HelseIdConfiguration>(HelseIdSamplesConfiguration.TokenExchangeClient);
         webApplicationBuilder.Services.AddSingleton<IDateTimeService, DateTimeService>();
-        webApplicationBuilder.Services.AddSingleton<IHelseIdEndpointDiscoverer>(new HelseIdEndpointDiscoverer(ConfigurationValues.StsUrl));
+        webApplicationBuilder.Services.AddSingleton<IDiscoveryDocumentGetter>(new DiscoveryDocumentGetter(ConfigurationValues.StsUrl));
+        webApplicationBuilder.Services.AddSingleton<IHelseIdEndpointsDiscoverer, HelseIdEndpointsDiscoverer>();
         webApplicationBuilder.Services.AddSingleton<IPayloadClaimsCreatorForClientAssertion, ClientAssertionPayloadClaimsCreator>();
         webApplicationBuilder.Services.AddSingleton<IJwtPayloadCreator, JwtPayloadCreator>();
         webApplicationBuilder.Services.AddSingleton<ISigningJwtTokenCreator, SigningJwtTokenCreator>();

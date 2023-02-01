@@ -2,17 +2,17 @@ using System.IdentityModel.Tokens.Jwt;
 using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Interfaces.TokenExpiration;
+using HelseId.Samples.Common.JwtTokens;
 using HelseId.Samples.Common.Models;
 using Microsoft.IdentityModel.Tokens;
 
 namespace HelseId.Samples.Common.PayloadClaimsCreators;
 
-// This class generates the claims that are required for the token that is sent
+// This class generates the (general) claims that are required for the token that is sent
 // to HelseID as part of a client assertion
 public class ClientAssertionPayloadClaimsCreator : IPayloadClaimsCreatorForClientAssertion
 {
     private readonly IDateTimeService _dateTimeService;
-    private const int TokenExpirationTimeInSeconds = 30;
     
     public ClientAssertionPayloadClaimsCreator(IDateTimeService dateTimeService)
     {
@@ -37,7 +37,7 @@ public class ClientAssertionPayloadClaimsCreator : IPayloadClaimsCreatorForClien
             // "aud" (audience): the audience for our client assertion is the HelseID server
             new(JwtRegisteredClaimNames.Aud, configuration.StsUrl),
             // "exp" (expires at): this describes the end of the token usage period
-            new(JwtRegisteredClaimNames.Exp, tokenIssuedAtEpochTime + TokenExpirationTimeInSeconds),
+            new(JwtRegisteredClaimNames.Exp, tokenIssuedAtEpochTime + JwtPayloadCreator.TokenExpirationTimeInSeconds),
             // "nbf" (not before): this describes the start of the token usage period
             new(JwtRegisteredClaimNames.Nbf, tokenIssuedAtEpochTime),
             // "iat" (issued at time): this describes the time when the token was issued

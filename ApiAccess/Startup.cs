@@ -84,10 +84,10 @@ public class Startup
         services.AddSingleton<IDateTimeService>(dateTimeService);
         services.AddSingleton<IExpirationTimeCalculator, ExpirationTimeCalculator>();
 
-        // Payload claim creators, either "normal" or for a payload with underenhet (child organization number)
+        // Payload claim creators for use when creating a request object
         if (_settings.ClientType == ClientType.ApiAccessWithRequestObject)
         {
-            // We need claims for the token request, both the "default" type and for the child organization number:
+            // We need payload claims for the token request, both the "default" type and for the child organization number:
             var compositePayloadClaimsCreator = new CompositePayloadClaimsCreator(new List<IPayloadClaimsCreator>
             {
                 new RequestObjectPayloadClaimsCreator(dateTimeService),
@@ -98,6 +98,7 @@ public class Startup
         }
         else
         {
+            // No request object is needed, so we inject a null object for payload claims creation instead
             services.AddSingleton<IPayloadClaimsCreatorForRequestObjects>(new NullPayloadClaimsCreatorForRequestObjects());
         }
 
@@ -111,7 +112,8 @@ public class Startup
         // Builder for client assertions
         services.AddSingleton<IClientAssertionsBuilder, ClientAssertionsBuilder>();
         // Finds the relevant endpoints on the HelseID server
-        services.AddSingleton<IHelseIdEndpointDiscoverer>(new HelseIdEndpointDiscoverer(_settings.HelseIdConfiguration.StsUrl));
+        services.AddSingleton<IDiscoveryDocumentGetter>(new DiscoveryDocumentGetter(_settings.HelseIdConfiguration.StsUrl));
+        services.AddSingleton<IHelseIdEndpointsDiscoverer, HelseIdEndpointsDiscoverer>();
         // Builds token requests (in our case, refresh token requests)
         services.AddSingleton<ITokenRequestBuilder, TokenRequestBuilder>();
         // Used for creating a simple view model

@@ -4,9 +4,10 @@ using HelseId.Samples.Common.Models;
 
 namespace HelseId.Samples.Common.PayloadClaimsCreators;
 
-// The double interface is a hack to make this class compatible as an instance of both IPayloadClaimsCreatorForClientAssertion
-// and IPayloadClaimsCreatorForRequestObjects. This is done because the default ASP.NET Core injection
-// framework does not have a pattern for injecting named types into services
+// The double interface is a hack to make this class compatible as an instance of both
+// IPayloadClaimsCreatorForClientAssertion and IPayloadClaimsCreatorForRequestObjects.
+// This is done because the default ASP.NET Core injection framework does not have a
+// pattern for injecting named types into services.
 public class CompositePayloadClaimsCreator : IPayloadClaimsCreatorForClientAssertion, IPayloadClaimsCreatorForRequestObjects
 {
     private readonly List<IPayloadClaimsCreator> _instances;

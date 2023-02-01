@@ -1,9 +1,7 @@
 namespace HelseId.Samples.Common.Interfaces.Endpoints;
 
-public interface IHelseIdEndpointDiscoverer
+public interface IHelseIdEndpointsDiscoverer
 {
-    string StsUrl { get; }
-
     Task<string> GetTokenEndpointFromHelseId();
     
     Task<string> GetClientInfoEndpointFromHelseId();
