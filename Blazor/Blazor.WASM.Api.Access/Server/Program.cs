@@ -74,7 +74,6 @@ try
             options.Scope.Add("openid");
             options.Scope.Add("profile");
             options.Scope.Add("helseid://scopes/client/sts_configuration_admin");
-            options.Scope.Add("offline_access");
 
             // keeps id_token smaller
             options.GetClaimsFromUserInfoEndpoint = true;
