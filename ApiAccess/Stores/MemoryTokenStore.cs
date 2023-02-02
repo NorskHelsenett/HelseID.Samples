@@ -5,7 +5,6 @@ using HelseId.Samples.ApiAccess.Models;
 namespace HelseId.Samples.ApiAccess.Stores;
 
 // Obviously, this store only persists tokens while the server is running.
-// You might want to use a different approach for a production-like environment.
 public class MemoryUserSessionDataStore : IUserSessionDataStore
 {
     // Slight hack to make the token store available for all instances

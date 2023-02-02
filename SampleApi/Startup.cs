@@ -52,7 +52,7 @@ public  class Startup
 
                 // Validation parameters are in agreement with HelseIDs requirements:
                 // https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/284229708/Guidelines+for+using+JSON+Web+Tokens+JWTs
-                // These (and a few others) are all set as true by default
+                // These (and a few others) are all true by default
                 options.TokenValidationParameters.ValidateLifetime = true;
                 options.TokenValidationParameters.ValidateIssuer = true;
                 options.TokenValidationParameters.ValidateAudience = true;

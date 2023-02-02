@@ -11,7 +11,6 @@ public class AuthenticationOptionsInitializer : IConfigureOptions<Authentication
     public void Configure(AuthenticationOptions authenticationOptions)
     {
         authenticationOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        //authenticationOptions.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         // OpenID connect is used as authentication mechanism when a user wants to access the requested resource
         authenticationOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme; 
     }

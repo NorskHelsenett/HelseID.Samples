@@ -51,12 +51,11 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         OpenIdConnectEventManagement(openIdConnectOptions);
     }
 
-    public void Configure(OpenIdConnectOptions options)
+    public void Configure(OpenIdConnectOptions openIdConnectOptions)
     {
-        // Should not be called
-        throw new Exception();
+        Configure(null, openIdConnectOptions);
     }
-    
+
     private void OpenIdConnectOptionsManagement(OpenIdConnectOptions openIdConnectOptions)
     {
         // Application-specific configuration for the OpenID Connect handler
@@ -71,18 +70,18 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
 
         // These defaults to false: tokens should preferably not be saved in the browser:
         openIdConnectOptions.SaveTokens = false;
-        
+
         // Set this to true if you need information about HPR authorization 
-        // openIdConnectOptions.GetClaimsFromUserInfoEndpoint = true;
+        openIdConnectOptions.GetClaimsFromUserInfoEndpoint = true;
 
         // These default to true, set here for instructional purposes:
         openIdConnectOptions.RequireHttpsMetadata = true;
         openIdConnectOptions.UsePkce = true;
-        
+
         // This matches the value set on the HelseID clients:
         openIdConnectOptions.SignedOutCallbackPath = "/signout-callback-oidc";
 
-        // We use POST as the authenticatio
+        // We use POST as the authentication method
         openIdConnectOptions.AuthenticationMethod = OpenIdConnectRedirectBehavior.FormPost;
     }
 
@@ -125,7 +124,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
 
             return Task.CompletedTask;
         };
-        
+
         // -----------------------------------------------------------------------
         // Returned token are validated
         // -----------------------------------------------------------------------
@@ -156,7 +155,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
                 await _userSessionDataStore.ClearUserSession(sessionId);
                 redirectContext.ProtocolMessage.IdTokenHint = userSessionData.IdToken;
             }
-            catch (SessionIdDoesNotExistException) {}
+            catch (SessionIdDoesNotExistException) { }
         };
 
         // -----------------------------------------------------------------------
@@ -172,7 +171,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
                 new CustomOpenIdConnectMessageParameters
                 {
                     RequestObject = CreateRequestObject(),
-                    ResourceIndicators = _settings.HelseIdConfiguration.ResourceIndicators, 
+                    ResourceIndicators = _settings.HelseIdConfiguration.ResourceIndicators,
                 };
             // For certain features, we need to establish a custom request message for creating
             // request objects or resource indicators.  The implementation of the former ('resource')
@@ -187,21 +186,21 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
                     redirectContext.ProtocolMessage.Clone());
 
                 redirectContext.ProtocolMessage = customProtocolMessage;
+
+                /*
+                The metadata endpoint https://helseid-sts.test.nhn.no/connect/availableidps list the available IDPs
+                in the test environment. If you want to redirect the user to a specific IDP, you can specify this value.
+                */
+
+                // redirectContext.ProtocolMessage.AcrValues = "idp:idporten-oidc";
+
+                /*
+                See https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/5571426/Use+of+ID-porten for more examples:
+                If you want to authenticate the user on behalf of a specific organization, you can add this parameter:
+                */
+
+                // redirectContext.ProtocolMessage.Parameters.Add("on_behalf_of", "912159523");
             }
-            
-            /*
-            The metadata endpoint https://helseid-sts.test.nhn.no/connect/availableidps list the available IDPs
-            in the test environment. If you want to redirect the user to a specific IDP, you can specify this value.
-            */
-
-            // redirectContext.ProtocolMessage.AcrValues = "idp:idporten-oidc";
-
-            /*
-            See https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/5571426/Use+of+ID-porten for more examples:
-            If you want to authenticate the user on behalf of a specific organization, you can add this parameter:
-            */
-
-            // redirectContext.ProtocolMessage.Parameters.Add("on_behalf_of", "912159523");
 
             return Task.CompletedTask;
         };
@@ -215,6 +214,10 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             // The exceptions will be re-thrown after this event unless suppressed.
 
             // Here, you might want to inform the user about a failed authentication
+            return Task.CompletedTask;
+        }; 
+
+        openIdConnectOptions.Events.OnUserInformationReceived = x => {
             return Task.CompletedTask;
         };
     }
@@ -259,7 +262,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         {
             StoreAccessTokenInUserSession(openIdConnectMessage, userSessionData);
         }
-        
+
         await _userSessionDataStore.UpsertUserSessionData(sessionId, userSessionData);
     }
 

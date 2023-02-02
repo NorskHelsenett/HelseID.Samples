@@ -4,6 +4,7 @@ using HelseID.Samples.Configuration;
 
 namespace HelseId.SampleAPI;
 
+// This file is used for bootstrapping the example. Nothing of interest here.
 public static class Program
 {
     public static async Task Main(string[] args)

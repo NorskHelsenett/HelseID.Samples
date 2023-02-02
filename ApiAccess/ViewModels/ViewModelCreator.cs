@@ -7,6 +7,7 @@ using HelseId.Samples.Common.Models;
 
 namespace HelseId.Samples.ApiAccess.ViewModels;
 
+// Creates a ViewModel for use in the user interface
 public class ViewModelCreator : IViewModelCreator
 {
     private readonly IUserSessionGetter _userSessionGetter;

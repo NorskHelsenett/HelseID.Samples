@@ -90,6 +90,7 @@ public class AccessTokenUpdater : IAccessTokenUpdater
         // If the value for refreshToken is null, we expect this method to fail
         var request = await _tokenRequestBuilder.CreateRefreshTokenRequest(_payloadClaimsCreatorForClientAssertion, tokenRequestParameters!);
 
+        // Send request using IdentityModel extension method
         return await httpClient.RequestRefreshTokenAsync(request);
     }
 

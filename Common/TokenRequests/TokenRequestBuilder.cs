@@ -39,14 +39,6 @@ public class TokenRequestBuilder : ITokenRequestBuilder
         var tokenEndpoint = await FindTokenEndpoint();
         var clientAssertion = BuildClientAssertion(payloadClaimsCreator, tokenRequestParameters.PayloadClaimParameters);
 
-        return CreateRefreshTokenRequest(tokenRequestParameters, tokenEndpoint, clientAssertion);
-    }
-
-    private RefreshTokenRequest CreateRefreshTokenRequest(
-        RefreshTokenRequestParameters tokenRequestParameters,
-        string tokenEndpoint,
-        ClientAssertion clientAssertion)
-    {
         // This class comes from the IdentityModel library and abstracts a request for a token using the refresh token grant
         var result = new RefreshTokenRequest
         {

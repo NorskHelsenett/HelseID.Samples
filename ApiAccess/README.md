@@ -61,9 +61,9 @@ To run the sample as a user login only application, start the application with t
 dotnet run --user-login-only
 ```
 
-### Use of request objects (for use of an underenhet):
+### Use of request objects (for use of a child organization number):
 If you want to send an underenhet (child org. no) as part of the claim to the API, you will need to set this underenhet as part of a request object that is sent to HelseID. If
-this underenhet is present in the client in HelseID, you will receive a claim of type `` as part of the access token. To do this, you can start the application with the extra option:
+this underenhet is present in the client in HelseID, you will receive a claim of type `helseid://claims/client/claims/orgnr_child` as part of the access token. To do this, you can start the application with the extra option:
 
 ```
 dotnet run --use-request-objects

@@ -4,10 +4,7 @@ using HelseId.Samples.ClientCredentials.Configuration;
 
 namespace HelseId.Samples.ClientCredentials;
 
-/// <summary>
-/// This sample shows how to use the client credential grant to get an access token from HelseID
-/// and the use this access token to consume a sample API.
-/// </summary>
+// This file is used for bootstrapping the example. Nothing of interest here.
 static class Program
 {
     static async Task Main(string[] args)

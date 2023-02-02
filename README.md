@@ -24,7 +24,15 @@ Please be advised that the sample code does not in any way represent working cod
 
 HelseID supports the use of several grants, that is, the resource owner's (user or enterprise) authorization used by the client to obtain an access token. Code samples are provided for different scenarios, and each will use at least one grant type. The following grants are provided:
 
-####Machine-to-machine sample
+#### Sample API
+
+The code can be found in the `SampleAPI` folder.
+
+Most of the HelseID samples demonstrate how a client can access an API. Therefore, a sample API has been created such that other HelseID samples can access it. The API requires authentication before the client is granted access. The API should be run locally before trying to connect through another HelseID sample.
+
+See [SampleApi/README.md](SampleApi/README.md) for more information.
+
+#### Machine-to-machine sample
 
 The code can be found in the `ClientCredentials` folder.
 
@@ -36,7 +44,7 @@ When using this sample, you will also need to start the [sample API](./SampleApi
 
 See [ClientCredentials/README.md](ClientCredentials/README.md) for more information.
 
-####User authentication/API access sample
+#### User authentication/API access sample
 
 The code can be found in the `SampleApi` folder.
 
@@ -50,7 +58,7 @@ This sample also exhibits the use of the [Refresh Token Grant](https://www.rfc-e
 
 See [APIAccess/README.md](UserAuthentication/README.md) for more information.
 
-####Token exchange sample
+#### Token exchange sample
 
 The code can be found in the `SampleApiForTokenExchange` folder.
 
@@ -61,15 +69,6 @@ If you wish to use this sample, you will need to start both
 * The [sample API](./SampleApi/README.md)
 
  See [SampleApiForTokenExchange/README.md](./SampleApiForTokenExchange/README.md) for more information.
-
-####Sample API
-
-The code can be found in the `SampleAPI` folder.
-
-Most of the HelseID samples demonstrate how a client can access an API. Therefore, a sample API has been created such that other HelseID samples can access it. The API requires authentication before the client is granted access. The API should be run locally before trying to connect through another HelseID sample.
-
-See [SampleApi/README.md](SampleApi/README.md) for more information.
-
 
 ## Native clients
 

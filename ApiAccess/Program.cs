@@ -5,6 +5,7 @@ using HelseID.Samples.Configuration;
 
 namespace HelseId.Samples.ApiAccess;
 
+// This file is used for bootstrapping the example. Nothing of interest here.
 public class Program
 {
     public static async Task Main(string[] args)

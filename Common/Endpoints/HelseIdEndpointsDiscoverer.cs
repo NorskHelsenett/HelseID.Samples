@@ -6,6 +6,7 @@ namespace HelseId.Samples.Common.Endpoints;
 // This class discovers endpoints on HelseID to use for (e.g. token) requests to HelseID
 public class HelseIdEndpointsDiscoverer : IHelseIdEndpointsDiscoverer
 {
+    //TODO: Lag som extension metoder i stedet
     public HelseIdEndpointsDiscoverer(IDiscoveryDocumentGetter discoveryDocumentGetter)
     {
         _discoveryDocumentGetter = discoveryDocumentGetter;

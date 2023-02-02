@@ -1,6 +1,6 @@
-## Sample API
+## Sample API for Token Exchange
 
-This is a sample REST API that is configured to use HelseID to authorize its usage. The API contoller makes use of the tooken exchange grant in order to call the 'other' sample API with an appropriate access token.
+This is a sample REST API that is configured to use HelseID to authorize its usage. The API contoller makes use of the token exchange grant in order to call the 'other' sample API with an appropriate access token.
 
 The API provides one endpoint, `token-exchange-clients/greetings`. 
 
@@ -16,6 +16,5 @@ The [.NET 7 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) is requ
 
 #### To run the sample, enter the following on the command line inside this folder:
 ```
-dotnet build
 dotnet run
 ```

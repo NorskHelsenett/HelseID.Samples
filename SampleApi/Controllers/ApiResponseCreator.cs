@@ -16,13 +16,12 @@ public class ApiResponseCreator : IApiResponseCreator
 
     public ApiResponse CreateApiResponse(List<Claim> claims, string apiName)
     {
-        var greetingResult = new ApiResponse
+        return new ApiResponse
         {
             Greeting = CreateGreeting(claims, apiName),
             OrganizationNumber = claims.SingleOrDefault(c => c.Type == "helseid://claims/client/claims/orgnr_parent")?.Value,
             ChildOrganizationNumber = claims.SingleOrDefault(c => c.Type == "helseid://claims/client/claims/orgnr_child")?.Value,
         };
-        return greetingResult;
     }
 
     private string CreateGreeting(IEnumerable<Claim> claims, string apiName)
