@@ -1,3 +1,4 @@
+using System.Text.Json;
 using HelseId.Samples.ApiAccess.Configuration;
 using HelseId.Samples.ApiAccess.Exceptions;
 using HelseId.Samples.ApiAccess.Interfaces.Stores;
@@ -9,6 +10,7 @@ using HelseId.Samples.Common.Interfaces.TokenExpiration;
 using HelseId.Samples.Common.Models;
 using HelseID.Samples.Configuration;
 using IdentityModel;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Options;
@@ -71,8 +73,15 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         // These defaults to false: tokens should preferably not be saved in the browser:
         openIdConnectOptions.SaveTokens = false;
 
-        // Set this to true if you need information about HPR authorization 
+        // Uses information from the user info endpoint
+        // Comment these lines out if you don't need information about HPR authorization:
         openIdConnectOptions.GetClaimsFromUserInfoEndpoint = true;
+        openIdConnectOptions.ClaimActions.MapCustomJson("helseid://claims/hpr/hpr_details",jsonElement =>
+        {
+            return jsonElement.TryGetProperty("helseid://claims/hpr/hpr_details", out var claimContent) ?
+                claimContent.GetRawText() :
+                string.Empty;
+        });
 
         // These default to true, set here for instructional purposes:
         openIdConnectOptions.RequireHttpsMetadata = true;
@@ -166,13 +175,13 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             // Invoked before redirecting to the identity provider to authenticate. This can be used to
             // set a ProtocolMessage.State that will be persisted through the authentication process.
             // The ProtocolMessage can also be used to add or customize parameters sent to the identity provider.
-
             var customOpenIdConnectMessageParameters =
                 new CustomOpenIdConnectMessageParameters
                 {
                     RequestObject = CreateRequestObject(),
                     ResourceIndicators = _settings.HelseIdConfiguration.ResourceIndicators,
-                };
+                }; 
+            
             // For certain features, we need to establish a custom request message for creating
             // request objects or resource indicators.  The implementation of the former ('resource')
             // is not in conformance with the specification (https://www.rfc-editor.org/rfc/rfc8707), and
@@ -216,10 +225,6 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             // Here, you might want to inform the user about a failed authentication
             return Task.CompletedTask;
         }; 
-
-        openIdConnectOptions.Events.OnUserInformationReceived = x => {
-            return Task.CompletedTask;
-        };
     }
 
     // Created a request object if the client type requires it.
