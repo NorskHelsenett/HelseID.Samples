@@ -1,0 +1,66 @@
+@model HelseId.Samples.ApiAccess.ViewModels.ApiResponseViewModel
+
+<div class="col-md">
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">User session</h5>
+            <p class="card-text">This is the session data for the logged on user:</p>
+            <p class="card-text">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th scope="col">Data type</th>
+                        <th scope="col">Value</th>
+                    </tr>
+                    </thead>
+                    <tr>
+                        <td>Session ID</td>
+                        <td>@Model.UserSessionData.SessionId</td>
+                    </tr>
+                    <tr>
+                        <td>Organization parent org. no</td>
+                        <td>@Model.UserSessionData.SelectedOrganization.OrgNoParent</td>
+                    </tr>
+                    <tr>
+                        <td>Organization child org. no</td>
+                        <td>@Model.UserSessionData.SelectedOrganization.OrgNoChild</td>
+                    </tr>
+                    <tr>
+                        <td>ID token</td>
+                        @if (Model.UserSessionData.IdToken.Length > 50)
+                        {
+                            <td><a href="https://jwt.ms/#id_token=@Model.UserSessionData.IdToken" target="_blank">@Model.UserSessionData.IdToken.Substring(0, 50)…</a></td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>Refresh token</td>
+                        <td>@Model.UserSessionData.RefreshToken</td>
+                    </tr>
+                    <tr>
+                        <td>Refresh token expires at</td>
+                        <td>@Model.UserSessionData.RefreshTokenExpiresAtUtc.ToLocalTime()</td>
+                    </tr>
+                    @foreach (var accessTokenData in @Model.UserSessionData.AccessTokens)
+                    {
+                        <tr>
+                            <td>Authorization token audience</td>
+                            <td>@accessTokenData.Key</td>
+                        </tr>
+                        <tr>
+                            <td>Access token</td>
+                            <td><a href="https://jwt.ms/#id_token=@accessTokenData.Value.AccessToken" target="_blank">@accessTokenData.Value.AccessToken.Substring(0, 50)…</a></td>
+                        </tr>
+                        <tr>
+                            <td>Access token expires at</td>
+                            <td>@accessTokenData.Value.AccessTokenExpiresAtUtc.ToLocalTime()</td>
+                        </tr>
+                    }
+                </table>
+            </p>            
+        </div>
+    </div>
+</div>
