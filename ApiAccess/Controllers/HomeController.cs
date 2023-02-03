@@ -26,7 +26,6 @@ public class HomeController : Controller
         IApiConsumer apiConsumer,
         IAccessTokenUpdater accessTokenUpdater,
         IViewModelCreator viewModelCreator)
-        
     {
         _logger = logger;
         _settings = settings;
@@ -44,14 +43,15 @@ public class HomeController : Controller
         return View();
     }
 
-    [Authorize("LoggedOnUser")] // Starts the configured authentication scheme when the user clicks Login
+    // Starts the configured authentication scheme when the user clicks Login
+    [Authorize(Startup.SecurityLevelClaimPolicy)] 
     public async Task<IActionResult> Login()
     {
         return View(await _viewModelCreator.GetApiResponseViewModel(claimsPrincipal: HttpContext.User));
     }
 
     [Route("home/call-api-1-with-resource-indicators")]
-    [Authorize("LoggedOnUser")]
+    [Authorize(Startup.SecurityLevelClaimPolicy)]
     public async Task<IActionResult> CallApi1WithResourceIndicators()
     {
         var apiUrl = _settings.ApiUrl1;
@@ -65,7 +65,7 @@ public class HomeController : Controller
     }
 
     [Route("home/call-api-2-with-resource-indicators")]
-    [Authorize("LoggedOnUser")]
+    [Authorize(Startup.SecurityLevelClaimPolicy)]
     public async Task<IActionResult> CallApi2WithResourceIndicators()
     {
         var apiUrl = _settings.ApiUrl2;
@@ -79,7 +79,7 @@ public class HomeController : Controller
     }
 
     [Route("home/call-api")]
-    [Authorize("LoggedOnUser")]
+    [Authorize(Startup.SecurityLevelClaimPolicy)]
     public async Task<IActionResult> CallApi()
     {
         var apiUrl = _settings.ApiUrl1;
@@ -89,12 +89,6 @@ public class HomeController : Controller
         };
 
         return await CallApi(apiIndicators, apiUrl);
-    }
-
-    [Route("home/access-denied")]
-    public IActionResult AccessDenied()
-    {
-        return View("AccessDenied");
     }
 
     private async Task<IActionResult> CallApi(ApiIndicators apiIndicators, string apiUrl)

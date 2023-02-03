@@ -31,6 +31,8 @@ namespace HelseId.Samples.ApiAccess;
 
 public class Startup
 {
+    public const string SecurityLevelClaimPolicy = "SecurityLevelClaimPolicy";
+
     private readonly Settings _settings;
 
     public Startup(Settings settings)
@@ -139,7 +141,7 @@ public class Startup
             .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
             {
                 // Path to access denied endpoint. Used when authorization fails
-                options.AccessDeniedPath = "/home/access-denied";
+                options.AccessDeniedPath = "/authorization/access-denied";
             })
             .AddOpenIdConnect(openIdConnectOptions =>
             {
@@ -149,14 +151,14 @@ public class Startup
                 initializer!.Configure(nameof(OpenIdConnectOptionsInitializer), openIdConnectOptions);
             });
 
-        var loggedOnUserAuthorizationPolicy = new AuthorizationPolicyBuilder()
+        var securityLevelClaimPolicy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
                 .RequireClaim(ConfigurationValues.HelseIdSecurityLevelClaim, "4")
                 .Build();
 
         services.AddAuthorization(config =>
         {
-            config.AddPolicy("loggedOnUser", loggedOnUserAuthorizationPolicy);
+            config.AddPolicy(SecurityLevelClaimPolicy, securityLevelClaimPolicy);
         });
     }
 
