@@ -26,7 +26,7 @@ To run the sample, enter the following on the command line inside this folder:
 dotnet run
 ```
 
-### Request indicators
+### Resource indicators
 
 To run the sample with for use in the Resource Indicator sample for the [ApiAccess](./ApiAccess/README.md) project, enter the following on the command line inside this folder:
 ```

@@ -24,6 +24,7 @@ using HelseID.Samples.Configuration;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 
 namespace HelseId.Samples.ApiAccess;
@@ -135,14 +136,28 @@ public class Startup
         
         // Set authentication options (these will call the AuthenticationOptionsInitializer and OpenIdConnectOptionsInitializer instances)
         services.AddAuthentication()
-            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+            {
+                // Path to access denied endpoint. Used when authorization fails
+                options.AccessDeniedPath = "/home/access-denied";
+            })
             .AddOpenIdConnect(openIdConnectOptions =>
             {
                 // We need to extract the OpenID Connect options initializer from the service provider:
                 var serviceProvider = services.BuildServiceProvider();
                 var  initializer = serviceProvider.GetService<IConfigureNamedOptions<OpenIdConnectOptions>>();
                 initializer!.Configure(nameof(OpenIdConnectOptionsInitializer), openIdConnectOptions);
-            });        
+            });
+
+        var loggedOnUserAuthorizationPolicy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .RequireClaim(ConfigurationValues.HelseIdSecurityLevelClaim, "4")
+                .Build();
+
+        services.AddAuthorization(config =>
+        {
+            config.AddPolicy("loggedOnUser", loggedOnUserAuthorizationPolicy);
+        });
     }
 
     private WebApplication Configure(WebApplication webApplication) 
