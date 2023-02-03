@@ -26,21 +26,21 @@ public class Program
             description: "If set, the application will use a request object in the call to the authorization endpoint",
             getDefaultValue: () => false);
 
-        var useRequestIndicatorsOption = new Option<bool>(
-            aliases: new [] {"--use-request-indicators", "-ri"},
+        var useResourceIndicatorsOption = new Option<bool>(
+            aliases: new [] {"--use-resource-indicators", "-ri"},
             description: "If set, the application will use resource indicators in order to call two APIs with different audiences",
             getDefaultValue: () => false);
 
         var rootCommand = new RootCommand("An authorization code flow usage sample")
         {
-            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useRequestIndicatorsOption
+            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption
         };
 
-        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useRequestIndicators) =>
+        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators) =>
         {
-            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useRequestIndicators);
+            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators);
             new Startup(settings).BuildWebApplication().Run();
-        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useRequestIndicatorsOption);
+        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption);
 
         await rootCommand.InvokeAsync(args);
     }
@@ -49,9 +49,9 @@ public class Program
         bool userLoginOnly,
         bool useTokenExchange,
         bool useRequestObjects,
-        bool useRequestIndicators)
+        bool useResourceIndicators)
     {
-        var clientType = GetClientType(userLoginOnly, useTokenExchange, useRequestObjects, useRequestIndicators);
+        var clientType = GetClientType(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators);
 
         return new Settings
         {
@@ -68,7 +68,7 @@ public class Program
         bool userLoginOnly,
         bool useTokenExchange,
         bool useRequestObjects,
-        bool useRequestIndicators)
+        bool useResourceIndicators)
     {
         if (userLoginOnly)
         {
@@ -85,7 +85,7 @@ public class Program
             return ClientType.ApiAccessWithRequestObject;
         }
 
-        if (useRequestIndicators)
+        if (useResourceIndicators)
         {
             return ClientType.ApiAccessWithResourceIndicators;
         }

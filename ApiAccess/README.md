@@ -69,11 +69,11 @@ this underenhet is present in the client in HelseID, you will receive a claim of
 dotnet run --use-request-objects
 ```
 
-### Use of request indicators:
-If you want to use the request indicators sample, you will need to start the application with an extra option:
+### Use of resource indicators:
+If you want to use the resource indicators sample, you will need to start the application with an extra option:
 
 ```
-dotnet run --use-request-indicators
+dotnet run --use-resource-indicators
 ```
 
 ### Use of token exchange:
