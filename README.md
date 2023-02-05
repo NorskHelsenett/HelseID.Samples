@@ -86,6 +86,10 @@ The sample demonstrates how resource indicators are used to download multiple ac
 
 The sample demonstrates how to use request objects for client authentication against HelseID. See [NativeClients/SimpleRequestObjectsDemo](NativeClients/SimpleRequestObjectsDemo/README.md).
 
+## Other languages
+
+In the folder [node/ClientAuthentication](./node/ClientAuthentication/README.md), you can find a small example for user login that uses Node.js.
+
 ## Advanced samples
 
 We've created a set of samples for more advanced cases.
