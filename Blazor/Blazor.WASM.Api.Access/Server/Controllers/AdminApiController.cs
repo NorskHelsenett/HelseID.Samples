@@ -23,16 +23,28 @@ namespace Blazor.WASM.Api.Access.Server.Controllers
 
             // call remote API
             var response = await httpClient.GetAsync($"/api/ConfigurationOwnersApi");
-            response.EnsureSuccessStatusCode();
-            string responseBody = await response.Content.ReadAsStringAsync();
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                
+                HelseIdConfigurationOwner[] confOwners = new HelseIdConfigurationOwner[1];
+
+                return confOwners;
+            }
+            else
+            {
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
 
 
 
-            JArray obj = JArray.Parse(responseBody.ToString());
-            var stringResult = obj.SelectToken("").ToString();
-            HelseIdConfigurationOwner[] confOwners = JsonConvert.DeserializeObject<HelseIdConfigurationOwner[]>(stringResult);
+                JArray obj = JArray.Parse(responseBody.ToString());
+                var stringResult = obj.SelectToken("").ToString();
+                HelseIdConfigurationOwner[] confOwners = JsonConvert.DeserializeObject<HelseIdConfigurationOwner[]>(stringResult);
+                return confOwners;
+            }
+         
 
-            return confOwners;
+            
         }
     }
 }

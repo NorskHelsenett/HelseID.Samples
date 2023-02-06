@@ -1,0 +1,85 @@
+﻿/* Don't collapse rows even if they are empty */
+::deep tbody tr {
+    height: 1.8rem;
+}
+
+::deep .quickgrid[theme=darkly] {
+   /* font-family: 'Comic Sans MS', 'Times New Roman', serif;*/
+    color: white;
+}
+
+    ::deep .quickgrid[theme=darkly] .col-title {
+        gap: 0.4rem; /* Separate the sort indicator from title text */
+        font-weight: bold;
+        line-height: 40px;
+        background-color: #375a7f;
+        box-sizing: unset;
+        border:none;
+        
+    }
+
+    ::deep .quickgrid[theme=darkly] .col-options-button {
+
+        margin: 5px;
+    
+    }
+    ::deep .quickgrid[theme=darkly] .col-options {
+        gap: 0.4rem; /* Separate the sort indicator from title text */
+        font-weight: bold;
+        line-height: 40px;
+        background-color: #375a7f;
+        box-sizing: unset;
+        border: none;
+    }
+
+
+::deep .quickgrid[theme=darkly] thead {
+    font-weight: bold;
+    background-color: #375a7f;
+    /*border: none;*/
+}
+
+    ::deep .quickgrid[theme=darkly] .sort-indicator {
+        color: blue;
+    }
+
+
+        :: deep .quickgrid[theme=darkly] button.col-title:hover, ::deep .quickgrid[theme=darkly] .col-options-button:hover {
+        background-color: hotpink;
+    }
+
+    ::deep .quickgrid[theme=darkly] button.col-title:active, ::deep .quickgrid[theme=darkly] .col-options-button:active {
+        background-color: yellow;
+    }
+
+
+/* Style the custom page links*/
+.page-buttons {
+    margin: 1rem 0;
+    align-items: center;
+}
+
+    .page-buttons button {
+        background: #d6d7d8;
+        color: black;
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.4rem;
+        transition: transform 0.3s ease-out;
+        margin: 0.25rem;
+    }
+
+        .page-buttons button:active {
+            background: #a7c1ff !important;
+            color: white;
+            transform: scale(0.95) translateY(-0.15rem);
+            transition-duration: 0.05s;
+        }
+
+        .page-buttons button:hover:not(.current) {
+            background: #c0c9dc;
+        }
+
+        .page-buttons button.current {
+            background: #3771f4;
+            color: white;
+        }

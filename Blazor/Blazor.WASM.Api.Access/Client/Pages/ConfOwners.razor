@@ -1,0 +1,172 @@
+﻿@page "/confowners"
+@using Blazor.WASM.Api.Access.Shared.AdminApiModels
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<AuthorizeView>
+    <Authorized>
+            <PageTitle>Configuration Owners</PageTitle>
+
+            <h4 class="">Configuration Owners:</h4>
+
+
+
+
+        @if (confOwners == null)
+                    {
+            <p><em>Loading...</em></p>
+                    }
+                    else
+                    {
+            <table class="table">
+            <QuickGrid class="table" Items="@FilteredNames" Pagination="@pagination" Theme="darkly">
+
+                <PropertyColumn Property="@(p => p.Name)" Sortable="true" >
+                     <ColumnOptions>
+                        <div class="search-box">
+                            <input type="search" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="Name..." />
+                        </div>
+                    </ColumnOptions>
+            </PropertyColumn>
+                <PropertyColumn Property="@(p => p.Description)" Sortable="true" />
+                <PropertyColumn Property="@(p => p.Prefix)" Sortable="true" />
+                <PropertyColumn Property="@(p => p.OrgNr)" Sortable="true" />
+                <PropertyColumn Property="@(p => p.Updated)" Sortable="true" />
+                <TemplateColumn Context="ctx" Title="Actions">
+                    <a class="btn btn-info" href='/confowneredit/@ctx.Id'>Edit</a>
+
+                </TemplateColumn>
+
+            </QuickGrid>
+            </table>
+            <div class="page-buttons">
+                Page:
+                @if (pagination.TotalItemCount.HasValue)
+                {
+                    for (var pageIndex = 0; pageIndex <= pagination.LastPageIndex; pageIndex++)
+                    {
+                        var capturedIndex = pageIndex;
+                        <button @onclick="@(() => GoToPageAsync(capturedIndex))"
+                        class="@PageButtonClass(capturedIndex)"
+                        aria-current="@AriaCurrentValue(capturedIndex)"
+                        aria-label="Go to page @(pageIndex + 1)">
+                            @(pageIndex + 1)
+                        </button>
+                    }
+                }
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr class="table-primary">
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Prefix</th>
+                        <th>OrgNr</th>
+                        <th>Updated</th>
+                        <th>Enabled</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var confOwner in confOwners)
+                    {
+                        <tr class="table-dark">
+                            <td>@confOwner.Name</td>
+                            <td>@confOwner.Description</td>
+                            <td>@confOwner.Prefix</td>
+                            <td>@confOwner.OrgNr</td>
+                            <td>@confOwner.Updated</td>
+                           
+                            <td><input disabled="true" type="checkbox" @bind="@confOwner.IsEnabled" /></td>
+
+                            <Button class="btn btn-sm btn-dark " Clicked="/confowneredit/@confOwner.Id">Edit</Button>
+                           
+                        </tr>
+                    }
+                </tbody>
+            </table>
+                    }
+
+
+        @code {
+            private HelseIdConfigurationOwner[]? confOwners;
+            PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
+            IQueryable<HelseIdConfigurationOwner>? itemsQueryable;
+            string nameFilter;
+            int minResults;
+            int maxResults = 120;
+
+        IQueryable<HelseIdConfigurationOwner> FilteredNames
+            {
+                get
+                {
+                var result = itemsQueryable?.Where(c => c.Name.Count() <= maxResults);
+
+                    if (!string.IsNullOrEmpty(nameFilter))
+                    {
+                        result = result.Where(c => c.Name.Contains(nameFilter, StringComparison.CurrentCultureIgnoreCase));
+                    }
+
+                if (minResults > 0)
+                    {
+                    result = result.Where(c => c.Name.Count() >= minResults);
+                    }
+
+                    return result;
+                }
+            }
+
+
+            public void editConfOwner(int id)
+            {
+
+                Navigation.NavigateTo($"/confowneredit/{id}");
+            }
+
+
+            protected override async Task OnInitializedAsync()
+            {
+
+                try
+                {
+                    confOwners = await Http.GetFromJsonAsync<HelseIdConfigurationOwner[]>("AdminApi");
+                    itemsQueryable = confOwners.AsQueryable();
+                    pagination.TotalItemCountChanged += (sender, eventArgs) => StateHasChanged();
+
+
+                    if (confOwners[0] == null)
+                    {
+                        var returnUrl = Uri.EscapeDataString("/" + Navigation.ToBaseRelativePath(Navigation.Uri));
+                        Navigation.NavigateTo($"bff/login?returnUrl={returnUrl}", forceLoad: true);
+                    }
+                }
+
+                catch (Exception)
+                {
+
+                }
+
+
+            }
+            private async Task GoToPageAsync(int pageIndex)
+            {
+                await pagination.SetCurrentPageIndexAsync(pageIndex);
+            }
+
+            private string? PageButtonClass(int pageIndex)
+            => pagination.CurrentPageIndex == pageIndex ? "current" : null;
+
+            private string? AriaCurrentValue(int pageIndex)
+            => pagination.CurrentPageIndex == pageIndex ? "page" : null;
+        }
+    
+
+            </Authorized >
+    <NotAuthorized >
+        <p><em> Redirecting to Login.. </em></p>
+              
+        <RedirectToLogin></RedirectToLogin>
+    </NotAuthorized>
+</AuthorizeView>
