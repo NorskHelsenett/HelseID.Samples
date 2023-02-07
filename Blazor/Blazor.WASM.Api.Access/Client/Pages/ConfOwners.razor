@@ -8,56 +8,35 @@
     <Authorized>
             <PageTitle>Configuration Owners</PageTitle>
 
-            <h4 class="">Configuration Owners:</h4>
-
-
-
-
         @if (confOwners == null)
-                    {
+        {
             <p><em>Loading...</em></p>
-                    }
-                    else
-                    {
-            <table class="table">
-            <QuickGrid class="table" Items="@FilteredNames" Pagination="@pagination" Theme="darkly">
+        }
+        else
+        {
 
-                <PropertyColumn Property="@(p => p.Name)" Sortable="true" >
-                     <ColumnOptions>
-                        <div class="search-box">
-                            <input type="search" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="Name..." />
-                        </div>
-                    </ColumnOptions>
-            </PropertyColumn>
-                <PropertyColumn Property="@(p => p.Description)" Sortable="true" />
-                <PropertyColumn Property="@(p => p.Prefix)" Sortable="true" />
-                <PropertyColumn Property="@(p => p.OrgNr)" Sortable="true" />
-                <PropertyColumn Property="@(p => p.Updated)" Sortable="true" />
-                <TemplateColumn Context="ctx" Title="Actions">
-                    <a class="btn btn-info" href='/confowneredit/@ctx.Id'>Edit</a>
+            <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1" Class="my-4">
+                Configuration Owners
+            </RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" Class="my-4">
+               
+            </RadzenText>
 
-                </TemplateColumn>
+            <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Class="mt-2 mb-4" Text="Add New Configuration Owner" Click="@InsertRow" Disabled=@(configOwnerToInsert != null || configOwnerToUpdate != null) />
 
-            </QuickGrid>
-            </table>
-            <div class="page-buttons">
-                Page:
-                @if (pagination.TotalItemCount.HasValue)
-                {
-                    for (var pageIndex = 0; pageIndex <= pagination.LastPageIndex; pageIndex++)
-                    {
-                        var capturedIndex = pageIndex;
-                        <button @onclick="@(() => GoToPageAsync(capturedIndex))"
-                        class="@PageButtonClass(capturedIndex)"
-                        aria-current="@AriaCurrentValue(capturedIndex)"
-                        aria-label="Go to page @(pageIndex + 1)">
-                            @(pageIndex + 1)
-                        </button>
-                    }
-                }
-            </div>
-
-            <table class="table">
+            <RadzenDataGrid @ref="configOwnersGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Simple" AllowSorting="true" PageSize="15" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                        Data="@confOwners" TItem="HelseIdConfigurationOwner" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedConfigOwners EditMode="DataGridEditMode.Single" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset">
+                <Columns>                    
+                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="Name" Title="Name" Frozen="true" Width="160px" />
+                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="Description" Title="Description" Width="200px" />
+                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="Prefix" Title="Prefix" Width="160px" />
+                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="OrgNr" Title="OrgNr"  Width="160px" />
+                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="Updated" Title="Updated" FormatString="{0:d}" Width="160px" />                    
+                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="IsEnabled" Title="IsEnabled" FormatString="{0:d}" Width="60px" />
+                   
+                </Columns>
+            </RadzenDataGrid>
+          @*  <table class="table">
                 <thead>
                     <tr class="table-primary">
                         <th>Name</th>
@@ -86,38 +65,21 @@
                         </tr>
                     }
                 </tbody>
-            </table>
+            </table>*@
                     }
 
 
         @code {
-            private HelseIdConfigurationOwner[]? confOwners;
-            PaginationState pagination = new PaginationState { ItemsPerPage = 10 };
-            IQueryable<HelseIdConfigurationOwner>? itemsQueryable;
-            string nameFilter;
-            int minResults;
-            int maxResults = 120;
+            HelseIdConfigurationOwner[]? confOwners;
+            IList<HelseIdConfigurationOwner> selectedConfigOwners;
+            RadzenDataGrid<HelseIdConfigurationOwner> configOwnersGrid;
+            //IList<HelseIdConfigurationOwner> confOwners;
 
-        IQueryable<HelseIdConfigurationOwner> FilteredNames
+            void Reset()
             {
-                get
-                {
-                var result = itemsQueryable?.Where(c => c.Name.Count() <= maxResults);
-
-                    if (!string.IsNullOrEmpty(nameFilter))
-                    {
-                        result = result.Where(c => c.Name.Contains(nameFilter, StringComparison.CurrentCultureIgnoreCase));
-                    }
-
-                if (minResults > 0)
-                    {
-                    result = result.Where(c => c.Name.Count() >= minResults);
-                    }
-
-                    return result;
-                }
+            configOwnerToInsert = null;
+            configOwnerToUpdate = null;
             }
-
 
             public void editConfOwner(int id)
             {
@@ -131,16 +93,15 @@
 
                 try
                 {
-                    confOwners = await Http.GetFromJsonAsync<HelseIdConfigurationOwner[]>("AdminApi");
-                    itemsQueryable = confOwners.AsQueryable();
-                    pagination.TotalItemCountChanged += (sender, eventArgs) => StateHasChanged();
-
-
+                confOwners = await Http.GetFromJsonAsync<HelseIdConfigurationOwner[]>("AdminApi");
+               
                     if (confOwners[0] == null)
                     {
                         var returnUrl = Uri.EscapeDataString("/" + Navigation.ToBaseRelativePath(Navigation.Uri));
                         Navigation.NavigateTo($"bff/login?returnUrl={returnUrl}", forceLoad: true);
                     }
+
+                selectedConfigOwners = confOwners.Take(1).ToList();
                 }
 
                 catch (Exception)
@@ -150,16 +111,112 @@
 
 
             }
-            private async Task GoToPageAsync(int pageIndex)
+
+        async Task EditRow(HelseIdConfigurationOwner confOwner)
+        {
+            configOwnerToUpdate = confOwner;
+            await configOwnersGrid.EditRow(confOwner);
+        }
+
+        void OnUpdateRow(HelseIdConfigurationOwner confOwner)
+        {
+            if (confOwner == configOwnerToInsert)
             {
-                await pagination.SetCurrentPageIndexAsync(pageIndex);
+                configOwnerToInsert = null;
             }
 
-            private string? PageButtonClass(int pageIndex)
-            => pagination.CurrentPageIndex == pageIndex ? "current" : null;
+            configOwnerToUpdate = null;
 
-            private string? AriaCurrentValue(int pageIndex)
-            => pagination.CurrentPageIndex == pageIndex ? "page" : null;
+            confOwners.Append(confOwner);
+          
+
+            // For demo purposes only
+           // confOwners.Customer = dbContext.Customers.Find(confOwners.CustomerID);
+          //  confOwners.Employee = dbContext.Employees.Find(confOwners.EmployeeID);
+
+            // For production
+            //dbContext.SaveChanges();
+        }
+
+        async Task SaveRow(HelseIdConfigurationOwner confOwner)
+        {
+            await configOwnersGrid.UpdateRow(confOwner);
+        }
+
+        void CancelEdit(HelseIdConfigurationOwner confOwner)
+        {
+            if (confOwner == configOwnerToInsert)
+            {
+                configOwnerToInsert = null;
+            }
+
+            configOwnerToUpdate = null;
+
+            configOwnersGrid.CancelEditRow(confOwner);
+
+            // For production
+            //var configOwnerEntry = confOwners.Entry(confOwner);
+            //if (configOwnerEntry.State == EntityState.Modified)
+            //{
+            //    configOwnersListEntry.CurrentValues.SetValues(configOwnersListEntry.OriginalValues);
+            //    configOwnersListEntry.State = EntityState.Unchanged;
+            //}
+        }
+
+        async Task DeleteRow(HelseIdConfigurationOwner confOwner)
+        {
+            if (confOwner == configOwnerToInsert)
+            {
+                configOwnerToInsert = null;
+            }
+
+            if (confOwner == configOwnerToUpdate)
+            {
+                configOwnerToUpdate = null;
+            }
+
+            if (confOwners.Contains(confOwner))
+            {
+              //  dbContext.Remove<HelseIdConfigurationOwner>(confOwner);
+
+                // For demo purposes only
+                //confOwners.Remove(confOwner);
+
+                // For production
+                //dbContext.SaveChanges();
+
+                await configOwnersGrid.Reload();
+            }
+            else
+            {
+                configOwnersGrid.CancelEditRow(confOwner);
+                await configOwnersGrid.Reload();
+            }
+        }
+
+        HelseIdConfigurationOwner configOwnerToInsert;
+        HelseIdConfigurationOwner configOwnerToUpdate;
+
+        async Task InsertRow()
+        {
+            configOwnerToInsert = new HelseIdConfigurationOwner();
+            await configOwnersGrid.InsertRow(configOwnerToInsert);
+        }
+
+        void OnCreateRow(HelseIdConfigurationOwner confOwners)
+        {
+           // dbContext.Add(confOwners);
+
+            // For demo purposes only
+            //confOwners.Customer = dbContext.Customers.Find(confOwners.CustomerID);
+            //confOwners.Employee = dbContext.Employees.Find(confOwners.EmployeeID);
+
+            // For production
+            //dbContext.SaveChanges();
+
+            configOwnerToInsert = null;
+        }
+
         }
     
 

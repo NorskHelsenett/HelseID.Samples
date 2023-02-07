@@ -1,17 +1,9 @@
 ﻿<AuthorizeView>
     <Authorized>
         <strong>Hello, @context!.User!.Identity!.Name</strong>
-        <a class="btn btn-primary my-2 my-sm-0" href="@context.User.FindFirst("bff:logout_url")?.Value">Log out</a>
+        <a class="rz-button rz-button-md rz-secondary rz-text-align-center rz-mr-4" href="@context.User.FindFirst("bff:logout_url")?.Value">Log out</a>
     </Authorized>
     <NotAuthorized>
-      
-            <a class="btn btn-primary my-2 my-sm-0" href="bff/login">
-                Log in
-                        <span class="visually-hidden">(current)</span>
-                    </a>
-
-       
-               
-       
+        <a class="rz-button rz-button-md rz-secondary rz-text-align-center rz-mr-4" href="bff/login">Log in</a>
     </NotAuthorized>
 </AuthorizeView>

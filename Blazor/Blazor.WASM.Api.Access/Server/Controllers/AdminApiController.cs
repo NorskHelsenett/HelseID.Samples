@@ -2,6 +2,7 @@ using Blazor.WASM.Api.Access.Shared.AdminApiModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Net;
 
 namespace Blazor.WASM.Api.Access.Server.Controllers
 {
@@ -25,10 +26,12 @@ namespace Blazor.WASM.Api.Access.Server.Controllers
             var response = await httpClient.GetAsync($"/api/ConfigurationOwnersApi");
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
-                
-                HelseIdConfigurationOwner[] confOwners = new HelseIdConfigurationOwner[1];
+
+                HelseIdConfigurationOwner[] confOwners = Array.Empty<HelseIdConfigurationOwner>();
 
                 return confOwners;
+                
+
             }
             else
             {
