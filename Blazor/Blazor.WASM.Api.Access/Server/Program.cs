@@ -1,9 +1,12 @@
 using Blazor.WASM.Api.Access.Server;
 using Duende.AccessTokenManagement;
+using Duende.Bff;
+using Duende.Bff.Yarp;
 using Microsoft.IdentityModel.Logging;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
+using Yarp.ReverseProxy.Configuration;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -32,8 +35,11 @@ try
 
     builder.Services.AddControllers();
     builder.Services.AddRazorPages();
-    builder.Services.AddBff();
+    builder.Services.AddBff()
+        .AddRemoteApis(); 
     builder.Services.AddSingleton<OidcEvents>();
+  
+
 
     //TODO: This should be read from some safe location
     var clientConfig = new ClientAssertionConfiguration()
@@ -113,6 +119,11 @@ try
     app.UseAuthorization();
 
     app.MapBffManagementEndpoints();
+
+    //built-in simple HTTP forwarder
+    app.MapRemoteBffApiEndpoint("/adminapi/ConfigurationOwnersApi", "https://localhost:44356/api/ConfigurationOwnersApi")
+            .RequireAccessToken(TokenType.User);
+
     app.MapRazorPages();
 
     app.MapControllers()

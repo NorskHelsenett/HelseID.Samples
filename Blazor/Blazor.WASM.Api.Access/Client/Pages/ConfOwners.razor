@@ -1,12 +1,16 @@
 ﻿@page "/confowners"
 @using Blazor.WASM.Api.Access.Shared.AdminApiModels
-@using Microsoft.AspNetCore.Components.QuickGrid
+@using System.Text;
+@using Newtonsoft.Json;
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@inject NotificationService NotificationService
+
+<RadzenNotification />
 
 <AuthorizeView>
     <Authorized>
-            <PageTitle>Configuration Owners</PageTitle>
+        <PageTitle>Configuration Owners</PageTitle>
 
         @if (confOwners == null)
         {
@@ -19,98 +23,152 @@
                 Configuration Owners
             </RadzenText>
             <RadzenText TextStyle="TextStyle.Body1" Class="my-4">
-               
+
             </RadzenText>
 
             <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" Class="mt-2 mb-4" Text="Add New Configuration Owner" Click="@InsertRow" Disabled=@(configOwnerToInsert != null || configOwnerToUpdate != null) />
 
             <RadzenDataGrid @ref="configOwnersGrid" AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Simple" AllowSorting="true" PageSize="15" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
                         Data="@confOwners" TItem="HelseIdConfigurationOwner" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedConfigOwners EditMode="DataGridEditMode.Single" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset">
-                <Columns>                    
-                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="Name" Title="Name" Frozen="true" Width="160px" />
-                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="Description" Title="Description" Width="200px" />
-                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="Prefix" Title="Prefix" Width="160px" />
-                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="OrgNr" Title="OrgNr"  Width="160px" />
-                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="Updated" Title="Updated" FormatString="{0:d}" Width="160px" />                    
-                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="IsEnabled" Title="IsEnabled" FormatString="{0:d}" Width="60px" />
-                   
+                <Columns>
+                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="Name" Title="Name" Frozen="true" Width="160px">
+                        <EditTemplate Context="helseIdConfigurationOwner">
+                            <RadzenTextBox @bind-Value="helseIdConfigurationOwner.Name" Style="width:100%; display: block" Name="Name" />
+                            <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="Description" Title="Description" Width="200px" >
+                        <EditTemplate Context="helseIdConfigurationOwner">
+                            <RadzenTextBox @bind-Value="helseIdConfigurationOwner.Description" Style="width:100%; display: block" Name="Description" />                           
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="Prefix" Title="Prefix" Width="160px" >
+                        <EditTemplate Context="helseIdConfigurationOwner">
+                            <RadzenTextBox @bind-Value="helseIdConfigurationOwner.Prefix" Style="width:100%; display: block" Name="Prefix" />
+                            <RadzenRequiredValidator Text="Prefix is required" Component="Prefix" Popup="true" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="OrgNr" Title="OrgNr" Width="160px" >
+                         <EditTemplate Context="helseIdConfigurationOwner">
+                            <RadzenTextBox @bind-Value="helseIdConfigurationOwner.OrgNr" Style="width:100%; display: block" Name="OrgNr" />
+                            <RadzenRequiredValidator Text="OrgNr is required" Component="OrgNr" Popup="true" />
+                            <RadzenRegexValidator Component="OrgNr" Text="OrgNr code must be 9 digits" Pattern="\d{9}" Popup="true" Style="position: absolute" />
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="Updated" Title="Updated" FormatString="{0:d}" Width="160px" >
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Property="IsEnabled" Title="IsEnabled" FormatString="{0:d}" Width="60px" >
+                        <EditTemplate Context="helseIdConfigurationOwner">
+                            <RadzenCheckBox @bind-Value="helseIdConfigurationOwner.IsEnabled" Style="width:100%; display: block" Name="IsEnabled" />                      
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="HelseIdConfigurationOwner" Context="helseIdConfigurationOwner" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Width="100px">
+                        <Template Context="helseIdConfigurationOwner">
+                            <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(helseIdConfigurationOwner))" @onclick:stopPropagation="true">
+                            </RadzenButton>
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@(args => DeleteRow(helseIdConfigurationOwner))" @onclick:stopPropagation="true">
+                            </RadzenButton>
+                        </Template>
+                        <EditTemplate Context="helseIdConfigurationOwner">
+                            <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(helseIdConfigurationOwner))">
+                            </RadzenButton>
+                            <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@((args) => CancelEdit(helseIdConfigurationOwner))">
+                            </RadzenButton>
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@(args => DeleteRow(helseIdConfigurationOwner))">
+                            </RadzenButton>
+                        </EditTemplate>
+                    </RadzenDataGridColumn>
                 </Columns>
             </RadzenDataGrid>
-          @*  <table class="table">
-                <thead>
-                    <tr class="table-primary">
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Prefix</th>
-                        <th>OrgNr</th>
-                        <th>Updated</th>
-                        <th>Enabled</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var confOwner in confOwners)
-                    {
-                        <tr class="table-dark">
-                            <td>@confOwner.Name</td>
-                            <td>@confOwner.Description</td>
-                            <td>@confOwner.Prefix</td>
-                            <td>@confOwner.OrgNr</td>
-                            <td>@confOwner.Updated</td>
-                           
-                            <td><input disabled="true" type="checkbox" @bind="@confOwner.IsEnabled" /></td>
+            @*  <table class="table">
+        <thead>
+        <tr class="table-primary">
+        <th>Name</th>
+        <th>Description</th>
+        <th>Prefix</th>
+        <th>OrgNr</th>
+        <th>Updated</th>
+        <th>Enabled</th>
+        <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var confOwner in confOwners)
+        {
+        <tr class="table-dark">
+        <td>@confOwner.Name</td>
+        <td>@confOwner.Description</td>
+        <td>@confOwner.Prefix</td>
+        <td>@confOwner.OrgNr</td>
+        <td>@confOwner.Updated</td>
 
-                            <Button class="btn btn-sm btn-dark " Clicked="/confowneredit/@confOwner.Id">Edit</Button>
-                           
-                        </tr>
-                    }
-                </tbody>
-            </table>*@
-                    }
+        <td><input disabled="true" type="checkbox" @bind="@confOwner.IsEnabled" /></td>
+
+        <Button class="btn btn-sm btn-dark " Clicked="/confowneredit/@confOwner.Id">Edit</Button>
+
+        </tr>
+        }
+        </tbody>
+        </table>*@
+        }
 
 
         @code {
-            HelseIdConfigurationOwner[]? confOwners;
+            IList<HelseIdConfigurationOwner> confOwners;
             IList<HelseIdConfigurationOwner> selectedConfigOwners;
             RadzenDataGrid<HelseIdConfigurationOwner> configOwnersGrid;
             //IList<HelseIdConfigurationOwner> confOwners;
 
-            void Reset()
+
+
+        void ShowNotification(NotificationMessage message)
+        {
+            NotificationService.Notify(message);
+
+        }
+
+
+        void Reset()
+        {
+        configOwnerToInsert = null;
+        configOwnerToUpdate = null;
+        }
+
+        public void editConfOwner(int id)
+        {
+
+        Navigation.NavigateTo($"/confowneredit/{id}");
+        }
+
+
+        protected override async Task OnInitializedAsync()
+        {
+
+            try
             {
-            configOwnerToInsert = null;
-            configOwnerToUpdate = null;
-            }
+                confOwners = await Http.GetFromJsonAsync<IList<HelseIdConfigurationOwner>>("/adminapi/ConfigurationOwnersApi");
 
-            public void editConfOwner(int id)
-            {
-
-                Navigation.NavigateTo($"/confowneredit/{id}");
-            }
-
-
-            protected override async Task OnInitializedAsync()
-            {
-
-                try
+                if (confOwners != null)
                 {
-                confOwners = await Http.GetFromJsonAsync<HelseIdConfigurationOwner[]>("AdminApi");
-               
-                    if (confOwners[0] == null)
-                    {
-                        var returnUrl = Uri.EscapeDataString("/" + Navigation.ToBaseRelativePath(Navigation.Uri));
-                        Navigation.NavigateTo($"bff/login?returnUrl={returnUrl}", forceLoad: true);
-                    }
-
-                selectedConfigOwners = confOwners.Take(1).ToList();
+                    selectedConfigOwners = confOwners.Take(1).ToList();
                 }
 
-                catch (Exception)
-                {
-
-                }
-
-
+                
             }
+
+            catch (Exception ex)
+            {
+                ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = ex.Message, Duration = 4000 });
+
+                if (ex.Message.Contains("Unauthorized"))
+                {
+                    var returnUrl = Uri.EscapeDataString("/" + Navigation.ToBaseRelativePath(Navigation.Uri));
+                    Navigation.NavigateTo($"bff/login?returnUrl={returnUrl}", forceLoad: true);
+                }
+            }
+
+
+        }
 
         async Task EditRow(HelseIdConfigurationOwner confOwner)
         {
@@ -118,7 +176,7 @@
             await configOwnersGrid.EditRow(confOwner);
         }
 
-        void OnUpdateRow(HelseIdConfigurationOwner confOwner)
+        async Task OnUpdateRow(HelseIdConfigurationOwner confOwner)
         {
             if (confOwner == configOwnerToInsert)
             {
@@ -127,15 +185,53 @@
 
             configOwnerToUpdate = null;
 
-            confOwners.Append(confOwner);
-          
+            var response = await Http.PostAsJsonAsync<HelseIdConfigurationOwner>("/adminapi/ConfigurationOwnersApi", confOwner, new CancellationToken());
 
-            // For demo purposes only
-           // confOwners.Customer = dbContext.Customers.Find(confOwners.CustomerID);
-          //  confOwners.Employee = dbContext.Employees.Find(confOwners.EmployeeID);
+            var jsonString = await response.Content.ReadAsStringAsync();
+            var confOwnerResult = JsonConvert.DeserializeObject<HelseIdConfigurationOwner>(jsonString);
 
-            // For production
-            //dbContext.SaveChanges();
+       
+
+            HelseIdConfigurationOwner confOwnerOld = confOwners.FirstOrDefault(x => x.Id == confOwner.Id);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+
+
+                
+                var position = confOwners.IndexOf(confOwnerOld);
+                confOwners.Insert(position, confOwner);
+                confOwners.Remove(confOwnerOld);
+                await configOwnersGrid.Reload();
+                ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Success", Detail = "Saved " + response.ReasonPhrase, Duration = 4000 });
+
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+
+
+                configOwnersGrid.CancelEditRow(confOwner);               
+                await configOwnersGrid.Reload();
+
+                ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Warning", Detail = "Not Saved, Error: " + response.ReasonPhrase, Duration = 4000 });
+
+
+                var returnUrl = Uri.EscapeDataString("/" + Navigation.ToBaseRelativePath(Navigation.Uri));
+                Navigation.NavigateTo($"bff/login?returnUrl={returnUrl}", forceLoad: true);
+            }
+            else
+            {
+                
+                configOwnersGrid.CancelEditRow(confOwner);
+                await configOwnersGrid.Reload();        
+                ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "Not Saved, Error " + response.ReasonPhrase, Duration = 4000 });
+
+
+            }
+
+       
+
+
         }
 
         async Task SaveRow(HelseIdConfigurationOwner confOwner)
@@ -143,7 +239,7 @@
             await configOwnersGrid.UpdateRow(confOwner);
         }
 
-        void CancelEdit(HelseIdConfigurationOwner confOwner)
+        async Task CancelEdit(HelseIdConfigurationOwner confOwner)
         {
             if (confOwner == configOwnerToInsert)
             {
@@ -153,6 +249,8 @@
             configOwnerToUpdate = null;
 
             configOwnersGrid.CancelEditRow(confOwner);
+            await configOwnersGrid.Reload();
+           
 
             // For production
             //var configOwnerEntry = confOwners.Entry(confOwner);
@@ -177,7 +275,7 @@
 
             if (confOwners.Contains(confOwner))
             {
-              //  dbContext.Remove<HelseIdConfigurationOwner>(confOwner);
+                //  dbContext.Remove<HelseIdConfigurationOwner>(confOwner);
 
                 // For demo purposes only
                 //confOwners.Remove(confOwner);
@@ -203,27 +301,59 @@
             await configOwnersGrid.InsertRow(configOwnerToInsert);
         }
 
-        void OnCreateRow(HelseIdConfigurationOwner confOwners)
+        async Task OnCreateRow(HelseIdConfigurationOwner confOwner)
         {
-           // dbContext.Add(confOwners);
+         
+            var response = await Http.PostAsJsonAsync<HelseIdConfigurationOwner>("/adminapi/ConfigurationOwnersApi", confOwner, new CancellationToken());
+          
+            var jsonString = await response.Content.ReadAsStringAsync();
+            var confOwnerResult = JsonConvert.DeserializeObject<HelseIdConfigurationOwner>(jsonString); 
 
-            // For demo purposes only
-            //confOwners.Customer = dbContext.Customers.Find(confOwners.CustomerID);
-            //confOwners.Employee = dbContext.Employees.Find(confOwners.EmployeeID);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+      
+                confOwners!.Add(confOwnerResult);              
+                await configOwnersGrid.Reload();
+                ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Success", Detail = response.ReasonPhrase, Duration = 4000 });
 
-            // For production
-            //dbContext.SaveChanges();
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+               
+
+                configOwnersGrid.CancelEditRow(confOwner);
+                await DeleteRow(confOwner);
+                await configOwnersGrid.Reload();
+
+                ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Warning", Detail = response.ReasonPhrase, Duration = 4000 });
+
+
+                var returnUrl = Uri.EscapeDataString("/" + Navigation.ToBaseRelativePath(Navigation.Uri));
+                Navigation.NavigateTo($"bff/login?returnUrl={returnUrl}", forceLoad: true);
+            }
+           else
+            {
+               
+                configOwnersGrid.CancelEditRow(confOwner);
+                await DeleteRow(confOwner);
+                await configOwnersGrid.Reload();
+                ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = response.ReasonPhrase, Duration = 4000 });
+
+               
+            }
 
             configOwnerToInsert = null;
         }
+       
 
         }
-    
+       
 
-            </Authorized >
-    <NotAuthorized >
+
+    </Authorized>
+    <NotAuthorized>
         <p><em> Redirecting to Login.. </em></p>
-              
+
         <RedirectToLogin></RedirectToLogin>
     </NotAuthorized>
 </AuthorizeView>

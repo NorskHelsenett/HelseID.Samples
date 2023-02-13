@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 using System.Net;
 
 namespace Blazor.WASM.Api.Access.Server.Controllers
-{
+{//Not in use, using built-in simple HTTP forwarder: MapRemoteBffApiEndpoint
     [ApiController]
     [Route("[controller]")]
     public class AdminApiController : ControllerBase
@@ -16,6 +16,19 @@ namespace Blazor.WASM.Api.Access.Server.Controllers
         {
             _httpClientFactory = httpClientFactory;
         }
+
+        [HttpPost]
+        public async Task<HttpResponseMessage> Post(HelseIdConfigurationOwner helseIdConfigurationOwner)
+        {
+            // create HTTP client
+            var httpClient = _httpClientFactory.CreateClient("apiClient");
+
+            // call remote API
+            var response = await httpClient.PostAsJsonAsync($"/api/ConfigurationOwnersApi",helseIdConfigurationOwner, new CancellationToken());
+  
+            return response;
+        }
+
         [HttpGet]
         public async Task<HelseIdConfigurationOwner[]> Get()
         {
@@ -27,7 +40,7 @@ namespace Blazor.WASM.Api.Access.Server.Controllers
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
 
-                HelseIdConfigurationOwner[] confOwners = Array.Empty<HelseIdConfigurationOwner>();
+                HelseIdConfigurationOwner[] confOwners = new HelseIdConfigurationOwner[1];
 
                 return confOwners;
                 

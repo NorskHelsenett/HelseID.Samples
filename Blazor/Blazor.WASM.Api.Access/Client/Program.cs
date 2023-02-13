@@ -19,17 +19,6 @@ builder.Services.AddTransient<AntiforgeryHandler>();
 builder.Services.AddHttpClient("backend", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
     .AddHttpMessageHandler<AntiforgeryHandler>();
 builder.Services.AddTransient(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("backend"));
-builder.Services.AddScoped<DialogService>();
 builder.Services.AddScoped<NotificationService>();
-builder.Services.AddScoped<TooltipService>();
-builder.Services.AddScoped<ContextMenuService>();
-builder.Services.AddScoped<RadzenLayout>();
-builder.Services.AddScoped<RadzenText>();
-builder.Services.AddScoped<RadzenHeader>();
-builder.Services.AddScoped<RadzenSidebarToggle>();
-builder.Services.AddScoped<RadzenLabel>();
-builder.Services.AddScoped<RadzenPanelMenu>();
-builder.Services.AddScoped<RadzenBody>();
-builder.Services.AddScoped<RadzenFooter>();
 
 await builder.Build().RunAsync();
