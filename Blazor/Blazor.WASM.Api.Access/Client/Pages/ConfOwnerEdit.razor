@@ -1,10 +1,156 @@
 ﻿@page "/confowneredit/{id}"
+@using Blazor.WASM.Api.Access.Shared.AdminApiModels
+@using System.Text;
+@using Newtonsoft.Json;
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject NotificationService NotificationService
+
+<RadzenNotification />
 
 <h3>Edit Configuration Owner</h3>
 
-<p>Current id: @id</p>
+
+
+
+<div class="container-fluid">
+    <div class="row px-3">
+        <div class="col-md-6 col-lg-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Id</RadzenText>
+                <RadzenTextBox Disabled @bind-Value="@confOwner.Id" Change=@(args => OnChange(args, "TextBox")) class="w-100" />
+            </RadzenCard>
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Name</RadzenText>
+                <RadzenTextBox @bind-Value="@confOwner.Name" Change=@(args => OnChange(args, "TextBox")) class="w-100" />
+            </RadzenCard>
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Description</RadzenText>
+                <RadzenTextBox @bind-Value="@confOwner.Description" Change=@(args => OnChange(args, "TextBox")) class="w-100" />
+            </RadzenCard>
+             <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Prefix</RadzenText>
+                <RadzenTextBox @bind-Value="@confOwner.Prefix" Change=@(args => OnChange(args, "TextBox")) class="w-100" />
+            </RadzenCard>
+             <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">OrgNr</RadzenText>
+                <RadzenTextBox @bind-Value="@confOwner.OrgNr" MaxLength="9" @oninput=@(args => OnChange(args.Value.ToString(), "OrgNr")) class="w-100" />
+            </RadzenCard>
+             <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Updated</RadzenText>
+                <RadzenTextBox Disabled @bind-Value="@confOwner.Updated" Change=@(args => OnChange(args, "TextBox")) class="w-100" />
+            </RadzenCard>
+             <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">IsEnabled</RadzenText>
+                <RadzenSwitch @bind-Value=@confOwner.IsEnabled Change=@(args => OnChangeSwitch(args, "Switch")) />
+            </RadzenCard>
+            <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="save" Size="ButtonSize.Large" Class="mt-3 mb-6" Text="Save Configuration Owner" Click="@(args => SaveConfOwner(confOwner))" />
+
+       
+        </div>
+    </div>
+</div>
 
 @code {
     [Parameter]
     public string id { get; set; }
+
+    HelseIdConfigurationOwner confOwner;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            confOwner = await Http.GetFromJsonAsync<HelseIdConfigurationOwner>("/adminapi/ConfigurationOwnersApi/" + id);
+
+            if (confOwner != null)
+            {
+                ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Loaded ConfOwner: ", Detail = confOwner.Name , Duration = 4000 });
+
+            }
+
+
+        }
+
+        catch (Exception ex)
+        {
+            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = ex.Message, Duration = 4000 });
+
+            if (ex.Message.Contains("Unauthorized"))
+            {
+                var returnUrl = Uri.EscapeDataString("/" + Navigation.ToBaseRelativePath(Navigation.Uri));
+                Navigation.NavigateTo($"bff/login?returnUrl={returnUrl}", forceLoad: true);
+            }
+        }
+
+
+    }
+
+    void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
+
+    }
+    void OnChange(string value, string name)
+    {
+        if (name == "OrgNr")
+        {
+            if (value.Length < 9)
+            {
+                ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "OrgNo must be at least 9 characters", Duration = 4000 });
+
+            }
+            else if (value.Length > 9)
+            {
+                ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "OrgNo must contain no more than 9 characters", Duration = 4000 });
+
+            }
+        }
+    }
+    void OnChangeSwitch(bool value, string name)
+    {
+        //console.Log($"{name} value changed to {value}");
+    }
+    async Task SaveConfOwner (HelseIdConfigurationOwner confOwner)
+    {
+        var response = await Http.PostAsJsonAsync<HelseIdConfigurationOwner>("/adminapi/ConfigurationOwnersApi", confOwner, new CancellationToken());
+
+        var jsonString = await response.Content.ReadAsStringAsync();
+        var confOwnerResult = JsonConvert.DeserializeObject<HelseIdConfigurationOwner>(jsonString);
+
+
+
+
+
+        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+
+
+     
+            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Success", Detail = "Saved " + response.ReasonPhrase, Duration = 4000 });
+            Navigation.NavigateTo($"confowners", forceLoad: false);
+        }
+        else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+
+
+      
+
+            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Warning", Detail = "Not Saved, Error: " + response.ReasonPhrase, Duration = 4000 });
+
+
+            var returnUrl = Uri.EscapeDataString("/" + Navigation.ToBaseRelativePath(Navigation.Uri));
+            Navigation.NavigateTo($"bff/login?returnUrl={returnUrl}", forceLoad: true);
+        }
+        else
+        {
+
+        
+            ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "Not Saved, Error " + response.ReasonPhrase, Duration = 4000 });
+
+
+        }
+       
+    }
 }

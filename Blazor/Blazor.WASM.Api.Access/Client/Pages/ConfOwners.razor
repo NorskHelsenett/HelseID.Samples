@@ -66,6 +66,8 @@
                         <Template Context="helseIdConfigurationOwner">
                             <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(helseIdConfigurationOwner))" @onclick:stopPropagation="true">
                             </RadzenButton>
+                            <RadzenButton Icon="open_in_new" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditConfOwner(helseIdConfigurationOwner.Id))" @onclick:stopPropagation="true">
+                            </RadzenButton>
                             <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" Class="my-1 ms-1" Click="@(args => DeleteRow(helseIdConfigurationOwner))" @onclick:stopPropagation="true">
                             </RadzenButton>
                         </Template>
@@ -118,27 +120,12 @@
             IList<HelseIdConfigurationOwner> selectedConfigOwners;
             RadzenDataGrid<HelseIdConfigurationOwner> configOwnersGrid;
             //IList<HelseIdConfigurationOwner> confOwners;
+            HelseIdConfigurationOwner configOwnerToInsert;
+            HelseIdConfigurationOwner configOwnerToUpdate;
+            HelseIdConfigurationOwner configOwnerToEdit;
 
 
 
-        void ShowNotification(NotificationMessage message)
-        {
-            NotificationService.Notify(message);
-
-        }
-
-
-        void Reset()
-        {
-        configOwnerToInsert = null;
-        configOwnerToUpdate = null;
-        }
-
-        public void editConfOwner(int id)
-        {
-
-        Navigation.NavigateTo($"/confowneredit/{id}");
-        }
 
 
         protected override async Task OnInitializedAsync()
@@ -153,7 +140,7 @@
                     selectedConfigOwners = confOwners.Take(1).ToList();
                 }
 
-                
+
             }
 
             catch (Exception ex)
@@ -170,9 +157,39 @@
 
         }
 
+
+        public HelseIdConfigurationOwner DeepCopy<HelseIdConfigurationOwner>(HelseIdConfigurationOwner self)
+        {
+            var serialized = JsonConvert.SerializeObject(self);
+            return JsonConvert.DeserializeObject<HelseIdConfigurationOwner>(serialized);
+        }
+
+
+        void ShowNotification(NotificationMessage message)
+        {
+            NotificationService.Notify(message);
+
+        }
+
+
+        void Reset()
+        {
+            configOwnerToInsert = null;
+            configOwnerToUpdate = null;
+        }
+
+        public void EditConfOwner(string id)
+        {
+
+            Navigation.NavigateTo($"/confowneredit/{id}");
+        }
+
+  
+
         async Task EditRow(HelseIdConfigurationOwner confOwner)
         {
             configOwnerToUpdate = confOwner;
+            configOwnerToEdit = DeepCopy(confOwner);
             await configOwnersGrid.EditRow(confOwner);
         }
 
@@ -190,15 +207,15 @@
             var jsonString = await response.Content.ReadAsStringAsync();
             var confOwnerResult = JsonConvert.DeserializeObject<HelseIdConfigurationOwner>(jsonString);
 
-       
 
-            HelseIdConfigurationOwner confOwnerOld = confOwners.FirstOrDefault(x => x.Id == confOwner.Id);
+
+
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
 
 
-                
+                HelseIdConfigurationOwner confOwnerOld = confOwners.FirstOrDefault(x => x.Id == confOwner.Id);
                 var position = confOwners.IndexOf(confOwnerOld);
                 confOwners.Insert(position, confOwner);
                 confOwners.Remove(confOwnerOld);
@@ -221,7 +238,7 @@
             }
             else
             {
-                
+
                 configOwnersGrid.CancelEditRow(confOwner);
                 await configOwnersGrid.Reload();        
                 ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "Not Saved, Error " + response.ReasonPhrase, Duration = 4000 });
@@ -229,7 +246,7 @@
 
             }
 
-       
+
 
 
         }
@@ -246,11 +263,16 @@
                 configOwnerToInsert = null;
             }
 
-            configOwnerToUpdate = null;
 
             configOwnersGrid.CancelEditRow(confOwner);
+  
+            var position = confOwners.IndexOf(confOwner);
+            confOwners.Insert(position, configOwnerToEdit);
+            confOwners.Remove(confOwner);
             await configOwnersGrid.Reload();
-           
+
+
+            configOwnerToUpdate = null;
 
             // For production
             //var configOwnerEntry = confOwners.Entry(confOwner);
@@ -275,13 +297,28 @@
 
             if (confOwners.Contains(confOwner))
             {
-                //  dbContext.Remove<HelseIdConfigurationOwner>(confOwner);
+                var response = await Http.DeleteFromJsonAsync<bool>("/adminapi/ConfigurationOwnersApi/"+confOwner.Id, new CancellationToken());
 
-                // For demo purposes only
-                //confOwners.Remove(confOwner);
+               
 
-                // For production
-                //dbContext.SaveChanges();
+                if (response)
+                {
+
+                    confOwners.Remove(confOwner);
+                    await configOwnersGrid.Reload();
+                    ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Success", Detail = "Admin API returned: " + response.ToString(), Duration = 4000 });
+
+                }     
+                else
+                {
+
+                    await configOwnersGrid.Reload();
+                    ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "Admin API returned: " + response.ToString(), Duration = 4000 });
+
+
+                }
+               
+         
 
                 await configOwnersGrid.Reload();
             }
@@ -292,8 +329,7 @@
             }
         }
 
-        HelseIdConfigurationOwner configOwnerToInsert;
-        HelseIdConfigurationOwner configOwnerToUpdate;
+      
 
         async Task InsertRow()
         {
