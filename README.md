@@ -37,7 +37,7 @@ See [SampleApi/README.md](SampleApi/README.md) for more information.
 HelseID supports the use of several grants, that is, the resource owner's (user or enterprise) authorization used by the client to obtain an access token. Code samples are provided for different scenarios, and each will use at least one grant type. The following grants are provided:
 
 
-#### Machine-to-machine sample
+### Machine-to-machine sample
 
 The code can be found in the `ClientCredentials` folder.
 
@@ -49,7 +49,7 @@ When using this sample, you will also need to start the [sample API](./SampleApi
 
 See [ClientCredentials/README.md](ClientCredentials/README.md) for more information.
 
-#### User authentication/API access sample
+### User authentication/API access sample
 
 The code can be found in the `SampleApi` folder.
 
@@ -61,9 +61,9 @@ You can use this sample for user login only, or, if you want to access an API, y
 This sample also exhibits the use of the [Refresh Token Grant](https://www.rfc-editor.org/rfc/rfc6749#section-1.5).
 
 
-See [APIAccess/README.md](UserAuthentication/README.md) for more information.
+See [APIAccess/README.md](ApiAccess/README.md) for more information.
 
-#### Token exchange sample
+### Token exchange sample
 
 The code can be found in the `SampleApiForTokenExchange` folder.
 
@@ -79,15 +79,15 @@ If you wish to use this sample, you will need to start both
 
 For use in "native clients", i.e. applications that does not run in a web client, we have created a set of simple examples for the use of a system browser for login against HelseID. These examples can be found in the `NativeClients`folder.
 
-#### <a name="APIAccessResourceIndicators"></a> Simple API access with API login
+### <a name="APIAccessResourceIndicators"></a> Simple API access with API login
 
 The sample demonstrates a simple user login. See [NativeClients/SimpleNativeClientWithUserLoginAndApiCall/README.md](NativeClients/SimpleNativeClientWithUserLoginAndApiCall/README.md) for more information.
 
-#### <a name="APIAccessResourceIndicators"></a> Simple API access with resource indicators
+### <a name="APIAccessResourceIndicators"></a> Simple API access with resource indicators
 
 The sample demonstrates how resource indicators are used to download multiple access tokens without performing multiple calls to the authorization endpoint. Each access token can then be used to call a specified API. See [NativeClients/SimpleResourceIndicatorsDemo/README.md](NativeClients/SimpleResourceIndicatorsDemo/README.md) for more information.
 
-#### <a name="RequestObjects"></a> Request objects
+### <a name="RequestObjects"></a> Request objects
 
 The sample demonstrates how to use request objects for client authentication against HelseID. See [NativeClients/SimpleRequestObjectsDemo](NativeClients/SimpleRequestObjectsDemo/README.md).
 
@@ -95,11 +95,11 @@ The sample demonstrates how to use request objects for client authentication aga
 
 We've created a set of samples for more advanced cases.
 
-#### <a name="BFF"></a> Backend for frontend (BFF)
+### <a name="BFF"></a> Backend for frontend (BFF)
 
 See [HelseId.Core.BFF.Sample](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Core.BFF.Sample).
 
-#### <a name="PersontjenestenSamples"></a> Persontjenesten samples
+### <a name="PersontjenestenSamples"></a> Persontjenesten samples
 
 Running samples for Persontjenesten API clients that exchange valid tokens with HelseID.
 
