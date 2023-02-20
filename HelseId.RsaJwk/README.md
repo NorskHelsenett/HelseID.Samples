@@ -4,9 +4,9 @@
 
 This is a command line program to generate a key pair as a JWK (JSON Web Key). It uses `System.Security.Cryptography` to generate a 4096 bit RSA key or a P-521 ECDSA key. The key pair is saved to two json files.
 
-## Requirements
+### Requirements
 
-.NET 5 (or later) SDK is required to build the program.
+The [.NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) is required to build the program.
 
 ## Usage
 

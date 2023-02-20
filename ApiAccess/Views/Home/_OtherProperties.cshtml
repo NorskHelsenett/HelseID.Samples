@@ -1,0 +1,29 @@
+@using Microsoft.AspNetCore.Authentication
+@model HelseId.Samples.ApiAccess.ViewModels.ApiResponseViewModel
+
+<div class="col-md">
+    <div class="card mt-3">
+        <div class="card-body">
+            
+            <h5 class="card-title">Other properties</h5>
+            
+            <p class="card-text">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th scope="col">Property name</th>
+                        <th scope="col">Property value</th>
+                    </tr>
+                    </thead>
+                    @foreach (var prop in (await Context.AuthenticateAsync()).Properties!.Items)
+                    {
+                        <tr>
+                            <td>@prop.Key</td>
+                            <td>@prop.Value</td>
+                        </tr>
+                    }
+                </table>
+            </p>
+        </div>
+    </div>
+</div>

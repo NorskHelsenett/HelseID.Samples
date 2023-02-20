@@ -1,0 +1,47 @@
+@using HelseId.Samples.ApiAccess.Configuration
+@model HelseId.Samples.ApiAccess.ViewModels.ApiResponseViewModel
+
+<div class="col-md">
+    <div class="card mt-3">
+        <div class="card-body">
+            @if (Model.ClientType == ClientType.ApiAccessWithTokenExchange)
+            {
+                <h5 class="card-title">Call the sample API with the token exchange grant</h5>
+                <p class="card-text">Click the button to check if the logged in user can access the API:</p>
+                <p class="card-text"><a href="~/home/call-api" class="btn btn-primary">Token exchange test</a></p>
+            }
+            else if (Model.ClientType == ClientType.ApiAccessWithRequestObject)
+            {
+                <h5 class="card-title">Call the sample API with a child object</h5>
+                <p class="card-text">Click the button to check if the logged in user can access the API:</p>
+                <p class="card-text"><a href="~/home/call-api" class="btn btn-primary">API test</a></p>
+            }
+            else if (Model.ClientType == ClientType.ApiAccessWithResourceIndicators)
+            {
+                <h5 class="card-title">Call sample API #1</h5>
+                <p class="card-text">Click the button to check if the logged in user can access the API:</p>
+                <p class="card-text"><a href="~/home/call-api-1-with-resource-indicators" class="btn btn-primary">API test (API #1)</a></p>
+            }
+            else
+            {
+                <h5 class="card-title">Call the sample API</h5>
+                <p class="card-text">Click the button to check if the logged in user can access the API:</p>
+                <p class="card-text"><a href="~/home/call-api" class="btn btn-primary">API test</a></p>
+            }
+        </div>
+    </div>
+</div>
+
+@if (Model.ClientType == ClientType.ApiAccessWithResourceIndicators)
+{
+    
+    <div class="col-md">
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Call sample API #2</h5>
+                <p class="card-text">Click the button to check if the logged in user can access the API:</p>
+                <p class="card-text"><a href="~/home/call-api-2-with-resource-indicators" class="btn btn-primary">API test (API #2)</a></p>
+            </div>
+        </div>
+    </div>
+}
