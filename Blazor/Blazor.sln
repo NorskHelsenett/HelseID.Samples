@@ -9,12 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.WASM.BFF.Client", "B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.WASM.BFF.Shared", "Blazor.WASM.BFF\Shared\Blazor.WASM.BFF.Shared.csproj", "{46C7D233-E79C-40A2-B3F4-334C428FC57A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.WASM.Api.Access.Client", "Blazor.WASM.Api.Access\Client\Blazor.WASM.Api.Access.Client.csproj", "{5D3DB20E-2A0E-4E3D-AC47-75E57E8BC58B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.WASM.Api.Access.Server", "Blazor.WASM.Api.Access\Server\Blazor.WASM.Api.Access.Server.csproj", "{E430D6F8-3761-4A92-A05C-A1258163A914}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.WASM.Api.Access.Shared", "Blazor.WASM.Api.Access\Shared\Blazor.WASM.Api.Access.Shared.csproj", "{05B12D74-31EB-4BB4-90CF-BC1C274BB30B}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,18 +27,6 @@ Global
 		{46C7D233-E79C-40A2-B3F4-334C428FC57A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46C7D233-E79C-40A2-B3F4-334C428FC57A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46C7D233-E79C-40A2-B3F4-334C428FC57A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5D3DB20E-2A0E-4E3D-AC47-75E57E8BC58B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5D3DB20E-2A0E-4E3D-AC47-75E57E8BC58B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5D3DB20E-2A0E-4E3D-AC47-75E57E8BC58B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5D3DB20E-2A0E-4E3D-AC47-75E57E8BC58B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E430D6F8-3761-4A92-A05C-A1258163A914}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E430D6F8-3761-4A92-A05C-A1258163A914}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E430D6F8-3761-4A92-A05C-A1258163A914}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E430D6F8-3761-4A92-A05C-A1258163A914}.Release|Any CPU.Build.0 = Release|Any CPU
-		{05B12D74-31EB-4BB4-90CF-BC1C274BB30B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{05B12D74-31EB-4BB4-90CF-BC1C274BB30B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{05B12D74-31EB-4BB4-90CF-BC1C274BB30B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{05B12D74-31EB-4BB4-90CF-BC1C274BB30B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

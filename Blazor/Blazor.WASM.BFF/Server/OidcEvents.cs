@@ -2,7 +2,7 @@
 using Duende.Bff;
 using Duende.AccessTokenManagement;
 
-namespace Blazor.WASM.Api.Access.Server
+namespace Blazor.WASM.BFF.Server
 {
     public class OidcEvents : BffOpenIdConnectEvents
     {

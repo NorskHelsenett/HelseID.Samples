@@ -4,7 +4,7 @@ using IdentityModel.Client;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Blazor.WASM.Api.Access.Server
+namespace Blazor.WASM.BFF.Server
 {
     public class ClientAssertionService : IClientAssertionService
     {

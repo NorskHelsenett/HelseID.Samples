@@ -1,4 +1,4 @@
-﻿namespace Blazor.WASM.Api.Access.Server
+﻿namespace Blazor.WASM.BFF.Server
 {
     public class ClientAssertionConfiguration
     {

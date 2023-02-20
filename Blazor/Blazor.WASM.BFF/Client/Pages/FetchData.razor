@@ -49,11 +49,11 @@
       
         try
             {
-                forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast");
+                 var result  = await Http.GetFromJsonAsync<IEnumerable<object>>("/SampleApi");
             }
-            catch (Exception)
+            catch (Exception e)
             {
-
+                Console.Out.WriteLine(e.Message);
                 
             }
         
