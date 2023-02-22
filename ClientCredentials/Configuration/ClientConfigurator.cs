@@ -25,16 +25,17 @@ public class ClientConfigurator
     /// </summary>
     public Machine2MachineClient ConfigureClient(
         bool useChildOrganizationNumberOptionValue,
-        bool useClientInfoEndpointOptionValue)
+        bool useClientInfoEndpointOptionValue,
+        bool useMultiTenantPatternOptionValue)
     {
         var discoveryDocumentGetter = new DiscoveryDocumentGetter(ConfigurationValues.StsUrl);
         var endpointDiscoverer = new HelseIdEndpointsDiscoverer(discoveryDocumentGetter);
         var apiConsumer = new ApiConsumer();
-        var tokenRequestBuilder = CreateTokenRequestBuilder(useChildOrganizationNumberOptionValue, endpointDiscoverer);
+        var tokenRequestBuilder = CreateTokenRequestBuilder(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue, endpointDiscoverer);
         var clientInfoRetriever = SetUpClientInfoRetriever(useClientInfoEndpointOptionValue, endpointDiscoverer);
-        var tokenRequestParameters = SetUpTokenRequestParameters(useChildOrganizationNumberOptionValue);
+        var tokenRequestParameters = SetUpTokenRequestParameters(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue);
         var expirationTimeCalculator = new ExpirationTimeCalculator(new DateTimeService());
-        var payloadClaimsCreator = SetUpPayloadClaimsCreator(useChildOrganizationNumberOptionValue);
+        var payloadClaimsCreator = SetUpPayloadClaimsCreator(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue);
 
         return new Machine2MachineClient(
             apiConsumer,
@@ -45,10 +46,10 @@ public class ClientConfigurator
             tokenRequestParameters);
     }
 
-    private ITokenRequestBuilder CreateTokenRequestBuilder(bool useChildOrganizationNumberOptionValue, IHelseIdEndpointsDiscoverer endpointsDiscoverer)
+    private ITokenRequestBuilder CreateTokenRequestBuilder(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue, IHelseIdEndpointsDiscoverer endpointsDiscoverer)
     {
         // This sets up the building of a token request for the client credentials grant
-        var configuration = SetUpHelseIdConfiguration(useChildOrganizationNumberOptionValue);
+        var configuration = SetUpHelseIdConfiguration(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue);
         var jwtPayloadCreator = new JwtPayloadCreator();
         var signingJwtTokenCreator = new SigningJwtTokenCreator(jwtPayloadCreator, configuration);
         // Two builder classes are used
@@ -72,33 +73,55 @@ public class ClientConfigurator
             new NullClientInfoRetriever();
     }
 
-    private  HelseIdConfiguration SetUpHelseIdConfiguration(bool useChildOrganizationNumberOptionValue)
+    private  HelseIdConfiguration SetUpHelseIdConfiguration(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue)
     {
-        return useChildOrganizationNumberOptionValue ?
+        if (useMultiTenantPatternOptionValue)
+        {
+            // This is done when the '--use-multi-tenant-pattern' option is used on the command line:
+            return HelseIdSamplesConfiguration.ClientCredentialsSampleForMultiTenantClient;
+        }
+        else if (useChildOrganizationNumberOptionValue)
+        {
             // This is done when the '--use-child-org-number' option is used on the command line:
-            HelseIdSamplesConfiguration.ClientCredentialsWithChildOrgNumberClient :
-            // Sets up the configuration for a "normal" client:
-            HelseIdSamplesConfiguration.ClientCredentialsClient;
+            return HelseIdSamplesConfiguration.ClientCredentialsWithChildOrgNumberClient;
+        }
+        // Sets up the configuration for a "normal" client:
+        return HelseIdSamplesConfiguration.ClientCredentialsClient;
     }
     
-    private  IPayloadClaimsCreatorForClientAssertion SetUpPayloadClaimsCreator(bool useChildOrganizationNumberOptionValue)
+    private  IPayloadClaimsCreatorForClientAssertion SetUpPayloadClaimsCreator(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue)
     {
         var tokenRequestPayloadClaimsCreator = new ClientAssertionPayloadClaimsCreator(new DateTimeService());
-        
-        return useChildOrganizationNumberOptionValue ?
+
+        if (useMultiTenantPatternOptionValue)
+        {
+            // Sets up payload configuration (for the client assertion) for a client that implements a
+            // multi-tenancy pattern.
+            // This is done when the '--use-multi-tenant' option is used on the command line.
+            return new CompositePayloadClaimsCreator(new List<IPayloadClaimsCreator>
+            {
+                tokenRequestPayloadClaimsCreator,
+                new PayloadClaimsCreatorForMultiTenantClient(),
+            });
+        }
+
+        if (useChildOrganizationNumberOptionValue)
+        {
             // Sets up payload configuration (for the client assertion) for a client that requests an underenhet
             // (child organization) number for the access token.
             // This is done when the '--use-child-org-number' option is used on the command line.
-            new CompositePayloadClaimsCreator(new List<IPayloadClaimsCreator>
+            return new CompositePayloadClaimsCreator(new List<IPayloadClaimsCreator>
             {
                 tokenRequestPayloadClaimsCreator,
                 new PayloadClaimsCreatorWithChildOrgNumber(),
-            }) :
-            // Sets up payload configuration (for the client assertion) for a "normal" client
-            tokenRequestPayloadClaimsCreator;
+            });
+        }
+
+        // Sets up payload configuration (for the client assertion) for a "normal" client
+        return tokenRequestPayloadClaimsCreator;
     }
 
-    private ClientCredentialsTokenRequestParameters SetUpTokenRequestParameters(bool useChildOrganizationNumberOptionValue)
+    private ClientCredentialsTokenRequestParameters SetUpTokenRequestParameters(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue)
     {
         var result = new ClientCredentialsTokenRequestParameters();
         if (useChildOrganizationNumberOptionValue)
@@ -106,6 +129,16 @@ public class ClientConfigurator
             result.PayloadClaimParameters = new PayloadClaimParameters()
             {
                 ChildOrganizationNumber = ConfigurationValues.ClientCredentialsWithChildOrganizationNumber,
+            };
+        }
+        if (useMultiTenantPatternOptionValue)
+        {
+            result.PayloadClaimParameters = new PayloadClaimParameters()
+            {
+                ParentOrganizationNumber = ConfigurationValues.FlaksvaagoeyKommuneOrganizationNumber,
+                // Optional: we pass on a child organization number for the organization that has
+                // delegated rights to the (multitenancy) supplier
+                ChildOrganizationNumber = ConfigurationValues.FlaksvaagoeyKommuneChildOrganizationNumber,
             };
         }
         return result;

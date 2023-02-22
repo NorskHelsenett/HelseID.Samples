@@ -17,14 +17,21 @@
                         <td>Session ID</td>
                         <td>@Model.UserSessionData.SessionId</td>
                     </tr>
-                    <tr>
-                        <td>Organization parent org. no</td>
-                        <td>@Model.UserSessionData.SelectedOrganization.OrgNoParent</td>
-                    </tr>
-                    <tr>
-                        <td>Organization child org. no</td>
-                        <td>@Model.UserSessionData.SelectedOrganization.OrgNoChild</td>
-                    </tr>
+                    @if (Model.UserSessionData.SelectedOrganization.IsEmpty == false)
+                    {
+                        <tr>
+                            <td>Represented organization parent organization number</td>
+                            <td>@Model.UserSessionData.SelectedOrganization.OrgNoParent – @Model.UserSessionData.SelectedOrganization.ParentName</td>
+                        </tr>
+                    }
+
+                    @if (Model.UserSessionData.SelectedOrganization.HasChildOrganization)
+                    {
+                        <tr>
+                            <td>Represented organization child organization number</td>
+                            <td>@Model.UserSessionData.SelectedOrganization.OrgNoChild – @Model.UserSessionData.SelectedOrganization.ChildName</td>
+                        </tr>
+                    }
                     <tr>
                         <td>ID token</td>
                         @if (Model.UserSessionData.IdToken.Length > 50)

@@ -107,7 +107,14 @@ public class Machine2MachineClient
             Console.WriteLine("Using the access token to call the sample API");
             var response = await _apiConsumer.CallApi(httpClient, ConfigurationValues.SampleApiUrlForM2M, accessToken);
             var notPresent = "<not present>";
-            Console.WriteLine($"Response from the sample API: {response?.Greeting}, org.nr: {response?.OrganizationNumber}, underenhet: {response?.ChildOrganizationNumber ?? notPresent}");
+            var supplierOrganization = OrganizationStore.GetOrganization(response?.SupplierOrganizationNumber);
+            var parentOrganization = OrganizationStore.GetOrganization(response?.ParentOrganizationNumber);
+            var childOrganization = OrganizationStore.GetOrganizationWithChild(response?.ChildOrganizationNumber);
+            Console.WriteLine($"Response from the sample API:");
+            Console.WriteLine($"{response?.Greeting}");
+            Console.WriteLine($"Supplier organization number (for multitenancy): '{supplierOrganization?.ParentName ?? notPresent}'");
+            Console.WriteLine($"Parent organization number: '{parentOrganization?.ParentName ?? notPresent}'");
+            Console.WriteLine($"Child organization number: '{childOrganization?.ChildName ?? notPresent}'");
         }
         catch (HttpRequestException e)
         {

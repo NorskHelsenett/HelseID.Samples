@@ -51,6 +51,11 @@ dotnet run
 dotnet run --use-child-org-number
 ```
 
+#### To run the sample as an app that uses multi-tenancy, i.e. makes use of both parent and child units in the call to the token endpoint: 
+````
+dotnet run --use-multi-tenant-pattern
+````
+
 #### To consume the clientinfo endpoint:
 ```
 dotnet run --use-client-info-endpoint

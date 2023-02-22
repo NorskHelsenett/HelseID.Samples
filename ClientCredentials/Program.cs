@@ -10,6 +10,11 @@ static class Program
     static async Task Main(string[] args)
     {
         // The Main method uses the System.Commandline library to parse the command line parameters:
+        var useMultiTenantPattern = new Option<bool>(
+            aliases: new [] {"--use-multi-tenant", "-mt"},
+            description: "If set, the application will use a client set up for multi-tenancy, i.e. it makes use of an organization number that is connected to the client.",
+            getDefaultValue: () => false);
+
         var useChildOrgNumberOption = new Option<bool>(
             aliases: new [] {"--use-child-org-number", "-uc"},
             description: "If set, the application will request an child organization (underenhet) claim for the access token.",
@@ -22,19 +27,19 @@ static class Program
 
         var rootCommand = new RootCommand("A client credentials usage sample")
         {
-            useChildOrgNumberOption, useClientInfoEndpointOption
+            useChildOrgNumberOption, useClientInfoEndpointOption, useMultiTenantPattern
         };
 
-        rootCommand.SetHandler(async (useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue) =>
+        rootCommand.SetHandler(async (useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue, useMultiTenantPatternOptionValue) =>
         {
             var clientConfigurator = new ClientConfigurator();
-            var client = clientConfigurator.ConfigureClient(useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue);
+            var client = clientConfigurator.ConfigureClient(useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue, useMultiTenantPatternOptionValue);
             var repeatCall = true;
             while (repeatCall)
             {
                 repeatCall = await CallApiWithToken(client);
             }
-        }, useChildOrgNumberOption, useClientInfoEndpointOption);
+        }, useChildOrgNumberOption, useClientInfoEndpointOption, useMultiTenantPattern);
 
         await rootCommand.InvokeAsync(args);
     }
