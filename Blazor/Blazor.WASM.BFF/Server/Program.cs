@@ -74,8 +74,9 @@ try
             // request scopes + refresh tokens
             options.Scope.Clear();
             options.Scope.Add("openid");
-            options.Scope.Add("profile");       
-
+            options.Scope.Add("profile");
+            options.Scope.Add("helseid://scopes/identity/security_level");
+            options.Scope.Add("nhn:helseid-public-samplecode/authorization-code");
             // keeps id_token smaller
             options.GetClaimsFromUserInfoEndpoint = true;
             options.SaveTokens = true;
@@ -90,7 +91,7 @@ try
     builder.Services.AddUserAccessTokenHttpClient("apiClient", configureClient: client =>
     {
         
-        client.BaseAddress = new Uri("https://localhost:5003/api/");
+        client.BaseAddress = new Uri("https://localhost:5081/");
     });
 
     var app = builder.Build();
@@ -117,7 +118,7 @@ try
     app.MapBffManagementEndpoints();
 
     //built-in simple HTTP forwarder
-    app.MapRemoteBffApiEndpoint("/SampleApi", "https://localhost:5003/api")
+    app.MapRemoteBffApiEndpoint("/SampleApi", "https://localhost:5081/user-login-clients/greetings")
             .RequireAccessToken(TokenType.User);
 
     app.MapRazorPages();

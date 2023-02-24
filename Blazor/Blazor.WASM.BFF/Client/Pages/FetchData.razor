@@ -11,45 +11,26 @@
 <p>This component demonstrates fetching data from the server.</p>
 
 
-    @if (forecasts == null)
+    @if (result == null)
     {
         <p><em>Loading...</em></p>
     }
     else
     {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Temp. (C)</th>
-                    <th>Temp. (F)</th>
-                    <th>Summary</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var forecast in forecasts)
-                {
-                    <tr>
-                        <td>@forecast.Date.ToShortDateString()</td>
-                        <td>@forecast.TemperatureC</td>
-                        <td>@forecast.TemperatureF</td>
-                        <td>@forecast.Summary</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+            <p><em>Loaded!</em></p>
     }
 
 
-@code {
-    private WeatherForecast[]? forecasts;
+        @code {
+            private WeatherForecast[]? forecasts;
+        object? result;
 
     protected override async Task OnInitializedAsync()
     {
       
         try
             {
-                 var result  = await Http.GetFromJsonAsync<IEnumerable<object>>("/SampleApi");
+                 var result  = await Http.GetStringAsync("/SampleApi");
             }
             catch (Exception e)
             {
