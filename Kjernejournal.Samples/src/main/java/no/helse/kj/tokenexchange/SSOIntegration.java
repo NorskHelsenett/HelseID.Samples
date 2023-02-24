@@ -36,7 +36,7 @@ import static java.time.temporal.ChronoUnit.SECONDS;
  */
 public class SSOIntegration {
 
-  public record Tokens(String accessToken, Instant tokenExpiry) { }
+  public record AccessTokenWithExpiry(String accessToken, Instant tokenExpiry) { }
 
   //These personal identifiers correspond to test-patients in the Kjernejournal test environment
   private static final String PATIENT_TRINE_FAKTOR = "12050050295";
@@ -54,13 +54,13 @@ public class SSOIntegration {
   private static final String KJ_WEB_URL = "https://st3.kjernejournal-test.no";
 
   private static final ObjectMapper mapper = new ObjectMapper();
-  private static final AtomicReference<Tokens> epjAccessToken = new AtomicReference<>();
+  private static final AtomicReference<AccessTokenWithExpiry> epjAccessToken = new AtomicReference<>();
 
   private static final Supplier<String> systemAccessTokenFetcher = () -> {
     throw new RuntimeException("Add the HelseID system token in use for calling the ticket endpoint.");
   };
 
-  private static final Supplier<Tokens> userAccessTokenFetcher = () -> {
+  private static final Supplier<AccessTokenWithExpiry> userAccessTokenFetcher = () -> {
     throw new RuntimeException("""
         Implement a function that fetches the current access token, along with its expiry.
         Examples of how to use the HelseID APIs for this are found elsewhere in this repository.
@@ -80,13 +80,12 @@ public class SSOIntegration {
     epjAccessToken.set(userAccessTokenFetcher.get());
 
     //A background process that ensures KJ has a valid access token at all times
-    var keepTokensUpdated = new Thread(() -> {
+    var keepTokenUpdated = new Thread(() -> {
       try {
-        //hent nye access tokens når det nåværende tokenet går ut
         while (!Thread.currentThread().isInterrupted()) {
-          var currentTokens = epjAccessToken.get();
+          var currentToken = epjAccessToken.get();
 
-          var timeToGetNewToken = currentTokens.tokenExpiry().minus(5, SECONDS);
+          var timeToGetNewToken = currentToken.tokenExpiry().minus(5, SECONDS);
           var sleepDuration = Duration.between(now(), timeToGetNewToken).toMillis();
 
           Thread.sleep(sleepDuration);
@@ -101,8 +100,8 @@ public class SSOIntegration {
         e.printStackTrace();
       }
     });
-    keepTokensUpdated.setDaemon(true);
-    keepTokensUpdated.start();
+    keepTokenUpdated.setDaemon(true);
+    keepTokenUpdated.start();
 
     final BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
     System.out.println("Enter patient identifier: ");
