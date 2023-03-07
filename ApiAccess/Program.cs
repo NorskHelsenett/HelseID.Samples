@@ -36,16 +36,21 @@ public class Program
             description: "If set, the application will use a client set up for multi-tenancy, i.e. it makes use of an organization number that is connected to the client.",
             getDefaultValue: () => false);
         
+        var useContextualClaimsOption = new Option<bool>(
+            aliases: new [] {"--use-contextual-claims", "-cc"},
+            description: "If set, the application will use submit a contextual claim to HelseID, which will in turn be returned to the sample API.",
+            getDefaultValue: () => false);
+        
         var rootCommand = new RootCommand("An authorization code flow usage sample")
         {
-            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption
+            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, useContextualClaimsOption
         };
 
-        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant) =>
+        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useContextualClaims) =>
         {
-            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant);
+            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useContextualClaims);
             new Startup(settings).BuildWebApplication().Run();
-        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption);
+        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, useContextualClaimsOption);
 
         await rootCommand.InvokeAsync(args);
     }
@@ -55,9 +60,10 @@ public class Program
         bool useTokenExchange,
         bool useRequestObjects,
         bool useResourceIndicators,
-        bool useMultiTenant)
+        bool useMultiTenant,
+        bool useContextualClaims)
     {
-        var clientType = GetClientType(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant);
+        var clientType = GetClientType(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useContextualClaims);
 
         return new Settings
         {
@@ -75,7 +81,8 @@ public class Program
         bool useTokenExchange,
         bool useRequestObjects,
         bool useResourceIndicators,
-        bool useMultiTenant)
+        bool useMultiTenant,
+        bool useContextualClaims)
     {
         if (userLoginOnly)
         {
@@ -100,6 +107,11 @@ public class Program
         if (useMultiTenant)
         {
             return ClientType.ApiAccessForMultiTenantClient;
+        }
+
+        if (useContextualClaims)
+        {
+            return ClientType.ApiAccessWithContextualClaims;
         }
 
         return ClientType.ApiAccess;
@@ -148,6 +160,7 @@ public class Program
             ClientType.ApiAccessWithResourceIndicators => HelseIdSamplesConfiguration.ResourceIndicatorsClient,
             ClientType.UserLoginOnly => HelseIdSamplesConfiguration.UserAuthenticationClient,
             ClientType.ApiAccessForMultiTenantClient => HelseIdSamplesConfiguration.ApiAccessForMultiTenantClient,
+            ClientType.ApiAccessWithContextualClaims => HelseIdSamplesConfiguration.ApiAccessWithContextualClaimsClient,
             _ => HelseIdSamplesConfiguration.ApiAccess
         };
     }

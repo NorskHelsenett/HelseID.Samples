@@ -68,6 +68,13 @@ public class HelseIdSamplesConfiguration : HelseIdConfiguration
             ConfigurationValues.ApiAccessSampleClientIdForMultiTenantApp,
             ConfigurationValues.ApiAccessSampleScopeForMultiTenantApp);
     
+    // Configuration for the ApiAccess project with use of contextual claims
+    public static HelseIdSamplesConfiguration ApiAccessWithContextualClaimsClient =>
+        new(
+            ConfigurationValues.ApiAccessSampleForContextualClaimsPrivateKeyJwk,
+            ConfigurationValues.ApiAccessSampleClientIdForContextualClaims,
+            ConfigurationValues.ApiAccessSampleScope);
+    
     // The configuration for the ApiAccess project (accessing the token exchange client)
     public static HelseIdSamplesConfiguration ApiAccessWithTokenExchange =>
         new(

@@ -337,6 +337,13 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             // (it is not validated with the code grant).
             result.IsAuthCodeRequest = true;
         }
+
+        if (_settings.ClientType == ClientType.ApiAccessWithContextualClaims)
+        {
+            // This sets the contextual claim type for the call to HelseID:
+            result.ContextualClaimType = ConfigurationValues.TestContextClaim;
+        }
+
         return result;
     }
 }

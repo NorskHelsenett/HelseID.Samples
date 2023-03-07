@@ -105,21 +105,31 @@ public class Startup
             services.AddSingleton<IPayloadClaimsCreatorForRequestObjects>(new NullPayloadClaimsCreatorForRequestObjects());
         }
 
+        var clientAssertionPayloadClaimsCreator = new ClientAssertionPayloadClaimsCreator(dateTimeService); 
         if (_settings.ClientType == ClientType.ApiAccessForMultiTenantClient)
         {
             // We need payload claims for the token request, both the "default" type and for the multi-tenant organization number:
             var compositePayloadClaimsCreator = new CompositePayloadClaimsCreator(new List<IPayloadClaimsCreator>
             {
-                new ClientAssertionPayloadClaimsCreator(dateTimeService),
+                clientAssertionPayloadClaimsCreator,
                 new PayloadClaimsCreatorForMultiTenantClient()
             });
             // We add this object as an instance of IPayloadClaimsCreatorForClientAssertion
             services.AddSingleton<IPayloadClaimsCreatorForClientAssertion>(compositePayloadClaimsCreator);
         }
+        else if (_settings.ClientType == ClientType.ApiAccessWithContextualClaims)
+        {
+            var compositePayloadClaimsCreator = new CompositePayloadClaimsCreator(new List<IPayloadClaimsCreator>
+            {
+                clientAssertionPayloadClaimsCreator,
+                new PayloadClaimsCreatorForContextualClaims(),
+            });
+            services.AddSingleton<IPayloadClaimsCreatorForClientAssertion>(compositePayloadClaimsCreator);
+        }
         else
         {
             // We only need the "default" token request payload claim creator:
-            services.AddTransient<IPayloadClaimsCreatorForClientAssertion, ClientAssertionPayloadClaimsCreator>();
+            services.AddSingleton<IPayloadClaimsCreatorForClientAssertion>(clientAssertionPayloadClaimsCreator);
         }
         
         // Builder for client assertions payloads
@@ -140,6 +150,10 @@ public class Startup
         if (_settings.ClientType == ClientType.ApiAccessForMultiTenantClient)
         {
             services.AddTransient<IAccessTokenUpdater, AccessTokenUpdaterForMultiTenantRequests>();
+        }
+        else if (_settings.ClientType == ClientType.ApiAccessWithContextualClaims)
+        {
+            services.AddTransient<IAccessTokenUpdater, AccessTokenUpdaterForContextualClaims>();
         }
         else
         {

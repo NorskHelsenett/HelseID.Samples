@@ -6,11 +6,11 @@ namespace HelseID.Samples.Configuration;
 public static class ConfigurationValues
 {
     // The URL for HelseID
-    public const string StsUrl = "https://localhost:44366"; // "https://helseid-sts.test.nhn.no";
+    public const string StsUrl = "https://helseid-sts.test.nhn.no";
 
     // Audience and scopes for using the 'regular' sample API:
     public const string SampleApiNameAudience = "nhn:helseid-public-samplecode";
-
+    
     public const string ClientCredentialsScopeForSampleApi = $"{SampleApiNameAudience}/client-credentials";
 
     public const string AuthorizationCodeScopeForSampleApi = $"{SampleApiNameAudience}/authorization-code";
@@ -29,6 +29,9 @@ public static class ConfigurationValues
 
     // The scope that is needed for access to the clientinfo_endpoint on HelseID (https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/492044292/Client+Info+Endpoint):
     private const string ClientInfoScope = "helseid://scopes/client/info";
+    
+    // The claim that is needed for use of contextual claims:
+    public const string TestContextClaim = "helseid://claims/external/test-context";
 
     // HelseID security level claim
     public const string HelseIdSecurityLevelClaim = "helseid://claims/identity/security_level";
@@ -91,6 +94,7 @@ public static class ConfigurationValues
     public static readonly SecurityKey ClientCredentialsWithChildOrgNumberSamplePrivateKeyJwk = new(GeneralPrivateRsaKey, SecurityAlgorithms.RsaSha512);
     public static readonly SecurityKey ApiAccessSampleRsaPrivateKeyJwk = new(GeneralPrivateRsaKey, SecurityAlgorithms.RsaSha512);
     public static readonly SecurityKey ApiAccessSampleForMultiTenantPrivateKeyJwk = new(GeneralPrivateRsaKey, SecurityAlgorithms.RsaSha512);
+    public static readonly SecurityKey ApiAccessSampleForContextualClaimsPrivateKeyJwk = new(GeneralPrivateRsaKey, SecurityAlgorithms.RsaSha512);
     public static readonly SecurityKey TokenExchangeSubjectRsaPrivateKeyJwk = new(GeneralPrivateRsaKey, SecurityAlgorithms.RsaSha512);
     public static readonly SecurityKey TokenExchangeActorRsaPrivateKeyJwk = new(GeneralPrivateRsaKey, SecurityAlgorithms.RsaSha512);
     public static readonly SecurityKey ApiAccessWithRequestObjectSampleRsaPrivateKeyJwk = new(GeneralPrivateRsaKey, SecurityAlgorithms.RsaSha512);
@@ -109,6 +113,7 @@ public static class ConfigurationValues
     public const string ClientCredentialsWithChildOrgNumberSampleClientId = "helseid-sample-client-credentials-with-underenhet";
     public const string ApiAccessSampleClientId = "helseid-sample-api-access";
     public const string ApiAccessSampleClientIdForMultiTenantApp = "helseid-sample-api-access-for-multitenant-app";
+    public const string ApiAccessSampleClientIdForContextualClaims = "helseid-sample-api-access-for-contextual-claims";
     public const string TokenExchangeSubjectClientId = "helseid-sample-token-exchange-subject-client";
     public const string TokenExchangeActorClientId = "helseid-sample-token-exchange-actor-client";
     public const string ApiAccessSampleClientIdWithRequestObject = "helseid-sample-request-objects-console";
