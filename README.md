@@ -88,7 +88,7 @@ The sample demonstrates how to use request objects for client authentication aga
 
 ## Other languages
 
-In the folder [node/ClientAuthentication](./node/ClientAuthentication/README.md), you can find a small example for user login that uses Node.js.
+In the folder [Node.js/ClientAuthentication](./Node.js/ClientAuthentication/README.md), you can find a small example for user login that uses Node.js.
 
 ## Advanced samples
 
