@@ -6,7 +6,7 @@ namespace HelseId.Samples.Common.PayloadClaimsCreators;
 
 public class PayloadClaimsCreatorForContextualClaims : IPayloadClaimsCreator
 {
-    // See https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/45973505/How+to+submit+organizational+information+to+HelseID+machine-to-machine
+    // See https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/491356176/Passing+extended+context+information+as+a+Client
     public IEnumerable<PayloadClaim> CreatePayloadClaims(PayloadClaimParameters payloadClaimParameters, HelseIdConfiguration configuration)
     {
         var authorizationDetails = new

@@ -41,12 +41,12 @@ The [.NET 7 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) is requ
 
 First, you will need to start the [Sample API project](../SampleAPI/README.md) in a separate terminal. Then, you can run this application, either with or without a request for a child organization number. 
 
-#### To run the sample without an underenhet, enter the following on the command line inside this folder
+#### To run the default sample, enter the following on the command line inside this folder
 ```
 dotnet run
 ```
 
-#### To run the sample with the use of a child organization number (underenhet)
+#### To run the sample with the use of a child organization number
 This makes use of a child organization number. The organization must be whitelisted in HelseID.
 ```
 dotnet run --use-child-org-number
