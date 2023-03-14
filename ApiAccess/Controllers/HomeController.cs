@@ -47,9 +47,59 @@ public class HomeController : Controller
     [Authorize(Startup.SecurityLevelClaimPolicy)] 
     public async Task<IActionResult> Login()
     {
-        return View(await _viewModelCreator.GetApiResponseViewModel(claimsPrincipal: HttpContext.User));
+        var responseViewModel = await _viewModelCreator.GetApiResponseViewModel(claimsPrincipal: HttpContext.User);
+
+        // Pre-login functionality for multi-tenant pattern:
+        if (_settings.ClientType == ClientType.ApiAccessForMultiTenantClient)
+        {
+            if (string.IsNullOrEmpty(responseViewModel.UserSessionData.SessionId))
+            {
+                // Not a logged on user; redirect to login 
+                return Challenge(OpenIdConnectDefaults.AuthenticationScheme);
+            }
+            if (responseViewModel.UserSessionData.SelectedOrganization.IsEmpty)
+            {
+                // The user must choose an organization
+                return RedirectToAction(nameof(SelectOrganizationForMultiTenantPattern));
+            }
+        }
+
+        // Standard login
+        return View(responseViewModel);
     }
 
+    [Authorize(Startup.SecurityLevelClaimPolicy)]
+    public async Task<IActionResult> SelectOrganizationForMultiTenantPattern()
+    {
+        try
+        {
+            var responseViewModel = await _viewModelCreator.GetApiResponseViewModel(claimsPrincipal: HttpContext.User);
+
+            return View(responseViewModel);
+        } catch (SessionIdDoesNotExistException)
+        {
+            // The user's session was not found in the token store -- log in the user: 
+            return Challenge(OpenIdConnectDefaults.AuthenticationScheme);
+        }        
+    }
+
+    [Authorize(Startup.SecurityLevelClaimPolicy)]
+    [HttpPost]
+    public async Task<IActionResult> SelectOrganizationForMultiTenantPattern(int organizationId)
+    {
+        try
+        {
+            var organization = OrganizationStore.GetOrganization(organizationId);
+            await _accessTokenUpdater.SetOrganizationAndDeleteTokens(HttpContext.User, organization!);
+
+            return RedirectToAction(nameof(Login));
+        } catch (SessionIdDoesNotExistException)
+        {
+            // The user's session was not found in the token store -- log in the user: 
+            return Challenge(OpenIdConnectDefaults.AuthenticationScheme);
+        }
+    }
+    
     [Route("home/call-api-1-with-resource-indicators")]
     [Authorize(Startup.SecurityLevelClaimPolicy)]
     public async Task<IActionResult> CallApi1WithResourceIndicators()
@@ -87,7 +137,6 @@ public class HomeController : Controller
         {
             ApiAudience = _settings.ApiAudience1,
         };
-
         return await CallApi(apiIndicators, apiUrl);
     }
 

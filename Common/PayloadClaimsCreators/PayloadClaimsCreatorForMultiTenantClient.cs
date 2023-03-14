@@ -9,34 +9,39 @@ namespace HelseId.Samples.Common.PayloadClaimsCreators;
 /// structure which HelseID can recognize.
 ///
 /// The purpose of this is to request a claim in the access token that
-/// contains a specified child organization (underenhet) for our call to
+/// contains a specified underenhet (child organization) for our call to
 /// the Sample API.
 ///
-/// The child organization requested must be present in a
+/// The underenhet (child organization) requested must be present in a
 /// list connected to the client in HelseID.
 /// </summary>
-public class PayloadClaimsCreatorWithChildOrgNumber : IPayloadClaimsCreator {
+public class PayloadClaimsCreatorForMultiTenantClient : IPayloadClaimsCreator {
 
     public IEnumerable<PayloadClaim> CreatePayloadClaims(
         PayloadClaimParameters payloadClaimParameters,
         HelseIdConfiguration configuration)
     {
-        if (string.IsNullOrEmpty(payloadClaimParameters.ChildOrganizationNumber))
+        if (payloadClaimParameters.IsAuthCodeRequest)
         {
-            throw new Exception("Need payload claim parameters with child organization number");
+            return new List<PayloadClaim>();
+        }
+
+        if (string.IsNullOrEmpty(payloadClaimParameters.ParentOrganizationNumber))
+        {
+            throw new Exception("Need payload claim parameters with a parent organization number");
         }
         
-        // When the client requires a child organization claim, HelseID will 
-        // require an authorization details claim with the following structure:
+        // When the client is of the multitenancy type, it will require a parent organization number claim.
+        // In this case, HelseID will require an authorization details claim with the following structure:
         //
         //  "authorization_details":{
         //      "type":"helseid_authorization",
         //      "practitioner_role":{
         //          "organization":{
         //              "identifier": {
-        //                  "system":"urn:oid:2.16.578.1.12.4.1.2.101",
+        //                  "system":"urn:oid:1.0.6523",
         //                  "type":"ENH",
-        //                  "value":"[orgnummer]"
+        //                  "value":"NO:ORGNR:[parent orgnumber]:[child orgnumber]"
         //              }
         //          }
         //      }
@@ -53,9 +58,9 @@ public class PayloadClaimsCreatorWithChildOrgNumber : IPayloadClaimsCreator {
                 {
                     identifier = new
                     {
-                        system = "urn:oid:2.16.578.1.12.4.1.2.101",
+                        system =  "urn:oid:1.0.6523",
                         type = "ENH",
-                        value = $"{payloadClaimParameters.ChildOrganizationNumber}"
+                        value = $"NO:ORGNR:{GetOrganizationNumberValue(payloadClaimParameters)}"
                     }
                 }
             }
@@ -64,5 +69,19 @@ public class PayloadClaimsCreatorWithChildOrgNumber : IPayloadClaimsCreator {
         return new List<PayloadClaim> {
             new PayloadClaim("authorization_details", authorizationDetails),
         };
+    }
+
+    private string GetOrganizationNumberValue(PayloadClaimParameters payloadClaimParameters)
+    {
+        var organizationNumberValue = payloadClaimParameters.ParentOrganizationNumber;
+        if (!string.IsNullOrEmpty(payloadClaimParameters.ChildOrganizationNumber))
+        {
+            organizationNumberValue += $":{payloadClaimParameters.ChildOrganizationNumber}";
+        }
+        else
+        {
+            organizationNumberValue += ":";
+        }
+        return organizationNumberValue;
     }
 }

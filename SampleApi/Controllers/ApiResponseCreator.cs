@@ -19,8 +19,9 @@ public class ApiResponseCreator : IApiResponseCreator
         return new ApiResponse
         {
             Greeting = CreateGreeting(claims, apiName),
-            OrganizationNumber = claims.SingleOrDefault(c => c.Type == "helseid://claims/client/claims/orgnr_parent")?.Value,
+            ParentOrganizationNumber = claims.SingleOrDefault(c => c.Type == "helseid://claims/client/claims/orgnr_parent")?.Value,
             ChildOrganizationNumber = claims.SingleOrDefault(c => c.Type == "helseid://claims/client/claims/orgnr_child")?.Value,
+            SupplierOrganizationNumber = claims.SingleOrDefault(c => c.Type == "helseid://claims/client/claims/orgnr_supplier")?.Value,
         };
     }
 

@@ -1,4 +1,3 @@
-using System.Text.Json;
 using HelseId.Samples.ApiAccess.Configuration;
 using HelseId.Samples.ApiAccess.Exceptions;
 using HelseId.Samples.ApiAccess.Interfaces.Stores;
@@ -94,6 +93,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         openIdConnectOptions.AuthenticationMethod = OpenIdConnectRedirectBehavior.FormPost;
     }
 
+    
     private void SetUpScopes(OpenIdConnectOptions openIdConnectOptions)
     {
         openIdConnectOptions.Scope.Clear();
@@ -258,6 +258,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         userSessionData.IdToken = openIdConnectMessage.IdToken;
         userSessionData.RefreshToken = openIdConnectMessage.RefreshToken;
         userSessionData.RefreshTokenExpiresAtUtc = refreshTokenExpiresAtUtc;
+        userSessionData.SessionId = sessionId;
 
         // The resource indicator application is a special case: we get an access token that has more than one
         // audience (i.e. the audience for both resources that were requested). Hence, we don't want to
@@ -329,6 +330,20 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             // This value will typically be assigned to a logged on user:
             result.ChildOrganizationNumber = ConfigurationValues.ApiAccessWithRequestObjectChildOrganizationNumber;
         }
+
+        if (_settings.ClientType == ClientType.ApiAccessForMultiTenantClient)
+        {
+            // This instructs the payload claim creator for multi-tenancy to not create an 'authorization_details' claim
+            // (it is not validated with the code grant).
+            result.IsAuthCodeRequest = true;
+        }
+
+        if (_settings.ClientType == ClientType.ApiAccessWithContextualClaims)
+        {
+            // This sets the contextual claim type for the call to HelseID:
+            result.ContextualClaimType = ConfigurationValues.TestContextClaim;
+        }
+
         return result;
     }
 }

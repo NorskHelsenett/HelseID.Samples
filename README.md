@@ -4,10 +4,11 @@
 
 # HelseID samples
 
-HelseID is a national authentication service for the health sector in Norway. 
+HelseID is a national authentication service for the healthcare sector in Norway. 
 These code samples are targeted at technical personel such as application architects and developers.  
 
 If you experience trouble while checking out this repository because of long paths, update your git config by running:  
+
 `git config --global core.longpaths true`
 
 ## Prerequisite knowledge
@@ -24,7 +25,7 @@ Please be advised that the sample code does not in any way represent working cod
 
 These samples use either machin-to-machine or user logon authentication methods.
 
-#### Sample API
+### Sample API
 
 The code can be found in the `SampleAPI` folder.
 
@@ -32,7 +33,7 @@ Most of the HelseID samples demonstrate how a client can access an API. Therefor
 
 See [SampleApi/README.md](SampleApi/README.md) for more information.
 
-#### Grant types
+### Grant types
 
 HelseID supports the use of several grants, that is, the resource owner's (user or enterprise) authorization used by the client to obtain an access token. Code samples are provided for different scenarios, and each will use at least one grant type. The following grants are provided:
 

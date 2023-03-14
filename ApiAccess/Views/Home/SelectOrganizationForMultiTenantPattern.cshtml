@@ -1,0 +1,12 @@
+@using HelseId.Samples.ApiAccess.Configuration
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model HelseId.Samples.ApiAccess.ViewModels.ApiResponseViewModel
+
+<div class="container">
+    @if (Model.ClientType == ClientType.ApiAccessForMultiTenantClient)
+    {
+        <div class="row">
+            <partial name="_OrganizationSelector"/>
+        </div>    
+    }
+</div>

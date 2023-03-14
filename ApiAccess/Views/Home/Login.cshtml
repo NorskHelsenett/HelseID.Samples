@@ -3,6 +3,11 @@
 @model HelseId.Samples.ApiAccess.ViewModels.ApiResponseViewModel
 
 <div class="container">
+    @if (Model.ClientType == ClientType.ApiAccessForMultiTenantClient)
+    {
+        <div class="row">
+            <partial name="_OrganizationSelector"/>
+        </div>    }
     @if (Model.ClientType != ClientType.UserLoginOnly)
     {
         <div class="row">

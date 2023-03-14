@@ -5,7 +5,7 @@ using HelseID.Samples.Configuration;
 
 namespace HelseId.Samples.ApiAccess;
 
-// This file is used for bootstrapping the example. Nothing of interest here.
+// This file is used for bootstrapping the example. Nothing of real interest here.
 public class Program
 {
     public static async Task Main(string[] args)
@@ -31,16 +31,26 @@ public class Program
             description: "If set, the application will use resource indicators in order to call two APIs with different audiences",
             getDefaultValue: () => false);
 
+        var useMultiTenantOption = new Option<bool>(
+            aliases: new [] {"--use-multi-tenant", "-mt"},
+            description: "If set, the application will use a client set up for multi-tenancy, i.e. it makes use of an organization number that is connected to the client.",
+            getDefaultValue: () => false);
+        
+        var useContextualClaimsOption = new Option<bool>(
+            aliases: new [] {"--use-contextual-claims", "-cc"},
+            description: "If set, the application will use submit a contextual claim to HelseID, which will in turn be returned to the sample API.",
+            getDefaultValue: () => false);
+        
         var rootCommand = new RootCommand("An authorization code flow usage sample")
         {
-            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption
+            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, useContextualClaimsOption
         };
 
-        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators) =>
+        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useContextualClaims) =>
         {
-            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators);
+            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useContextualClaims);
             new Startup(settings).BuildWebApplication().Run();
-        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption);
+        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, useContextualClaimsOption);
 
         await rootCommand.InvokeAsync(args);
     }
@@ -49,9 +59,11 @@ public class Program
         bool userLoginOnly,
         bool useTokenExchange,
         bool useRequestObjects,
-        bool useResourceIndicators)
+        bool useResourceIndicators,
+        bool useMultiTenant,
+        bool useContextualClaims)
     {
-        var clientType = GetClientType(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators);
+        var clientType = GetClientType(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useContextualClaims);
 
         return new Settings
         {
@@ -68,7 +80,9 @@ public class Program
         bool userLoginOnly,
         bool useTokenExchange,
         bool useRequestObjects,
-        bool useResourceIndicators)
+        bool useResourceIndicators,
+        bool useMultiTenant,
+        bool useContextualClaims)
     {
         if (userLoginOnly)
         {
@@ -88,6 +102,16 @@ public class Program
         if (useResourceIndicators)
         {
             return ClientType.ApiAccessWithResourceIndicators;
+        }
+
+        if (useMultiTenant)
+        {
+            return ClientType.ApiAccessForMultiTenantClient;
+        }
+
+        if (useContextualClaims)
+        {
+            return ClientType.ApiAccessWithContextualClaims;
         }
 
         return ClientType.ApiAccess;
@@ -135,6 +159,8 @@ public class Program
             ClientType.ApiAccessWithRequestObject => HelseIdSamplesConfiguration.ApiAccessWithRequestObject,
             ClientType.ApiAccessWithResourceIndicators => HelseIdSamplesConfiguration.ResourceIndicatorsClient,
             ClientType.UserLoginOnly => HelseIdSamplesConfiguration.UserAuthenticationClient,
+            ClientType.ApiAccessForMultiTenantClient => HelseIdSamplesConfiguration.ApiAccessForMultiTenantClient,
+            ClientType.ApiAccessWithContextualClaims => HelseIdSamplesConfiguration.ApiAccessWithContextualClaimsClient,
             _ => HelseIdSamplesConfiguration.ApiAccess
         };
     }
