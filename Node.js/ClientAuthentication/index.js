@@ -5,21 +5,27 @@ const helmet              = require('helmet');
 const passport            = require('passport');
 const http                = require('http');
 const { Issuer,Strategy } = require('openid-client');
+const https               = require("https");
+const fs                  = require('fs');
 
 // ------------------------------------------------------------
 // Configuration constants
 // ------------------------------------------------------------
 const LOGIN_PATH = '/login';
+const LOGOUT_PATH = '/logout';
 const CALLBACK_PATH = '/login/callback';
+const LOGOUT_CALLBACK_PATH = '/logout/callback';
 const LOGGED_IN_USER_PATH = '/user';
 const LOGIN_FAILURE_PATH = '/login-failure';
+const LOGIN_IN_AT_WRONG_SECURITY_LEVEL = '/login-at-wrong-security-level';
 
 const PASSPORT_OIDC_STRATEGY = 'oidc';
 const PORT_NUMBER = 5040;
 const STS_URL = 'https://helseid-sts.test.nhn.no';
 const CLIENT_ID = 'helseid-sample-client-authentication';
-const CLIENT_SCOPE = 'openid profile';
-const REDIRECT_URI = `http://localhost:${PORT_NUMBER}${CALLBACK_PATH}`
+const CLIENT_SCOPE = 'openid profile helseid://scopes/identity/pid helseid://scopes/identity/security_level';
+const REDIRECT_URI = `https://localhost:${PORT_NUMBER}${CALLBACK_PATH}`
+const POST_LOGOUT_REDIRECT_URI = `https://localhost:${PORT_NUMBER}${LOGOUT_CALLBACK_PATH}`
 const PRIVATE_KEY_RSA = {
   'd': 'dJFf2efy5al1PZPEtgbifR0E7IC1yjTZn8OcgjdoVsaJG7F7rrAUH4awxyXJaOrHfz0ZwNtp57TzKtO50Qy08PPcg8uHO4WIpvmHgS_mtNSovWVxsWVnGdq0NlgAT8EEhVT1-3acu6OvfOROM8HfWgzded8dkWPm9QMPJtd9q2u0-ZGdEDu71ttHfFHHb8BZK5C6AX-BBaEpJQ8fsmXyO8MLmXGos4Q95XX40qgsMqMrxLIYNCjcmXkdOq9gfHd1d5ub-X84u2MzVc3qXDr3F5YgCmx0i4sKddFrQ4J28rIjTWnyYPJDOzpSVCBuazVLkSY7I15CwCZnMU_1BdkEWowzULWNQVwB2vLQTgbS2uMGci2R0QbmxCqMt2teQ9W4sroHcantTJjEcPx0K4wpy0BGhHGJXcecFw78QD5qUzUyM5TyakyEIfbVicZHDPcbQyx4xxQlhNugrljD4UelRE2_In53Re1kNPBUwiC_Ql0fMlilxyU6R1lLPUoz-BnATZn9ofJB1UQqUKYUxPB763I16WLvQwIP42unKww4HPEKTPojWzwy7igFQklJ0IavdXpQtebTQeXLuyhsikX1wYe1tX6zSFRcCDUukfz3YQb-BTGpWLFcIjbqvYND08sYDGwXcOfQeHwJIy-4MHti4HpYgy5QvibrQHfGH7soxxU',
   'dp': '1NS8GseB2YzZfkOYe9aFcvqrFTbdvShYDhbd2we4ukViZaLUQ1FnfzgTzh8WDi_7Py1rwsZZHfpZjSyI81_VGP919_kcDtf74IK502nLpztoaLRgELGZbdDCadAMb4nXGMRfoFG5esl3vRQU2JQuOnglFNccBuq61d7VPe5F8J2eF-NmtxrcxZeSvSHBGEbDFCE9xz-yCwS0sbM-ymcSVP937frfXdYztaASgUL1Mvn7EoyHcXXV787uOlpJ306lp9bTOVzeRpRy_2apQoLucq5pCSKyame7oeinpVrvbfkvdTXHZkZnS1uNv3D8cKiyt8GXKG0nUw-7SYX_Rg-6aQ',
@@ -37,7 +43,8 @@ const SIGNING_ALGORITHM_RSA = 'RS384';
 // ------------------------------------------------------------
 // Set up the application
 // ------------------------------------------------------------
-
+// https://codeburst.io/how-to-implement-openid-authentication-with-openid-client-and-passport-in-node-js-43d020121e87
+// https://www.codespeedy.com/how-to-enable-https-in-express-js/
 const app = express();
 
 app.use(cookieParser());
@@ -54,19 +61,25 @@ app.use(helmet());
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Gets a serialized user object into the session
 passport.serializeUser((user, done) => {
+  /*
     console.log('-----------------------------');
     console.log('serialize user');
     console.log(user);
     console.log('-----------------------------');
+    */
     done(null, user);
 });
 
+// Deserializes user objects out of the session
 passport.deserializeUser((user, done) => {
+  /*
     console.log('-----------------------------');
     console.log('deserialize user');
     console.log(user);
     console.log('-----------------------------');
+    */
     done(null, user);
 });
 
@@ -77,78 +90,125 @@ passport.deserializeUser((user, done) => {
 Issuer.discover(STS_URL).then(oidcIssuer => {
 
   var client = new oidcIssuer.Client({
-      client_id: CLIENT_ID,
-      redirect_uris: [ REDIRECT_URI ],
-      response_types: [ 'code' ],    
-      token_endpoint_auth_signing_alg: SIGNING_ALGORITHM_RSA,
-      token_endpoint_auth_method: 'private_key_jwt',
-    },
-    { 
-      // This is needed to sign the client assertion:
-      keys: [PRIVATE_KEY_RSA]
-    });
-
-    passport.use(
-      PASSPORT_OIDC_STRATEGY,
-      new Strategy({ client, passReqToCallback: true }, (req, tokenSet, userinfo, done) => {
-        console.log('tokenSet', tokenSet);
-        console.log('userinfo', userinfo);
-        req.session.tokenSet = tokenSet;
-        req.session.userinfo = userinfo;
-        return done(null, tokenSet.claims());
-      }));
+    client_id: CLIENT_ID,
+    redirect_uris: [ REDIRECT_URI ],
+    response_types: [ 'code' ],    
+    token_endpoint_auth_signing_alg: SIGNING_ALGORITHM_RSA,
+    token_endpoint_auth_method: 'private_key_jwt',
+    post_logout_redirect_uris: [ POST_LOGOUT_REDIRECT_URI ],
+  },
+  { 
+    // This is needed to sign the client assertion:
+    keys: [PRIVATE_KEY_RSA]
   });
 
-// ------------------------------------------------------------
-// Application paths
-// ------------------------------------------------------------
+  passport.use(
+    PASSPORT_OIDC_STRATEGY,
+    new Strategy({ client, passReqToCallback: true }, (req, tokenSet, userinfo, done) => {
+      //console.log('tokenSet', tokenSet);
+      //console.log('userinfo', userinfo);
+      req.session.tokenSet = tokenSet;
+      req.session.userinfo = userinfo;
+      return done(null, tokenSet.claims());
+    }));
 
-app.get('/', (req, res) => {
-  res.send(`
-      <h1>Welcome</h1>
-      <p> This sample demonstrates how a client can access an API that requires authentication. <br> 
-      <a href='${LOGIN_PATH}'>Log in</a> and use <strong>Test IDP</strong> to authenticate the user. The logged in user can then call the API and access data. </p>
-      `);
+
+  // ------------------------------------------------------------
+  // Application paths
+  // ------------------------------------------------------------
+
+  app.get('/', (req, res) => {
+    res.send(`
+        <h1>Welcome</h1>
+        <p> This sample demonstrates how a client can access an API that requires authentication. <br> 
+        <a href='${LOGIN_PATH}'>Log in</a> and use <strong>Test IDP</strong> to authenticate the user. The logged in user can then call the API and access data. </p>
+        `);
+  });
+
+  app.get(LOGIN_IN_AT_WRONG_SECURITY_LEVEL, (req, res) => {
+    res.send(`
+        <h3>Access denied</h3>
+        <p>You were logged on, but the security level was not accepted.</p>
+        <p>Please <a href='${LOGOUT_PATH}'>log out</a> and try to log in log in with another identity provider!</p>
+        `);
+  });
+
+  app.get(LOGIN_PATH, (req, res, next)  => {
+    console.log('Starting the passport authenticate function');
+    next();
+  }, passport.authenticate(PASSPORT_OIDC_STRATEGY, {scope: CLIENT_SCOPE}));
+
+  app.get(CALLBACK_PATH, (req, res, next) => {
+    passport.authenticate(PASSPORT_OIDC_STRATEGY, { successRedirect: LOGGED_IN_USER_PATH, failureRedirect: LOGIN_FAILURE_PATH })
+    (req, res, next)
+  });
+
+  app.get(LOGGED_IN_USER_PATH, (req, res) => {
+
+    if (req.session.passport == undefined || req.session.passport.user == undefined) {
+      return res.redirect('/');
+    }
+
+    var user = req.session.passport.user;
+    
+    if (user['helseid://claims/identity/security_level'] !== '4') {
+      // The security level is not at the required value
+      return res.redirect(LOGIN_IN_AT_WRONG_SECURITY_LEVEL);
+    }
+
+    const userInfo = JSON.stringify({
+      user
+    }, null, 1);
+
+    res.send(`
+        <h1>Success</h1>
+        <p>The user was logged in</p>
+        <p>${userInfo}</p> 
+        <p><a href='${LOGOUT_PATH}'>Log out</a> here!</p>        
+        `);  
+  });
+
+  app.get(LOGOUT_PATH, (req, res) => {
+    res.redirect(client.endSessionUrl());
+  });
+
+  // logout callback
+  app.get(LOGOUT_CALLBACK_PATH, (req, res) => {
+    // clears the persisted user from the local storage
+    req.logout();
+    // redirects the user to a public route
+    res.redirect('/');
+  });
+
+  app.get(LOGIN_FAILURE_PATH, (req, res) => {
+    res.send(`
+        <h1>Error</h1>
+        <p>The login failed</p>
+        `);
+  });
 });
 
-app.get(LOGIN_PATH, (req, res, next)  => {
-  console.log('Starting the passport authenticate function');
-  next();
-}, passport.authenticate(PASSPORT_OIDC_STRATEGY, {scope: CLIENT_SCOPE}));
 
-app.get(CALLBACK_PATH, (req, res, next) => {
-  passport.authenticate(PASSPORT_OIDC_STRATEGY, { successRedirect: LOGGED_IN_USER_PATH, failureRedirect: LOGIN_FAILURE_PATH })
-  (req, res, next)
-});
-
-app.get(LOGGED_IN_USER_PATH, (req, res) => {
-  /*
-  const userInformation = JSON.stringify({
-    tokenset: req.session.tokenSet, userinfo: req.session.userinfo 
-  }, null, 2);
-  */
- 
-  const userInfo = JSON.stringify({
-    user: req.session.passport.user 
-  }, null, 1);
-  res.send(`
-      <h1>Success</h1>
-      <p>The user was logged in</p>
-      <p>${userInfo}</p> 
-      `);  
-});
-
-app.get(LOGIN_FAILURE_PATH, (req, res) => {
-  res.send(`
-      <h1>Error</h1>
-      <p>The login failed</p>
-      `);
-});
 
 // ------------------------------------------------------------
 // Start the application
 // ------------------------------------------------------------
+// Create a NodeJS HTTPS listener on port 4000 that points to the Express app
+// Use a callback function to tell when the server is created.
+// openssl req -x509 -nodes -days 8000 -newkey rsa:2048 -keyout ./sslcert/server.key -out ./sslcert/server.crt
+// https://stackoverflow.com/questions/11744975/enabling-https-on-express-js
+var privateKey = fs.readFileSync('sslcert/server.key').toString();
+var certificate = fs.readFileSync('sslcert/server.crt').toString();
 
-http.createServer(app).listen(PORT_NUMBER, () => {
+var credentials = {key: privateKey, cert: certificate};
+
+https
+  .createServer(credentials, app)
+  .listen(PORT_NUMBER, ()=> {
+    console.log(`Now listening on: https://localhost:${PORT_NUMBER}`)
+  });
+/*
+  http.createServer(app).listen(PORT_NUMBER, () => {
   console.log(`Now listening on: http://localhost:${PORT_NUMBER}`)
 });
+*/
