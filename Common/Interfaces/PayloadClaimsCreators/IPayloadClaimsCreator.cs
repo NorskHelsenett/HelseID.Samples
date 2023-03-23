@@ -1,13 +1,10 @@
-using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Models;
 
 namespace HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 
 public interface IPayloadClaimsCreator
 {
-    IEnumerable<PayloadClaim> CreatePayloadClaims(
-        PayloadClaimParameters payloadClaimParameters,
-        HelseIdConfiguration configuration);
+    IEnumerable<PayloadClaim> CreatePayloadClaims(PayloadClaimParameters payloadClaimParameters);
 }
 
 // Instances of this interface create a payload for use in a client assertion

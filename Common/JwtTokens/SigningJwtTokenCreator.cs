@@ -1,9 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
-using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Interfaces.JwtTokens;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Models;
-using Microsoft.IdentityModel.Tokens;
 
 namespace HelseId.Samples.Common.JwtTokens;
 
@@ -14,20 +12,20 @@ namespace HelseId.Samples.Common.JwtTokens;
 public class SigningJwtTokenCreator : ISigningJwtTokenCreator
 {
     private readonly IJwtPayloadCreator _jwtPayloadCreator;
-    private readonly HelseIdConfiguration _configuration;
+    private readonly ISigningCredentialsStore _signingCredentialsStore;
     
     public SigningJwtTokenCreator(
         IJwtPayloadCreator jwtPayloadCreator,
-        HelseIdConfiguration configuration)
+        ISigningCredentialsStore signingCredentialsStore)
     {
         _jwtPayloadCreator = jwtPayloadCreator;
-        _configuration = configuration;
+        _signingCredentialsStore = signingCredentialsStore;
     }
 
     public string CreateSigningToken(IPayloadClaimsCreator payloadClaimsCreator, PayloadClaimParameters payloadClaimParameters)
     {
         var header = CreateJwtHeaderWithSigningCredentials();
-        var payload = _jwtPayloadCreator.CreateJwtPayload(payloadClaimsCreator, payloadClaimParameters, _configuration);
+        var payload = _jwtPayloadCreator.CreateJwtPayload(payloadClaimsCreator, payloadClaimParameters);
 
         // The JwtSecurityToken class is part of the System.IdentityModel library.
         var jwtSecurityToken = new JwtSecurityToken(header, payload);
@@ -42,14 +40,8 @@ public class SigningJwtTokenCreator : ISigningJwtTokenCreator
     /// </summary>
     private JwtHeader CreateJwtHeaderWithSigningCredentials()
     {
-        var signingCredentials = GetClientAssertionSigningCredentials();
+        var signingCredentials = _signingCredentialsStore.GetSigningCredentials();
         // The JwtHeader class is part of the System.IdentityModel library.
         return new JwtHeader(signingCredentials);
-    }
-
-    private SigningCredentials GetClientAssertionSigningCredentials()
-    {
-        var securityKey = new JsonWebKey(_configuration.RsaPrivateKeyJwk.JwkValue);
-        return new SigningCredentials(securityKey, _configuration.RsaPrivateKeyJwk.Algorithm);
     }
 }

@@ -1,6 +1,8 @@
+using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Interfaces.Endpoints;
 using IdentityModel.Client;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 
 namespace HelseId.Samples.Common.Endpoints;
 
@@ -14,9 +16,9 @@ public class DiscoveryDocumentGetter : IDiscoveryDocumentGetter
     private readonly IMemoryCache _memoryCache;
     private readonly string _stsUrl;
 
-    public DiscoveryDocumentGetter(string stsUrl)
+    public DiscoveryDocumentGetter(IConfiguration configuration)
     {
-        _stsUrl = stsUrl;
+        _stsUrl = configuration.GetOptions<StsOptions>().StsUrl;
         _memoryCache = new MemoryCache(new MemoryCacheOptions
         {
             ExpirationScanFrequency = TimeSpan.FromHours(DiscoveryDocumentCacheExpirationInHours)

@@ -4,6 +4,7 @@ using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Interfaces.TokenExpiration;
 using HelseId.Samples.Common.JwtTokens;
 using HelseId.Samples.Common.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace HelseId.Samples.Common.PayloadClaimsCreators;
@@ -13,15 +14,17 @@ namespace HelseId.Samples.Common.PayloadClaimsCreators;
 public class ClientAssertionPayloadClaimsCreator : IPayloadClaimsCreatorForClientAssertion
 {
     private readonly IDateTimeService _dateTimeService;
-    
-    public ClientAssertionPayloadClaimsCreator(IDateTimeService dateTimeService)
+    private readonly ClientOptions _clientOptions;
+    private readonly StsOptions _stsOptions;
+
+    public ClientAssertionPayloadClaimsCreator(IDateTimeService dateTimeService, IConfiguration configuration)
     {
         _dateTimeService = dateTimeService;
+        _clientOptions = configuration.GetOptions<ClientOptions>();
+        _stsOptions = configuration.GetOptions<StsOptions>();
     }
     
-    public IEnumerable<PayloadClaim> CreatePayloadClaims(
-        PayloadClaimParameters payloadClaimParameters,
-        HelseIdConfiguration configuration)
+    public IEnumerable<PayloadClaim> CreatePayloadClaims(PayloadClaimParameters payloadClaimParameters)
     {
         // Time values are converted to epoch (UNIX) time format
         var tokenIssuedAtEpochTime = EpochTime.GetIntDate(_dateTimeService.UtcNow);
@@ -31,11 +34,11 @@ public class ClientAssertionPayloadClaimsCreator : IPayloadClaimsCreatorForClien
         {
             // See https://www.rfc-editor.org/rfc/rfc7523#section-3 for a further description of these claims
             // "iss": the issuer claim; in our case the client ID
-            new(JwtRegisteredClaimNames.Iss, configuration.ClientId),
+            new(JwtRegisteredClaimNames.Iss, _clientOptions.ClientId),
             // "sub" (subject): a unique identifier for the End-User at the Issuer. HelseID expects this to be the client ID.
-            new(JwtRegisteredClaimNames.Sub, configuration.ClientId),
+            new(JwtRegisteredClaimNames.Sub, _clientOptions.ClientId),
             // "aud" (audience): the audience for our client assertion is the HelseID server
-            new(JwtRegisteredClaimNames.Aud, configuration.StsUrl),
+            new(JwtRegisteredClaimNames.Aud, _stsOptions.StsUrl),
             // "exp" (expires at): this describes the end of the token usage period
             new(JwtRegisteredClaimNames.Exp, tokenIssuedAtEpochTime + JwtPayloadCreator.TokenExpirationTimeInSeconds),
             // "nbf" (not before): this describes the start of the token usage period

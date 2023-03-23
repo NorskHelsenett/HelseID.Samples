@@ -1,4 +1,3 @@
-using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Models;
 
@@ -17,12 +16,12 @@ public class CompositePayloadClaimsCreator : IPayloadClaimsCreatorForClientAsser
         _instances = instances;
     }
 
-    public IEnumerable<PayloadClaim> CreatePayloadClaims(PayloadClaimParameters payloadClaimParameters, HelseIdConfiguration configuration)
+    public IEnumerable<PayloadClaim> CreatePayloadClaims(PayloadClaimParameters payloadClaimParameters)
     {
         var result = new List<PayloadClaim>();
         foreach (var payloadClaimsCreator in _instances)
         {
-            result.AddRange(payloadClaimsCreator.CreatePayloadClaims(payloadClaimParameters, configuration));
+            result.AddRange(payloadClaimsCreator.CreatePayloadClaims(payloadClaimParameters));
         }
         return result;
     }

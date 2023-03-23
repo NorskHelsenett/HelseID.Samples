@@ -9,7 +9,12 @@ using IdentityModel.Client;
 
 namespace HelseId.Samples.ClientCredentials.Client;
 
-public class Machine2MachineClient
+public interface IMachine2MachineClient
+{
+    Task CallApiWithToken();
+}
+
+public class Machine2MachineClient : IMachine2MachineClient
 {
     private ITokenRequestBuilder _tokenRequestBuilder;
     private IApiConsumer _apiConsumer;

@@ -3,8 +3,8 @@ using HelseId.Samples.Common.TokenRequests;
 using HelseId.Samples.Common.ApiConsumers;
 using HelseId.Samples.ClientCredentials.Client;
 using HelseId.Samples.ClientCredentials.ClientInfoEndpoint;
+using HelseId.Samples.ClientCredentials.SigningCredentials;
 using HelseId.Samples.Common.ClientAssertions;
-using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Endpoints;
 using HelseId.Samples.Common.Interfaces.Endpoints;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
@@ -14,6 +14,7 @@ using HelseId.Samples.Common.Models;
 using HelseId.Samples.Common.PayloadClaimsCreators;
 using HelseId.Samples.Common.TokenExpiration;
 using HelseID.Samples.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace HelseId.Samples.ClientCredentials.Configuration;
 
@@ -26,16 +27,17 @@ public class ClientConfigurator
     public Machine2MachineClient ConfigureClient(
         bool useChildOrganizationNumberOptionValue,
         bool useClientInfoEndpointOptionValue,
-        bool useMultiTenantPatternOptionValue)
+        bool useMultiTenantPatternOptionValue,
+        IConfiguration configuration)
     {
-        var discoveryDocumentGetter = new DiscoveryDocumentGetter(ConfigurationValues.StsUrl);
+        var discoveryDocumentGetter = new DiscoveryDocumentGetter(configuration);
         var endpointDiscoverer = new HelseIdEndpointsDiscoverer(discoveryDocumentGetter);
         var apiConsumer = new ApiConsumer();
-        var tokenRequestBuilder = CreateTokenRequestBuilder(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue, endpointDiscoverer);
+        var tokenRequestBuilder = CreateTokenRequestBuilder(endpointDiscoverer, configuration);
         var clientInfoRetriever = SetUpClientInfoRetriever(useClientInfoEndpointOptionValue, endpointDiscoverer);
         var tokenRequestParameters = SetUpTokenRequestParameters(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue);
         var expirationTimeCalculator = new ExpirationTimeCalculator(new DateTimeService());
-        var payloadClaimsCreator = SetUpPayloadClaimsCreator(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue);
+        var payloadClaimsCreator = SetUpPayloadClaimsCreator(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue, configuration);
 
         return new Machine2MachineClient(
             apiConsumer,
@@ -46,12 +48,11 @@ public class ClientConfigurator
             tokenRequestParameters);
     }
 
-    private ITokenRequestBuilder CreateTokenRequestBuilder(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue, IHelseIdEndpointsDiscoverer endpointsDiscoverer)
+    private ITokenRequestBuilder CreateTokenRequestBuilder(IHelseIdEndpointsDiscoverer endpointsDiscoverer, IConfiguration configuration)
     {
         // This sets up the building of a token request for the client credentials grant
-        var configuration = SetUpHelseIdConfiguration(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue);
         var jwtPayloadCreator = new JwtPayloadCreator();
-        var signingJwtTokenCreator = new SigningJwtTokenCreator(jwtPayloadCreator, configuration);
+        var signingJwtTokenCreator = new SigningJwtTokenCreator(jwtPayloadCreator, new SigningCredentialsStore());
         // Two builder classes are used
         //   * A ClientAssertionsBuilder, which creates a client assertion that will be used
         //     inside the token request to HelseID in order to authenticate this client
@@ -73,25 +74,9 @@ public class ClientConfigurator
             new NullClientInfoRetriever();
     }
 
-    private  HelseIdConfiguration SetUpHelseIdConfiguration(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue)
+    private  IPayloadClaimsCreatorForClientAssertion SetUpPayloadClaimsCreator(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue, IConfiguration configuration)
     {
-        if (useMultiTenantPatternOptionValue)
-        {
-            // This is done when the '--use-multi-tenant-pattern' option is used on the command line:
-            return HelseIdSamplesConfiguration.ClientCredentialsSampleForMultiTenantClient;
-        }
-        else if (useChildOrganizationNumberOptionValue)
-        {
-            // This is done when the '--use-child-org-number' option is used on the command line:
-            return HelseIdSamplesConfiguration.ClientCredentialsWithChildOrgNumberClient;
-        }
-        // Sets up the configuration for a "normal" client:
-        return HelseIdSamplesConfiguration.ClientCredentialsClient;
-    }
-    
-    private  IPayloadClaimsCreatorForClientAssertion SetUpPayloadClaimsCreator(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue)
-    {
-        var tokenRequestPayloadClaimsCreator = new ClientAssertionPayloadClaimsCreator(new DateTimeService());
+        var tokenRequestPayloadClaimsCreator = new ClientAssertionPayloadClaimsCreator(new DateTimeService(), configuration);
 
         if (useMultiTenantPatternOptionValue)
         {

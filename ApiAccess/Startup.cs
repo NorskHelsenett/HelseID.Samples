@@ -42,23 +42,37 @@ public class Startup
     
     public WebApplication BuildWebApplication()
     {
-        var builder = WebApplication.CreateBuilder();
+        var webApplicationBuilder = WebApplication.CreateBuilder();
 
-        ConfigureHttpServer(builder);
+        CreateConfiguration(webApplicationBuilder);
 
-        ConfigureServices(builder.Services);
+        ConfigureHttpServer(webApplicationBuilder);
+
+        ConfigureServices(webApplicationBuilder.Services, webApplicationBuilder.Configuration);
 
         DisableDefaultNamespaces();
 
-        var webApplication = builder.Build();
+        var webApplication = webApplicationBuilder.Build();
+
         return Configure(webApplication);
     }
 
-    private void ConfigureHttpServer(WebApplicationBuilder builder)
+    private void CreateConfiguration(WebApplicationBuilder webApplicationBuilder)
+    {
+        webApplicationBuilder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
+
+        var contentRootPath = webApplicationBuilder.Environment.ContentRootPath;
+        var sharedConfigurationPath = Path.Combine(contentRootPath, "..", "Configuration");
+
+        webApplicationBuilder.Configuration.AddJsonFile(Path.Combine(sharedConfigurationPath, _settings.AppsettingsFile), optional: false, reloadOnChange: false);
+        webApplicationBuilder.Configuration.AddJsonFile(Path.Combine(sharedConfigurationPath, "appsettings.General.json"), optional: false, reloadOnChange: false);
+    }
+
+    private void ConfigureHttpServer(WebApplicationBuilder webApplicationBuilder)
     {
         // Sets the server to use the port that is described in ConfigurationValues.
         const int serverPort = ConfigurationValues.ApiAccessWebServerPort;
-        builder.WebHost.UseKestrel(kestrelServerOptions =>
+        webApplicationBuilder.WebHost.UseKestrel(kestrelServerOptions =>
         {
             // Bind directly to a socket handle or Unix socket
             kestrelServerOptions.ListenLocalhost(serverPort, listenOptions => listenOptions.UseHttps());
@@ -72,15 +86,13 @@ public class Startup
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
     }
 
-    private void ConfigureServices(IServiceCollection services) 
+    private void ConfigureServices(IServiceCollection services, IConfiguration configuration) 
     {
         // Add services to the container.
         services.AddControllersWithViews();
 
         // Create a settings instance. These can be injected into other objects, for instance the HomeController 
         services.AddSingleton<Settings>(_settings);
-        // We need the HelseIdConfiguration instance as a service as well:
-        services.AddSingleton<HelseIdConfiguration>(_settings.HelseIdConfiguration);
 
         // Services for calculating the expiration time for tokens
         var dateTimeService = new DateTimeService();
@@ -93,8 +105,19 @@ public class Startup
             // We need payload claims for the token request, both the "default" type and for the child organization number:
             var compositePayloadClaimsCreator = new CompositePayloadClaimsCreator(new List<IPayloadClaimsCreator>
             {
-                new RequestObjectPayloadClaimsCreator(dateTimeService),
+                new RequestObjectPayloadClaimsCreator(dateTimeService, configuration),
                 new PayloadClaimsCreatorWithChildOrgNumber()
+            });
+            // We add this object as an instance of IPayloadClaimsCreatorForClientAssertion
+            services.AddSingleton<IPayloadClaimsCreatorForRequestObjects>(compositePayloadClaimsCreator);
+        }
+        else if (_settings.ClientType == ClientType.ApiAccessWithRequestObjectsWithContextualClaimsOption)
+        {
+            // We need payload claims for the token request, both the "default" type and for the contextual claim type:
+            var compositePayloadClaimsCreator = new CompositePayloadClaimsCreator(new List<IPayloadClaimsCreator>
+            {
+                new RequestObjectPayloadClaimsCreator(dateTimeService, configuration),
+                new PayloadClaimsCreatorForContextualClaims(),
             });
             // We add this object as an instance of IPayloadClaimsCreatorForClientAssertion
             services.AddSingleton<IPayloadClaimsCreatorForRequestObjects>(compositePayloadClaimsCreator);
@@ -105,7 +128,7 @@ public class Startup
             services.AddSingleton<IPayloadClaimsCreatorForRequestObjects>(new NullPayloadClaimsCreatorForRequestObjects());
         }
 
-        var clientAssertionPayloadClaimsCreator = new ClientAssertionPayloadClaimsCreator(dateTimeService); 
+        var clientAssertionPayloadClaimsCreator = new ClientAssertionPayloadClaimsCreator(dateTimeService, configuration); 
         if (_settings.ClientType == ClientType.ApiAccessForMultiTenantClient)
         {
             // We need payload claims for the token request, both the "default" type and for the multi-tenant organization number:
@@ -134,12 +157,14 @@ public class Startup
         
         // Builder for client assertions payloads
         services.AddTransient<IJwtPayloadCreator, JwtPayloadCreator>();
+        // The store that contains the private key (secret)
+        services.AddSingleton<ISigningCredentialsStore, SigningCredentialsStore>();
         // Builder for JWT tokens used for client assertions
         services.AddSingleton<ISigningJwtTokenCreator, SigningJwtTokenCreator>();
         // Builder for client assertions
         services.AddTransient<IClientAssertionsBuilder, ClientAssertionsBuilder>();
         // Finds the relevant endpoints on the HelseID server
-        services.AddSingleton<IDiscoveryDocumentGetter>(new DiscoveryDocumentGetter(_settings.HelseIdConfiguration.StsUrl));
+        services.AddSingleton<IDiscoveryDocumentGetter, DiscoveryDocumentGetter>();
         services.AddSingleton<IHelseIdEndpointsDiscoverer, HelseIdEndpointsDiscoverer>();
         // Builds token requests (in our case, refresh token requests)
         services.AddTransient<ITokenRequestBuilder, TokenRequestBuilder>();
@@ -219,3 +244,4 @@ public class Startup
         return webApplication;
     }
 }
+

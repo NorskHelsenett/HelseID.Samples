@@ -1,7 +1,5 @@
 using System.CommandLine;
 using HelseId.Samples.ApiAccess.Configuration;
-using HelseId.Samples.Common.Configuration;
-using HelseID.Samples.Configuration;
 
 namespace HelseId.Samples.ApiAccess;
 
@@ -21,9 +19,14 @@ public class Program
             description: "If set, the application will use a client that can be used for a token exchange flow",
             getDefaultValue: () => false);
 
-        var useRequsetObjects = new Option<bool>(
+        var useRequestObjectsOption = new Option<bool>(
             aliases: new [] {"--use-request-objects", "-ro"},
             description: "If set, the application will use a request object in the call to the authorization endpoint",
+            getDefaultValue: () => false);
+
+        var useRequestObjectsWithContextualClaimsOption = new Option<bool>(
+            aliases: new [] {"--use-request-objects-with-contextual-claims", "-roc"},
+            description: "If set, the application will use a request object with contextual claims in the call to the authorization endpoint",
             getDefaultValue: () => false);
 
         var useResourceIndicatorsOption = new Option<bool>(
@@ -43,14 +46,14 @@ public class Program
         
         var rootCommand = new RootCommand("An authorization code flow usage sample")
         {
-            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, useContextualClaimsOption
+            userLoginOnlyOption, useTokenExchangeOption, useRequestObjectsOption, useRequestObjectsWithContextualClaimsOption, useResourceIndicatorsOption, useMultiTenantOption, useContextualClaimsOption
         };
 
-        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useContextualClaims) =>
+        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useRequestObjectsWithContextualClaims, useResourceIndicators, useMultiTenant, useContextualClaims) =>
         {
-            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useContextualClaims);
+            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useRequestObjectsWithContextualClaims, useResourceIndicators, useMultiTenant, useContextualClaims);
             new Startup(settings).BuildWebApplication().Run();
-        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, useContextualClaimsOption);
+        }, userLoginOnlyOption, useTokenExchangeOption, useRequestObjectsOption, useRequestObjectsWithContextualClaimsOption, useResourceIndicatorsOption, useMultiTenantOption, useContextualClaimsOption);
 
         await rootCommand.InvokeAsync(args);
     }
@@ -59,109 +62,78 @@ public class Program
         bool userLoginOnly,
         bool useTokenExchange,
         bool useRequestObjects,
-        bool useResourceIndicators,
-        bool useMultiTenant,
-        bool useContextualClaims)
-    {
-        var clientType = GetClientType(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useContextualClaims);
-
-        return new Settings
-        {
-            ClientType = clientType,
-            ApiUrl1 = GetApiUrl1(clientType),
-            ApiUrl2 = GetApiUrl2(clientType),
-            ApiAudience1 = GetApiAudience1(clientType),
-            ApiAudience2 = GetApiAudience2(clientType),
-            HelseIdConfiguration = SetSamplesConfiguration(clientType),
-        };
-    }
-
-    private static ClientType GetClientType(
-        bool userLoginOnly,
-        bool useTokenExchange,
-        bool useRequestObjects,
+        bool useRequestObjectsWithContextualClaimsOption,
         bool useResourceIndicators,
         bool useMultiTenant,
         bool useContextualClaims)
     {
         if (userLoginOnly)
         {
-            return ClientType.UserLoginOnly;
+            return new Settings
+            {
+                ClientType = ClientType.UserLoginOnly,
+                AppsettingsFile = "appsettings.UserAuthentication.json",
+            };
         }
 
         if (useTokenExchange)
         {
-            return ClientType.ApiAccessWithTokenExchange;
+            return new Settings
+            {
+                ClientType = ClientType.ApiAccessWithTokenExchange,
+                AppsettingsFile = "appsettings.ApiAccessWithTokenExchangeClient.json",
+            };
         }
 
         if (useRequestObjects)
         {
-            return ClientType.ApiAccessWithRequestObject;
+            return new Settings
+            {
+                ClientType = ClientType.ApiAccessWithRequestObject,
+                AppsettingsFile = "appsettings.ApiAccessWithRequestObjectClient.json",
+            };
+        }
+        
+        if (useRequestObjectsWithContextualClaimsOption)
+        {
+            return new Settings
+            {
+                ClientType = ClientType.ApiAccessWithRequestObjectsWithContextualClaimsOption,
+                AppsettingsFile = "appsettings.ApiAccessWithRequestObjectWithContextualClaimsClient.json",
+            };
         }
 
         if (useResourceIndicators)
         {
-            return ClientType.ApiAccessWithResourceIndicators;
+            return new Settings
+            {
+                ClientType = ClientType.ApiAccessWithResourceIndicators,
+                AppsettingsFile = "appsettings.ApiAccessWithResourceIndicatorsClient.json",
+            };
         }
 
         if (useMultiTenant)
         {
-            return ClientType.ApiAccessForMultiTenantClient;
+            return new Settings
+            {
+                ClientType = ClientType.ApiAccessForMultiTenantClient,
+                AppsettingsFile = "appsettings.ApiAccessForMultiTenantClient.json",
+            };
         }
 
         if (useContextualClaims)
         {
-            return ClientType.ApiAccessWithContextualClaims;
+            return new Settings
+            {
+                ClientType = ClientType.ApiAccessWithContextualClaims,
+                AppsettingsFile = "appsettings.ApiAccessWithContextualClaimsClient.json",
+            };
         }
 
-        return ClientType.ApiAccess;
-    }
-
-    private static string GetApiUrl1(ClientType clientType)
-    {
-        return clientType switch
+        return new Settings
         {
-            ClientType.ApiAccessWithTokenExchange => ConfigurationValues.SampleApiUrlForTokenExchange,
-            ClientType.ApiAccessWithResourceIndicators => ConfigurationValues.SampleApiUrlForResourceIndicators1,
-            _ => ConfigurationValues.SampleApiUrl
-        };
-    }
-
-    private static string GetApiUrl2(ClientType clientType)
-    {
-        return clientType == ClientType.ApiAccessWithResourceIndicators ?
-            ConfigurationValues.SampleApiUrlForResourceIndicators2 :
-            string.Empty;
-    }
-
-    private static string GetApiAudience1(ClientType clientType)
-    {
-        return clientType switch
-        {
-            ClientType.ApiAccessWithTokenExchange => ConfigurationValues.SampleTokenExchangeApiAudience,
-            ClientType.ApiAccessWithResourceIndicators => ConfigurationValues.SampleApiForResourceIndicators1Audience,
-            _ => ConfigurationValues.SampleApiNameAudience
-        };
-    }
-
-    private static string GetApiAudience2(ClientType clientType)
-    {
-        return clientType == ClientType.ApiAccessWithResourceIndicators ?
-            ConfigurationValues.SampleApiForResourceIndicators2Audience :
-            string.Empty;
-    }
-
-    private static HelseIdConfiguration SetSamplesConfiguration(ClientType clientType)
-    {
-        return clientType switch
-        {
-            ClientType.ApiAccessWithTokenExchange => HelseIdSamplesConfiguration.ApiAccessWithTokenExchange,
-            ClientType.ApiAccessWithRequestObject => HelseIdSamplesConfiguration.ApiAccessWithRequestObject,
-            ClientType.ApiAccessWithResourceIndicators => HelseIdSamplesConfiguration.ResourceIndicatorsClient,
-            ClientType.UserLoginOnly => HelseIdSamplesConfiguration.UserAuthenticationClient,
-            ClientType.ApiAccessForMultiTenantClient => HelseIdSamplesConfiguration.ApiAccessForMultiTenantClient,
-            ClientType.ApiAccessWithContextualClaims => HelseIdSamplesConfiguration.ApiAccessWithContextualClaimsClient,
-            _ => HelseIdSamplesConfiguration.ApiAccess
+            ClientType = ClientType.ApiAccess,
+            AppsettingsFile = "appsettings.ApiAccessClient.json",
         };
     }
 }

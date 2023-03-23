@@ -4,6 +4,7 @@ using HelseId.Samples.ApiAccess.Exceptions;
 using HelseId.Samples.ApiAccess.Interfaces.AccessTokenUpdaters;
 using Microsoft.AspNetCore.Mvc;
 using HelseId.Samples.ApiAccess.Models;
+using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Interfaces.ApiConsumers;
 using HelseID.Samples.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -19,14 +20,17 @@ public class HomeController : Controller
     private readonly IApiConsumer _apiConsumer;
     private readonly IAccessTokenUpdater _accessTokenUpdater;
     private readonly IViewModelCreator _viewModelCreator;
+    private readonly SampleApiOptions _sampleApiOptions;
 
     public HomeController(
+        IConfiguration configuration,
         ILogger<HomeController> logger,
         Settings settings,
         IApiConsumer apiConsumer,
         IAccessTokenUpdater accessTokenUpdater,
         IViewModelCreator viewModelCreator)
     {
+        _sampleApiOptions = configuration.GetOptions<SampleApiOptions>();
         _logger = logger;
         _settings = settings;
         _apiConsumer = apiConsumer;
@@ -104,10 +108,10 @@ public class HomeController : Controller
     [Authorize(Startup.SecurityLevelClaimPolicy)]
     public async Task<IActionResult> CallApi1WithResourceIndicators()
     {
-        var apiUrl = _settings.ApiUrl1;
+        var apiUrl = _sampleApiOptions.SampleApi1Url;
         var apiIndicators = new ApiIndicators
         {
-            ApiAudience = _settings.ApiAudience1,
+            ApiAudience = _sampleApiOptions.SampleApi1Audience,
             ResourceIndicator = ConfigurationValues.SampleApiForResourceIndicators1Audience,
         };
 
@@ -118,10 +122,10 @@ public class HomeController : Controller
     [Authorize(Startup.SecurityLevelClaimPolicy)]
     public async Task<IActionResult> CallApi2WithResourceIndicators()
     {
-        var apiUrl = _settings.ApiUrl2;
+        var apiUrl = _sampleApiOptions.SampleApi2Url;;
         var apiIndicators = new ApiIndicators
         {
-            ApiAudience = _settings.ApiAudience2,
+            ApiAudience = _sampleApiOptions.SampleApi2Audience,
             ResourceIndicator = ConfigurationValues.SampleApiForResourceIndicators2Audience,
         };
 
@@ -132,10 +136,10 @@ public class HomeController : Controller
     [Authorize(Startup.SecurityLevelClaimPolicy)]
     public async Task<IActionResult> CallApi()
     {
-        var apiUrl = _settings.ApiUrl1;
+        var apiUrl = _sampleApiOptions.SampleApi1Url;
         var apiIndicators = new ApiIndicators
         {
-            ApiAudience = _settings.ApiAudience1,
+            ApiAudience = _sampleApiOptions.SampleApi1Audience,
         };
         return await CallApi(apiIndicators, apiUrl);
     }

@@ -7,13 +7,6 @@ namespace HelseId.SampleAPI.Controllers;
 
 public class ApiResponseCreator : IApiResponseCreator
 {
-    private readonly Settings _settings;
-
-    public ApiResponseCreator(Settings settings)
-    {
-        _settings = settings;
-    }
-
     public ApiResponse CreateApiResponse(List<Claim> claims, string apiName)
     {
         return new ApiResponse

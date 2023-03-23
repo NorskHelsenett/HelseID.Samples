@@ -1,5 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Interfaces.JwtTokens;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Models;
@@ -13,14 +12,13 @@ public class JwtPayloadCreator : IJwtPayloadCreator
 
     public JwtPayload CreateJwtPayload(
         IPayloadClaimsCreator payloadClaimsCreator,
-        PayloadClaimParameters payloadClaimParameters,
-        HelseIdConfiguration configuration)
+        PayloadClaimParameters payloadClaimParameters)
     {
         // The payload for the jwt gets set up with the required claims:
         var payload = new JwtPayload();
 
         // The PayloadClaimsCreator creates any extra claims we might need to send to HelseID.
-        foreach (var payloadClaim in payloadClaimsCreator.CreatePayloadClaims(payloadClaimParameters, configuration))
+        foreach (var payloadClaim in payloadClaimsCreator.CreatePayloadClaims(payloadClaimParameters))
         {
             payload[payloadClaim.Name] = payloadClaim.Value;
         }

@@ -1,3 +1,4 @@
+using HelseId.SampleApiForTokenExchange.Stores;
 using HelseId.Samples.Common.ApiConsumers;
 using HelseId.Samples.Common.ClientAssertions;
 using HelseId.Samples.Common.Configuration;
@@ -34,6 +35,8 @@ public static class Program
     {
         var webApplicationBuilder = WebApplication.CreateBuilder(args);
 
+        AddFilesToConfiguration(webApplicationBuilder);
+
         AddServices(webApplicationBuilder);
 
         SetUpKestrel(webApplicationBuilder);
@@ -44,40 +47,52 @@ public static class Program
 
         return webApplication;
     }
+    
+    private static void AddFilesToConfiguration(WebApplicationBuilder builder)
+    {
+        var contentRootPath = builder.Environment.ContentRootPath;
+        var sharedConfigurationPath = Path.Combine(contentRootPath, "..", "Configuration");
 
-    private static void AddServices(WebApplicationBuilder webApplicationBuilder)
+        builder.Configuration.AddJsonFile(Path.Combine(sharedConfigurationPath, "appsettings.SampleApiForTokenExchangeClient.json"), optional: false, reloadOnChange: false);
+        builder.Configuration.AddJsonFile(Path.Combine(sharedConfigurationPath, "appsettings.General.json"), optional: false, reloadOnChange: false);
+    }
+
+    private static void AddServices(WebApplicationBuilder builder)
     {
         var settings = new Settings();
-        webApplicationBuilder.Services.AddSingleton(settings);
-        webApplicationBuilder.Services.AddSingleton<HelseIdConfiguration>(HelseIdSamplesConfiguration.TokenExchangeClient);
-        webApplicationBuilder.Services.AddSingleton<IDateTimeService, DateTimeService>();
-        webApplicationBuilder.Services.AddSingleton<IDiscoveryDocumentGetter>(new DiscoveryDocumentGetter(ConfigurationValues.StsUrl));
-        webApplicationBuilder.Services.AddSingleton<IHelseIdEndpointsDiscoverer, HelseIdEndpointsDiscoverer>();
-        webApplicationBuilder.Services.AddSingleton<IPayloadClaimsCreatorForClientAssertion, ClientAssertionPayloadClaimsCreator>();
-        webApplicationBuilder.Services.AddSingleton<IJwtPayloadCreator, JwtPayloadCreator>();
-        webApplicationBuilder.Services.AddSingleton<ISigningJwtTokenCreator, SigningJwtTokenCreator>();
+        builder.Services.AddSingleton(settings);
+        builder.Services.AddSingleton<IDateTimeService, DateTimeService>();
+        builder.Services.AddSingleton<IDiscoveryDocumentGetter, DiscoveryDocumentGetter>();
+        builder.Services.AddSingleton<IHelseIdEndpointsDiscoverer, HelseIdEndpointsDiscoverer>();
+        builder.Services.AddSingleton<IPayloadClaimsCreatorForClientAssertion, ClientAssertionPayloadClaimsCreator>();
+        builder.Services.AddSingleton<IJwtPayloadCreator, JwtPayloadCreator>();
+        builder.Services.AddSingleton<ISigningCredentialsStore, SigningCredentialsStore>();
+        builder.Services.AddSingleton<ISigningJwtTokenCreator, SigningJwtTokenCreator>();
         // Two builder classes are used for creating the token exchange request to HelseID
         //   * A ClientAssertionsBuilder, which creates a client assertion that will be used
         //     inside the token request to HelseID in order to authenticate this client
-        webApplicationBuilder.Services.AddSingleton<IClientAssertionsBuilder, ClientAssertionsBuilder>();
+        builder.Services.AddSingleton<IClientAssertionsBuilder, ClientAssertionsBuilder>();
         //   * A TokenRequestBuilder, which creates the token request that is used against
         //     the HelseID service, and also finds the token endpoint for this request
-        webApplicationBuilder.Services.AddSingleton<ITokenRequestBuilder, TokenRequestBuilder>();
+        builder.Services.AddSingleton<ITokenRequestBuilder, TokenRequestBuilder>();
 
         // The controller also needs an API consumer:
-        webApplicationBuilder.Services.AddSingleton<IApiConsumer, ApiConsumer>();
+        builder.Services.AddSingleton<IApiConsumer, ApiConsumer>();
         
-        webApplicationBuilder.Services.AddMvc(option => option.EnableEndpointRouting = false);
-        webApplicationBuilder.Services.AddControllers();
-        webApplicationBuilder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddMvc(option => option.EnableEndpointRouting = false);
+        builder.Services.AddControllers();
+        builder.Services.AddEndpointsApiExplorer();
 
        // Adds the authentication scheme to be used for bearer tokens
-        webApplicationBuilder.Services.AddAuthentication(TokenAuthenticationScheme)
+        builder.Services.AddAuthentication(TokenAuthenticationScheme)
             .AddJwtBearer(TokenAuthenticationScheme, options =>
             {
+                var stsOptions = builder.Configuration.GetOptions<StsOptions>();
+                var apiOptions = builder.Configuration.GetOptions<ApiOptions>();
+
                 options.RequireHttpsMetadata = true;
-                options.Authority = settings.Authority;
-                options.Audience = settings.Audience;
+                options.Authority = stsOptions.StsUrl;
+                options.Audience = apiOptions.Audience;
 
                 // Validation parameters are in agreement with HelseIDs requirements:
                 // https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/284229708/Guidelines+for+using+JSON+Web+Tokens+JWTs
@@ -90,7 +105,7 @@ public static class Program
                 options.TokenValidationParameters.RequireAudience = true;
             });
 
-        webApplicationBuilder.Services.AddAuthorization(options =>
+        builder.Services.AddAuthorization(options =>
         {   
             // Add a policy for verifying scopes and claims for a logged on user for the token exchange endpoint
             options.AddPolicy(

@@ -1,4 +1,3 @@
-using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Models;
 
@@ -17,9 +16,7 @@ namespace HelseId.Samples.Common.PayloadClaimsCreators;
 /// </summary>
 public class PayloadClaimsCreatorForMultiTenantClient : IPayloadClaimsCreator {
 
-    public IEnumerable<PayloadClaim> CreatePayloadClaims(
-        PayloadClaimParameters payloadClaimParameters,
-        HelseIdConfiguration configuration)
+    public IEnumerable<PayloadClaim> CreatePayloadClaims(PayloadClaimParameters payloadClaimParameters)
     {
         if (payloadClaimParameters.IsAuthCodeRequest)
         {

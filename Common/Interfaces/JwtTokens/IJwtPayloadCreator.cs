@@ -1,5 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Models;
 
@@ -9,6 +8,5 @@ public interface IJwtPayloadCreator
 {
     JwtPayload CreateJwtPayload(
         IPayloadClaimsCreator payloadClaimsCreator,
-        PayloadClaimParameters payloadClaimParameters,
-        HelseIdConfiguration configuration);
+        PayloadClaimParameters payloadClaimParameters);
 }

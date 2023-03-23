@@ -70,14 +70,14 @@ dotnet run --use-request-objects
 ```
 
 ### Use of resource indicators
-If you need to access more than one API, the preferred solution is to use `resource indicators` as part of the call to HelseID.
+If you need to access more than one API, the preferred solution is to use `resource indicators` as part of the call to HelseID. 
+The SampleApi will stand in as two separate APIs with separate audiences for this usage. 
 To use the resource indicators sample, you will need to start the application with an extra option:
 
 ```
 dotnet run --use-resource-indicators
 ```
 
-You will also need to start two instances of the [Sample API project](../SampleAPI/README.md). See the [readme](../SampleAPI/README.md) file in that folder for more information on how to do this. 
 
 ### Use of token exchange
 If you want to use the token exchange sample, you will need to start the application with an extra option:
@@ -85,7 +85,7 @@ If you want to use the token exchange sample, you will need to start the applica
 ```
 dotnet run --use-token-exchange
 ```
-In addition to start the [Sample API project](../SampleAPI/README.md), you will also need to start the [Sample API for token exchange project](../SampleApiForTokenExchange/README.md). Look into that project folder for more information.
+In addition to starting the [Sample API project](../SampleAPI/README.md), you will also need to start the [Sample API for token exchange project](../SampleApiForTokenExchange/README.md). Look into that project folder for more information.
 
 ### Use of multi-tenancy
 *Multi-tenancy* is a pattern that allows multiple consumers of a software vendor to use the same instance of the vendor’s software. The consequence of this is that a multi-tenant system can set the parent organization number for a token request. In order to do this, use the extra option

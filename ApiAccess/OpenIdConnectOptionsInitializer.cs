@@ -2,6 +2,7 @@ using HelseId.Samples.ApiAccess.Configuration;
 using HelseId.Samples.ApiAccess.Exceptions;
 using HelseId.Samples.ApiAccess.Interfaces.Stores;
 using HelseId.Samples.ApiAccess.Models;
+using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Interfaces.ClientAssertions;
 using HelseId.Samples.Common.Interfaces.JwtTokens;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
@@ -26,8 +27,12 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
     private readonly IPayloadClaimsCreatorForRequestObjects _payloadClaimsCreatorForRequestObjects;
     private readonly Settings _settings;
     private readonly IExpirationTimeCalculator _expirationTimeCalculator;
+    private readonly ClientOptions _clientOptions;
+    private readonly SampleApiOptions _sampleApiOptions;
+    private readonly StsOptions _stsOptions;
 
     public OpenIdConnectOptionsInitializer(
+        IConfiguration configuration,
         IClientAssertionsBuilder clientAssertionsBuilder,
         ISigningJwtTokenCreator signingJwtTokenCreator,
         IUserSessionDataStore userSessionDataStore,
@@ -36,6 +41,10 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         Settings settings,
         IExpirationTimeCalculator expirationTimeCalculator)
     {
+        _clientOptions = configuration.GetOptions<ClientOptions>();
+        _sampleApiOptions = configuration.GetOptions<SampleApiOptions>();
+        _stsOptions = configuration.GetOptions<StsOptions>();
+
         _clientAssertionsBuilder = clientAssertionsBuilder;
         _signingJwtTokenCreator = signingJwtTokenCreator;
         _userSessionDataStore = userSessionDataStore;
@@ -61,8 +70,9 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
     {
         // Application-specific configuration for the OpenID Connect handler
         // (we read data from ../Configuration/HelseIdSamplesConfiguration.cs)
-        openIdConnectOptions.Authority = _settings.HelseIdConfiguration.StsUrl;
-        openIdConnectOptions.ClientId = _settings.HelseIdConfiguration.ClientId;
+        
+        openIdConnectOptions.Authority = _stsOptions.StsUrl;
+        openIdConnectOptions.ClientId = _clientOptions.ClientId;
         SetUpScopes(openIdConnectOptions);
 
         // Required settings:
@@ -97,7 +107,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
     private void SetUpScopes(OpenIdConnectOptions openIdConnectOptions)
     {
         openIdConnectOptions.Scope.Clear();
-        foreach (var scope in _settings.HelseIdConfiguration.Scope.Split(' '))
+        foreach (var scope in _clientOptions.Scope.Split(' '))
         {
             openIdConnectOptions.Scope.Add(scope);
         }
@@ -106,11 +116,59 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
     // This method sets up the receiving of events from the OpenID Connect library
     private void OpenIdConnectEventManagement(OpenIdConnectOptions openIdConnectOptions)
     {
-        // See the class Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectEvents for
-        // more events that might be useful in a production scenario
+        // See the class Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectEvents
+        // (https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.openidconnect.openidconnectevents?view=aspnetcore-7.0)
+        // for more events that might be useful to you in a production scenario
 
         // -----------------------------------------------------------------------
-        // Authorization code has been received
+        // Redirecting to the authentication endpoint (logging in the user)
+        // -----------------------------------------------------------------------
+        openIdConnectOptions.Events.OnRedirectToIdentityProvider = redirectContext =>
+        {
+            // Invoked before redirecting to the identity provider to authenticate. This can be used to
+            // set a ProtocolMessage.State that will be persisted through the authentication process.
+            // The ProtocolMessage can also be used to add or customize parameters sent to the identity provider.
+            var customOpenIdConnectMessageParameters =
+                new CustomOpenIdConnectMessageParameters
+                {
+                    RequestObject = CreateRequestObject(),
+                    ResourceIndicators =  _clientOptions.ResourceIndicators,
+                }; 
+            
+            // For certain features, we need to establish a custom request message for creating
+            // request objects or resource indicators.  The implementation of the former ('resource')
+            // is not in conformance with the specification (https://www.rfc-editor.org/rfc/rfc8707), and
+            // the (optional) 'request' parameter (https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests)
+            // is not currently implemented
+            if (redirectContext.ProtocolMessage.RequestType == OpenIdConnectRequestType.Authentication)
+            {
+                // We need a custom class for creating the message to the authorization endpoint:
+                var customProtocolMessage = new CustomOpenIdConnectMessage(
+                    customOpenIdConnectMessageParameters,
+                    redirectContext.ProtocolMessage.Clone());
+
+                redirectContext.ProtocolMessage = customProtocolMessage;
+
+                /*
+                The metadata endpoint https://helseid-sts.test.nhn.no/connect/availableidps list the available IDPs
+                in the test environment. If you want to redirect the user to a specific IDP, you can specify this value.
+                */
+
+                // redirectContext.ProtocolMessage.AcrValues = "idp:idporten-oidc";
+
+                /*
+                See https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/5571426/Use+of+ID-porten for more examples:
+                If you want to authenticate the user on behalf of a specific organization, you can add this parameter:
+                */
+
+                // redirectContext.ProtocolMessage.Parameters.Add("on_behalf_of", "912159523");
+            }
+
+            return Task.CompletedTask;
+        };
+
+        // -----------------------------------------------------------------------
+        // Authorization code has been received from the authorization endpoint
         // -----------------------------------------------------------------------
         openIdConnectOptions.Events.OnAuthorizationCodeReceived = authCodeReceivedContext =>
         {
@@ -168,53 +226,6 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         };
 
         // -----------------------------------------------------------------------
-        // Redirecting to the authentication endpoint
-        // -----------------------------------------------------------------------
-        openIdConnectOptions.Events.OnRedirectToIdentityProvider = redirectContext =>
-        {
-            // Invoked before redirecting to the identity provider to authenticate. This can be used to
-            // set a ProtocolMessage.State that will be persisted through the authentication process.
-            // The ProtocolMessage can also be used to add or customize parameters sent to the identity provider.
-            var customOpenIdConnectMessageParameters =
-                new CustomOpenIdConnectMessageParameters
-                {
-                    RequestObject = CreateRequestObject(),
-                    ResourceIndicators = _settings.HelseIdConfiguration.ResourceIndicators,
-                }; 
-            
-            // For certain features, we need to establish a custom request message for creating
-            // request objects or resource indicators.  The implementation of the former ('resource')
-            // is not in conformance with the specification (https://www.rfc-editor.org/rfc/rfc8707), and
-            // the (optional) 'request' parameter (https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests)
-            // is not currently implemented
-            if (redirectContext.ProtocolMessage.RequestType == OpenIdConnectRequestType.Authentication)
-            {
-                // We need a custom class for creating the message to the authorization endpoint:
-                var customProtocolMessage = new CustomOpenIdConnectMessage(
-                    customOpenIdConnectMessageParameters,
-                    redirectContext.ProtocolMessage.Clone());
-
-                redirectContext.ProtocolMessage = customProtocolMessage;
-
-                /*
-                The metadata endpoint https://helseid-sts.test.nhn.no/connect/availableidps list the available IDPs
-                in the test environment. If you want to redirect the user to a specific IDP, you can specify this value.
-                */
-
-                // redirectContext.ProtocolMessage.AcrValues = "idp:idporten-oidc";
-
-                /*
-                See https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/5571426/Use+of+ID-porten for more examples:
-                If you want to authenticate the user on behalf of a specific organization, you can add this parameter:
-                */
-
-                // redirectContext.ProtocolMessage.Parameters.Add("on_behalf_of", "912159523");
-            }
-
-            return Task.CompletedTask;
-        };
-
-        // -----------------------------------------------------------------------
         // Authentication failed
         // -----------------------------------------------------------------------
         openIdConnectOptions.Events.OnAuthenticationFailed = authenticationFailedContext =>
@@ -232,16 +243,24 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
     // in the access token
     private string CreateRequestObject()
     {
-        if (_settings.ClientType != ClientType.ApiAccessWithRequestObject)
+        if (_settings.ClientType != ClientType.ApiAccessWithRequestObject && _settings.ClientType != ClientType.ApiAccessWithRequestObjectsWithContextualClaimsOption)
         {
             return string.Empty;
         }
 
-        // This value is set as a static value from configuration here:
-        var payloadClaimParameters = new PayloadClaimParameters
+        var payloadClaimParameters = new PayloadClaimParameters();
+        if (_settings.ClientType == ClientType.ApiAccessWithRequestObject)
         {
-            ChildOrganizationNumber = ConfigurationValues.ApiAccessWithRequestObjectChildOrganizationNumber
-        };
+            // This value is set as a static value from configuration here:
+            payloadClaimParameters.ChildOrganizationNumber = ConfigurationValues.ApiAccessWithRequestObjectChildOrganizationNumber;
+        }
+
+        if (_settings.ClientType == ClientType.ApiAccessWithRequestObjectsWithContextualClaimsOption)
+        {
+            // This value is set as a static value from configuration here:
+            payloadClaimParameters.ContextualClaimType = ConfigurationValues.TestContextClaim;
+        }
+
         // We create a signing token (as used in a client assertion), and use this as a request object: 
         return _signingJwtTokenCreator.CreateSigningToken(_payloadClaimsCreatorForRequestObjects, payloadClaimParameters);
     }
@@ -294,7 +313,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             openIdConnectMessage.AccessToken,
             accessTokenExpiresAtUtc);
 
-        userSessionData.AccessTokens.Add(_settings.ApiAudience1, accessTokenWithExpiration);
+        userSessionData.AccessTokens.Add(_sampleApiOptions?.SampleApi1Audience ?? "User login only (no audience)", accessTokenWithExpiration);
     }
 
     private static string GetSessionIdFromPrincipal(TokenValidatedContext tokenValidatedContext)

@@ -6,6 +6,8 @@ using HelseId.Samples.Common.Interfaces.TokenRequests;
 using HelseId.Samples.Common.Models;
 using IdentityModel;
 using IdentityModel.Client;
+using Microsoft.Extensions.Configuration;
+using ClientOptions = HelseId.Samples.Common.Configuration.ClientOptions;
 
 namespace HelseId.Samples.Common.TokenRequests;
 
@@ -20,16 +22,16 @@ public class TokenRequestBuilder : ITokenRequestBuilder
 {
     private readonly IClientAssertionsBuilder _clientAssertionsBuilder;
     private readonly IHelseIdEndpointsDiscoverer _endpointsDiscoverer;
-    private readonly HelseIdConfiguration _configuration;
+    private readonly ClientOptions _clientOptions;
 
     public TokenRequestBuilder(
         IClientAssertionsBuilder clientAssertionsBuilder,
         IHelseIdEndpointsDiscoverer endpointsDiscoverer,
-        HelseIdConfiguration configuration)
+        IConfiguration configuration)
     {
         _clientAssertionsBuilder = clientAssertionsBuilder;
         _endpointsDiscoverer = endpointsDiscoverer;
-        _configuration = configuration;
+        _clientOptions = configuration.GetOptions<ClientOptions>();
     }
 
     public async Task<RefreshTokenRequest> CreateRefreshTokenRequest(
@@ -44,7 +46,7 @@ public class TokenRequestBuilder : ITokenRequestBuilder
         {
             Address = tokenEndpoint,
             ClientAssertion = clientAssertion,
-            ClientId = _configuration.ClientId,
+            ClientId = _clientOptions.ClientId,
             GrantType = OidcConstants.GrantTypes.RefreshToken,
             ClientCredentialStyle = ClientCredentialStyle.PostBody,
             RefreshToken = tokenRequestParameters.RefreshToken,
@@ -69,8 +71,8 @@ public class TokenRequestBuilder : ITokenRequestBuilder
         {
             Address = tokenEndpoint,
             ClientAssertion = clientAssertion,
-            ClientId = _configuration.ClientId,
-            Scope = _configuration.Scope,
+            ClientId = _clientOptions.ClientId,
+            Scope = _clientOptions.Scope,
             GrantType = OidcConstants.GrantTypes.TokenExchange,
             ClientCredentialStyle = ClientCredentialStyle.PostBody,
             SubjectTokenType = OidcConstants.TokenTypeIdentifiers.AccessToken,
@@ -90,8 +92,8 @@ public class TokenRequestBuilder : ITokenRequestBuilder
         {
             Address = tokenEndpoint,
             ClientAssertion = clientAssertion,
-            ClientId = _configuration.ClientId,
-            Scope = _configuration.Scope,
+            ClientId = _clientOptions.ClientId,
+            Scope = _clientOptions.Scope,
             GrantType = OidcConstants.GrantTypes.ClientCredentials,
             ClientCredentialStyle = ClientCredentialStyle.PostBody
         };
