@@ -17,6 +17,8 @@ As HelseID is based on the [OAuth 2.0 framework](https://oauth.net/2/), both the
 ### General information
 The examples connect to the HelseID **test** environment. For each example, there exists a corresponding client in HelseID. The sample code will be able to use 1) a client ID in connection with 2) a self-issued client assertion signed with a [JWK-encoded](https://www.rfc-editor.org/rfc/rfc7517) private key in order to authenticate against HelseID.
 
+For all samples that requires user authentication you can use our "TestIDP" which provides a way to simulate user login without the need for actual test users.
+
 #### Important notice
 
 Please be advised that the sample code does not in any way represent working code for a production environment. In particular, special care **MUST** be taken in order to secure the private keys that the code uses to authenticate against HelseID.
