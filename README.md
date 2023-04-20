@@ -5,7 +5,7 @@
 # HelseID samples
 
 HelseID is a national authentication service for the healthcare sector in Norway. 
-These code samples are targeted at technical personel such as application architects and developers.  
+These code samples are targeted at technical personnel such as application architects and developers.  
 
 If you experience trouble while checking out this repository because of long paths, update your git config by running:  
 
@@ -25,7 +25,7 @@ Please be advised that the sample code does not in any way represent working cod
 
 ## Basic samples
 
-These samples use either machin-to-machine or user logon authentication methods.
+These samples use either machine-to-machine or user logon authentication methods.
 
 ### Sample API
 
@@ -122,7 +122,7 @@ A command line program to generate a key pair as a JSON Web Key (JWK). The sampl
 
 ## Other resources
 
-An exellent introductory guide to OAuth 2 can be found [here](https://www.oauth.com/)
+An excellent introductory guide to OAuth 2 can be found [here](https://www.oauth.com/)
 
 You can find the OAuth 2 specs here: [https://oauth.net/specs/](https://oauth.net/specs/)
 
