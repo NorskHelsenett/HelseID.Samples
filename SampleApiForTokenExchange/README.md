@@ -1,6 +1,6 @@
 ## Sample API for Token Exchange
 
-This is a sample REST API that is configured to use HelseID to authorize its usage. The API contoller makes use of the token exchange grant in order to call the 'other' sample API with an appropriate access token.
+This is a sample REST API that is configured to use HelseID to authorize its usage. The API controller makes use of the token exchange grant in order to call the 'other' sample API with an appropriate access token.
 
 The API provides one endpoint, `token-exchange-clients/greetings`. 
 
@@ -8,7 +8,7 @@ The API provides one endpoint, `token-exchange-clients/greetings`.
 
 The APIAccess sample is configured to use this API when using the token exchange functionality. While doing this, you must also run the [Sample API](../SampleApi/README.md) as this API consumes it.
 
-The localhost port for this API is configured in the file `ConfigurationValues.cs`in the `Configuration` folder in the hieararchy above this folder. If you want to change the port number, change the `SampleApiForTokenExchangePort`constant in that file.
+The localhost port for this API is configured in the file `ConfigurationValues.cs`in the `Configuration` folder in the hierarchy above this folder. If you want to change the port number, change the `SampleApiForTokenExchangePort`constant in that file.
 
 ### Requirements
 

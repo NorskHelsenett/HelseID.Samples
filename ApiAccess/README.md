@@ -30,9 +30,9 @@ When you start the sample with `dotnet run` on the command line, you'll need to 
 Now listening on: https://localhost:5151
 Application started. Press Ctrl+C to shut down.
 ```
-the default address is `https://localhost:5151`, but you can change the port number in the file [`ConfigurationValues.cs`](../Configuration/ConfigurationValues.cs) in the `Configuration` folder in the hieararchy above this folder. If you want to change the port number, change the `ApiAccessWebServerPort`constant in that file.
+the default address is `https://localhost:5151`, but you can change the port number in the file [`ConfigurationValues.cs`](../Configuration/ConfigurationValues.cs) in the `Configuration` folder in the hierarchy above this folder. If you want to change the port number, change the `ApiAccessWebServerPort`constant in that file.
 
-Click "Login", and use the "Test IDP". Then log in as a well known test person. You should be redirected back to the application at `https://localhost:5151`.
+Click "Login" and use the "Test IDP". Then log in as a well-known test person. You should be redirected back to the application at `https://localhost:5151`.
 
 ### API Access
 
@@ -40,7 +40,7 @@ Next, we can get access to the [Sample API](./SampleApi/README.md) by running th
 
 This is done by using the access token that we got from the authentication process as a bearer token when accessing the Sample API.
 
-The access token is set as a ``Bearer`` token in the Authorization Header, after which we call the API and retrive the result.
+The access token is set as a ``Bearer`` token in the Authorization Header, after which we call the API and retrieve the result.
 
 ### Requirements
 
@@ -95,7 +95,7 @@ dotnet run --use-multi-tenant
 ```
 
 ### Use of contextual claims
-The use of *contextual claims* allows a client to send a structured claim as client assertion to HelseID. This claim will then be attatched to the returned access token. In order to sample this functionality, use the extra option
+The use of *contextual claims* allows a client to send a structured claim as client assertion to HelseID. This claim will then be attached to the returned access token. In order to sample this functionality, use the extra option
 ```
 dotnet run --use-contextual-claims
 ```

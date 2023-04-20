@@ -14,8 +14,7 @@ restricted access to the client credentials).
      |            |                                  |               |
      +------------+                                  +---------------+
 ```
-This sample is created as a command-line application. It demonstrates how to generate a signed 
-JSON Web Token (JWT) which then is used to request access to a HelseID. The code for this functionality can be found in the `TokenRequests` folder.
+This sample is created as a command-line application. It demonstrates how to generate a signed JSON Web Token (JWT) which then is used to request access to a HelseID. The code for this functionality can be found in the `TokenRequests` folder.
 
 When HelseID approves the request, an access token is returned. The application then uses the access token to access
 the [Sample API](../../SampleAPI/README.md).

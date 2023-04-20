@@ -13,7 +13,7 @@ claims for a logged on user (`helseid://claims/identity/pid`) and a valid securi
 
 The other HelseID samples are configured to use this API. Have an instance of this API running locally before trying to run the other samples.
 
-The localhost port for this API is configured in the file [`ConfigurationValues.cs`](../Configuration/ConfigurationValues.cs) in the `Configuration` folder in the hieararchy above this folder. If you want to change the port number, change the `SampleApiPort`constant in that file.
+The localhost port for this API is configured in the file [`ConfigurationValues.cs`](../Configuration/ConfigurationValues.cs) in the `Configuration` folder in the hierarchy above this folder. If you want to change the port number, change the `SampleApiPort`constant in that file.
 
 ### Requirements
 
