@@ -2,11 +2,11 @@ namespace TestTokenTool.RequestModel;
 
 public class TokenRequest
 {
-    public ParametersGeneration GeneralParametersGeneration { get; set; }
+    public ParametersGeneration GeneralClaimsParametersGeneration { get; set; }
     
     public ParametersGeneration UserClaimsParametersGeneration { get; set; }
 
-    public ParametersGeneration DokumentdelingClaimsParametersGeneration { get; set; }
+    public bool CreateDokumentdelingClaims { get; set; }
 
     public bool SignJwtWithInvalidSigningKey { get; set; } 
 
@@ -24,7 +24,8 @@ public class TokenRequest
 
     public int ExpirationTimeInSeconds { get; set; } = Int32.MinValue;
 
-    public GeneralParameters GeneralParameters { get; set; } = new();
+    public HeaderParameters HeaderParameters { get; set; } = new();
+    public GeneralParameters GeneralClaimsParameters { get; set; } = new();
     
     public UserClaimsParameters UserClaimsParameters { get; set; } = new ();
 

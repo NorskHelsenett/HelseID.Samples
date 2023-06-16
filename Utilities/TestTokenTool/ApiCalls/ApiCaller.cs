@@ -1,4 +1,5 @@
 using IdentityModel.Client;
+using Parameters = TestTokenTool.Configuration.Parameters;
 using TokenResponse = TestTokenTool.ResponseModel.TokenResponse;
 
 namespace TestTokenTool.ApiCalls;

@@ -18,6 +18,8 @@ public class UserClaimsParameters
     public string AssuranceLevel { get; set; } = string.Empty;
     // helseid://claims/identity/network
     public string Network { get; set; } = string.Empty;
+    // amr
+    public string Amr { get; set; } = string.Empty;
     // sub
     public string Subject { get; set; } = string.Empty;
     // sid

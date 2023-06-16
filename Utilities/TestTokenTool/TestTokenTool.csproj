@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommandDotNet" Version="7.0.2" />
     <PackageReference Include="IdentityModel" Version="6.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="7.0.0" />
@@ -17,9 +18,9 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.31.0" />
   </ItemGroup>
   
-  <Target Name="CopyCustomContent" BeforeTargets="BeforeBuild">
-    <Copy SourceFiles="jwk.json" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
-  </Target>
+  <ItemGroup>
+    <None Update="jwk.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
     <Copy SourceFiles="config.json" DestinationFolder="$(OutDir)" />

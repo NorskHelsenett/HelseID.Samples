@@ -1,6 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text.Json;
+using TestTokenTool.Configuration;
 using TestTokenTool.Constants;
 using TokenResponse = TestTokenTool.ResponseModel.TokenResponse;
 
@@ -42,9 +42,7 @@ internal static class TokenPrinter
 
     private static void PrintToken(string jwtInput)
     {
-        Console.WriteLine("Token response:");
         Console.WriteLine(jwtInput);
-        Console.WriteLine();
     }
 
     private static void PrettyPrintToken(string jwtInput)
@@ -53,7 +51,7 @@ internal static class TokenPrinter
         var jwtHandler = new JwtSecurityTokenHandler();
         var readableToken = jwtHandler.CanReadToken(jwtInput);
 
-        if(!readableToken)
+        if (!readableToken)
         {
             Console.WriteLine("The token is not in a valid format.");
             return;
@@ -63,30 +61,12 @@ internal static class TokenPrinter
 
         var token = jwtHandler.ReadJwtToken(jwtInput);
 
-        //Extract the headers of the JWT
-        var headers = token.Header;
-        var jwtHeader = "{";
-        foreach (var h in headers)
-        {
-            jwtHeader += '"' + h.Key + "\":\"" + h.Value + "\",";
-        }
-        jwtHeader += "}";
-      
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.Write(JsonPrettify(jwtHeader));
-
-        //Extract the payload of the JWT
-        var claims = token.Claims;
-        var jwtPayload = "{";
-        foreach (Claim c in claims)
-        {
-            jwtPayload += '"' + c.Type + "\":\"" + c.Value + "\",";
-        }
-        jwtPayload += "}";
-
+        Console.Write(JsonPrettify(token.Header.SerializeToJson()));
+        
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.Write(".");
-        Console.Write(JsonPrettify(jwtPayload));
+        Console.Write(JsonPrettify(token.Payload.SerializeToJson()));
         Console.ForegroundColor = ConsoleColor.Green;
         Console.Write(".[Signature]");
         
@@ -94,7 +74,7 @@ internal static class TokenPrinter
         Console.WriteLine();
         Console.WriteLine();
     }
-    
+
     private static string JsonPrettify(string json)
     {
         using var jDoc = JsonDocument.Parse(json, new JsonDocumentOptions{ AllowTrailingCommas = true});
