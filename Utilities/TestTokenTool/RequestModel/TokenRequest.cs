@@ -25,9 +25,12 @@ public class TokenRequest
     public int ExpirationTimeInSeconds { get; set; } = Int32.MinValue;
 
     public HeaderParameters HeaderParameters { get; set; } = new();
+    
     public GeneralParameters GeneralClaimsParameters { get; set; } = new();
     
     public UserClaimsParameters UserClaimsParameters { get; set; } = new ();
 
     public TillitsrammeverkClaimsParameters TillitsrammeverkClaimsParameters { get; set; } = new();
+
+    public DokumentdelingClaimsParameters DokumentdelingClaimsParameters { get; set; } = new();
 }

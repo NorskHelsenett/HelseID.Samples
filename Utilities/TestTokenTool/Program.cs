@@ -94,6 +94,8 @@ public class Program
         string? sid = "",
         [Option(Description = "The returned token will contain a 'sub' claim matching the injected value")]
         string? sub = "",
+        // -----------------------------------------
+        // Tillitsrammeverk parameters
         [Option(Description = "Parameter for use in 'tillitsrammeverk' claims")]
         string legalEntityId = "",
         [Option(Description = "Parameter for use in 'tillitsrammeverk' claims")]
@@ -102,6 +104,28 @@ public class Program
         string pointOfCareId = "",
         [Option(Description = "Parameter for use in 'tillitsrammeverk' claims")]
         string pointOfCareName = "",
+        [Option(Description = "Parameter for use in 'tillitsrammeverk' claims")]
+        string practitionerAuthorizationCode = "",
+        [Option(Description = "Parameter for use in 'tillitsrammeverk' claims")]
+        string practitionerAuthorizationText = "",
+        [Option(Description = "Parameter for use in 'dokumentdeling' claims")]
+        string careRelationshipDepartmentId = "",
+        [Option(Description = "Parameter for use in 'dokumentdeling' claims")]
+        string careRelationshipDepartmentName = "",
+        [Option(Description = "Parameter for use in 'dokumentdeling' claims")]
+        string careRelationshipHealthcareServiceCode = "",
+        [Option(Description = "Parameter for use in 'dokumentdeling' claims")]
+        string careRelationshipHealthcareServiceText = "",
+        [Option(Description = "Parameter for use in 'dokumentdeling' claims")]
+        string careRelationshipPurposeOfUseCode = "",
+        [Option(Description = "Parameter for use in 'dokumentdeling' claims")]
+        string careRelationshipPurposeOfUseText = "",
+        [Option(Description = "Parameter for use in 'dokumentdeling' claims")]
+        string careRelationshipPurposeOfUseDetailsCode = "",
+        [Option(Description = "Parameter for use in 'dokumentdeling' claims")]
+        string careRelationshipPurposeOfUseDetailsText = "",
+        [Option(Description = "Parameter for use in 'dokumentdeling' claims")]
+        string careRelationshipTracingRefId = "",
         // -----------------------------------------
         // Usage of parameters
         [Option(Description = "Instructs how common claims are created")]
@@ -161,10 +185,24 @@ public class Program
             },
             TillitsrammeverkClaimsParameters = new TillitsrammeverkClaimsParameters
             {
+                PractitionerAuthorizationCode = practitionerAuthorizationCode,
+                PractitionerAuthorizationText = practitionerAuthorizationText, 
                 LegalEntityId = legalEntityId,
                 LegalEntityName = legalEntityName,
                 PointOfCareId = pointOfCareId,
                 PointOfCareName = pointOfCareName,
+            },
+            DokumentdelingClaimsParameters = new DokumentdelingClaimsParameters
+            {
+              CareRelationshipDepartmentId  = careRelationshipDepartmentId,
+              CareRelationshipDepartmentName = careRelationshipDepartmentName,
+              CareRelationshipHealthcareServiceCode = careRelationshipHealthcareServiceCode,
+              CareRelationshipHealthcareServiceText = careRelationshipHealthcareServiceText,
+              CareRelationshipPurposeOfUseCode = careRelationshipPurposeOfUseCode,
+              CareRelationshipPurposeOfUseText = careRelationshipPurposeOfUseText,
+              CareRelationshipPurposeOfUseDetailsCode = careRelationshipPurposeOfUseDetailsCode,
+              CareRelationshipPurposeOfUseDetailsText = careRelationshipPurposeOfUseDetailsText, 
+              CareRelationshipTracingRefId = careRelationshipTracingRefId,
             },
             GetPersonFromPersontjenesten = getPersonFromPersontjenesten,
             GetHprNumberFromHprregisteret = getHprNumberFromHprregisteret,
