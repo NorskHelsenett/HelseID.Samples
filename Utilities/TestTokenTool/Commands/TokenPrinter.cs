@@ -1,5 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Unicode;
 using TestTokenTool.Configuration;
 using TestTokenTool.Constants;
 using TokenResponse = TestTokenTool.ResponseModel.TokenResponse;
@@ -62,6 +64,7 @@ internal static class TokenPrinter
         var token = jwtHandler.ReadJwtToken(jwtInput);
 
         Console.ForegroundColor = ConsoleColor.Red;
+        var foo = JsonPrettify(token.Header.SerializeToJson());
         Console.Write(JsonPrettify(token.Header.SerializeToJson()));
         
         Console.ForegroundColor = ConsoleColor.Cyan;
@@ -77,8 +80,13 @@ internal static class TokenPrinter
 
     private static string JsonPrettify(string json)
     {
-        using var jDoc = JsonDocument.Parse(json, new JsonDocumentOptions{ AllowTrailingCommas = true});
-        return JsonSerializer.Serialize(jDoc, new JsonSerializerOptions { WriteIndented = true });
+        using var jDoc = JsonDocument.Parse(json, new JsonDocumentOptions{ AllowTrailingCommas = true });
+        var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping, 
+                WriteIndented = true,
+            };
+        return JsonSerializer.Serialize(jDoc, jsonSerializerOptions);
     }
     
     private static void SaveTokenToFile(string jwtInput)
