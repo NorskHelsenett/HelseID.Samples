@@ -41,7 +41,7 @@ public class GetTokenOptions : IArgumentModel
     [Option(Description = "The returned token will contain a 'helseid://claims/client/claims/orgnr_parent' claim matching the injected value")]
     public string? orgnrParent { get; set; } = string.Empty;
     [Option(Description = "The returned token will contain a 'client_id' claim matching the injected value")]
-    public Guid? ClientId { get; set;} = default;
+    public Guid? clientId { get; set;} = default;
     [Option(Description = "The returned token will contain a 'helseid://claims/client/client_name' claim matching the injected value")]
     public string? clientName { get; set; } = string.Empty;
     [Option(Description = "The returned token will contain a 'scope' claim matching the injected value. Use quotes and spaces to insert several scopes.")]
@@ -58,6 +58,8 @@ public class GetTokenOptions : IArgumentModel
     public string? securityLevel { get; set; } = string.Empty;
     [Option(Description = "The returned token will contain a claim with a pseudonymized pid value. Requires that the 'pid' parameter is set.")]
     public bool setPidPseudonym { get; set; } = false;
+    [Option(Description = "The returned token will contain a claim with a pseudonymized pid value in the 'sub' claim. Requires that both the 'pid' and 'clientid' parameters are set.")]
+    public bool setSubject { get; set; } = false;
     [Option(Description = "The returned token will contain a 'pid' claim matching the injected value")]
     public string? pid { get; set; } = string.Empty;
     [Option(Description = "If this value is set, the PID value will be used to extract person information from Persontjenesten. Requires that the 'pid' parameter is set.")]

@@ -1,3 +1,4 @@
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace TestTokenTool.RequestModel;
 
 public class TokenRequest
@@ -21,6 +22,8 @@ public class TokenRequest
     public bool GetHprNumberFromHprregisteret { get; set; }
 
     public bool SetPidPseudonym { get; set; }
+    
+    public bool SetSubject { get; set; }
 
     public int ExpirationTimeInSeconds { get; set; } = Int32.MinValue;
 
