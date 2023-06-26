@@ -44,7 +44,7 @@ public class Program
     }
 
     [Command("getToken", Description = "Get a token from the test token service")] 
-    public async Task GetToken(GetTokenOptions getTokenOptions)
+    public async Task GetToken(GetTokenOptions options)
     {
         
         if (!File.Exists(FileConstants.JwkFileName))
@@ -55,75 +55,78 @@ public class Program
         
         var tokenRequest = new TokenRequest
         {
-            SignJwtWithInvalidSigningKey = getTokenOptions.signJwtWithInvalidSigningKey,
-            SetInvalidIssuer = getTokenOptions.setInvalidIssuer,
-            SetInvalidAudience = getTokenOptions.setInvalidAudience,
-            SetExpirationTimeAsExpired = getTokenOptions.setExpirationTimeAsExpired,
-            ExpirationTimeInSeconds = getTokenOptions.expirationTimeInSeconds,
-            SetPidPseudonym = getTokenOptions.setPidPseudonym,
-            SetSubject = getTokenOptions.setSubject,
-            GeneralClaimsParametersGeneration = getTokenOptions.generalClaimsCreation.ToParametersGeneration(),
-            UserClaimsParametersGeneration = getTokenOptions.userClaimsCreation.ToParametersGeneration(),
-            CreateDokumentdelingClaims = getTokenOptions.createDokumentdelingClaims,
+            // Invalid output from TTT
+            SignJwtWithInvalidSigningKey =      options.signJwtWithInvalidSigningKey,
+            SetInvalidIssuer =                  options.setInvalidIssuer,
+            SetInvalidAudience =                options.setInvalidAudience,
+            SetExpirationTimeAsExpired =        options.setExpirationTimeAsExpired,
+            ExpirationTimeInSeconds =           options.expirationTimeInSeconds,
+            // User parameters
+            SetPidPseudonym =                   options.setPidPseudonym,
+            SetSubject =                        options.setSubject,
+            GetPersonFromPersontjenesten =      options.getPersonFromPersontjenesten,
+            GetHprNumberFromHprregisteret =     options.getHprNumberFromHprregisteret,
+            // Usage of parameters
+            GeneralClaimsParametersGeneration = options.generalClaimsCreation.ToParametersGeneration(),
+            UserClaimsParametersGeneration =    options.userClaimsCreation.ToParametersGeneration(),
+            CreateDokumentdelingClaims =        options.createDokumentdelingClaims,
             HeaderParameters = new HeaderParameters()
             {
-                Typ = getTokenOptions.typHeader.GetEmptyStringIfNotSet(), 
+                Typ = options.typHeader.GetEmptyStringIfNotSet(), 
             },
             GeneralClaimsParameters = new GeneralParameters
             {
-                AuthenticationMethodsReferences = getTokenOptions.clientAmr.GetListWithParameter(),
-                ClientAuthenticationMethodsReferences = getTokenOptions.helseidClientAmr.GetEmptyStringIfNotSet(),
-                OrgnrParent = getTokenOptions.orgnrParent.GetEmptyStringIfNotSet(),
-                ClientId = getTokenOptions.clientId != null ? getTokenOptions.clientId.ToString()! : string.Empty,
-                ClientName = getTokenOptions.clientName.GetEmptyStringIfNotSet(),
-                Scope = getTokenOptions.scope.GetListWithMultipleParameters(),
+                AuthenticationMethodsReferences = options.clientAmr.GetListWithParameter(),
+                ClientAuthenticationMethodsReferences = options.helseidClientAmr.GetEmptyStringIfNotSet(),
+                OrgnrParent = options.orgnrParent.GetEmptyStringIfNotSet(),
+                ClientId = options.clientId != null ? options.clientId.ToString()! : string.Empty,
+                ClientName = options.clientName.GetEmptyStringIfNotSet(),
+                Scope = options.scope.GetListWithMultipleParameters(),
             },
             UserClaimsParameters = new UserClaimsParameters
             {
-                Pid = getTokenOptions.pid.GetEmptyStringIfNotSet(),
-                Network = getTokenOptions.network.GetEmptyStringIfNotSet(),
-                Name = getTokenOptions.name.GetEmptyStringIfNotSet(),
-                Sid = getTokenOptions.sid.GetEmptyStringIfNotSet(),
-                Subject = getTokenOptions.sub.GetEmptyStringIfNotSet(),
-                AssuranceLevel = getTokenOptions.assuranceLevel.GetEmptyStringIfNotSet(),
-                SecurityLevel = getTokenOptions.securityLevel.GetEmptyStringIfNotSet(),
-                HprNumber = getTokenOptions.hprNumber.GetEmptyStringIfNotSet(),
-                IdentityProvider = getTokenOptions.identityProvider.GetEmptyStringIfNotSet(),
-                PidPseudonym = getTokenOptions.pidPseudonym.GetEmptyStringIfNotSet(),
-                Amr = getTokenOptions.amr.GetEmptyStringIfNotSet(),
+                Pid = options.pid.GetEmptyStringIfNotSet(),
+                Network = options.network.GetEmptyStringIfNotSet(),
+                Name = options.name.GetEmptyStringIfNotSet(),
+                Sid = options.sid.GetEmptyStringIfNotSet(),
+                Subject = options.sub.GetEmptyStringIfNotSet(),
+                AssuranceLevel = options.assuranceLevel.GetEmptyStringIfNotSet(),
+                SecurityLevel = options.securityLevel.GetEmptyStringIfNotSet(),
+                HprNumber = options.hprNumber.GetEmptyStringIfNotSet(),
+                IdentityProvider = options.identityProvider.GetEmptyStringIfNotSet(),
+                PidPseudonym = options.pidPseudonym.GetEmptyStringIfNotSet(),
+                Amr = options.amr.GetEmptyStringIfNotSet(),
             },
             TillitsrammeverkClaimsParameters = new TillitsrammeverkClaimsParameters
             {
-                PractitionerAuthorizationCode = getTokenOptions.practitionerAuthorizationCode,
-                PractitionerAuthorizationText = getTokenOptions.practitionerAuthorizationText, 
-                LegalEntityId = getTokenOptions.legalEntityId,
-                LegalEntityName = getTokenOptions.legalEntityName,
-                PointOfCareId = getTokenOptions.pointOfCareId,
-                PointOfCareName = getTokenOptions.pointOfCareName,
+                PractitionerAuthorizationCode = options.practitionerAuthorizationCode,
+                PractitionerAuthorizationText = options.practitionerAuthorizationText, 
+                LegalEntityId = options.legalEntityId,
+                LegalEntityName = options.legalEntityName,
+                PointOfCareId = options.pointOfCareId,
+                PointOfCareName = options.pointOfCareName,
             },
             DokumentdelingClaimsParameters = new DokumentdelingClaimsParameters
             {
-              CareRelationshipDepartmentId  = getTokenOptions.careRelationshipDepartmentId,
-              CareRelationshipDepartmentName = getTokenOptions.careRelationshipDepartmentName,
-              CareRelationshipHealthcareServiceCode = getTokenOptions.careRelationshipHealthcareServiceCode,
-              CareRelationshipHealthcareServiceText = getTokenOptions.careRelationshipHealthcareServiceText,
-              CareRelationshipPurposeOfUseCode = getTokenOptions.careRelationshipPurposeOfUseCode,
-              CareRelationshipPurposeOfUseText = getTokenOptions.careRelationshipPurposeOfUseText,
-              CareRelationshipPurposeOfUseDetailsCode = getTokenOptions.careRelationshipPurposeOfUseDetailsCode,
-              CareRelationshipPurposeOfUseDetailsText = getTokenOptions.careRelationshipPurposeOfUseDetailsText, 
-              CareRelationshipTracingRefId = getTokenOptions.careRelationshipTracingRefId,
+              CareRelationshipDepartmentId  = options.careRelationshipDepartmentId,
+              CareRelationshipDepartmentName = options.careRelationshipDepartmentName,
+              CareRelationshipHealthcareServiceCode = options.careRelationshipHealthcareServiceCode,
+              CareRelationshipHealthcareServiceText = options.careRelationshipHealthcareServiceText,
+              CareRelationshipPurposeOfUseCode = options.careRelationshipPurposeOfUseCode,
+              CareRelationshipPurposeOfUseText = options.careRelationshipPurposeOfUseText,
+              CareRelationshipPurposeOfUseDetailsCode = options.careRelationshipPurposeOfUseDetailsCode,
+              CareRelationshipPurposeOfUseDetailsText = options.careRelationshipPurposeOfUseDetailsText, 
+              CareRelationshipTracingRefId = options.careRelationshipTracingRefId,
             },
-            GetPersonFromPersontjenesten = getTokenOptions.getPersonFromPersontjenesten,
-            GetHprNumberFromHprregisteret = getTokenOptions.getHprNumberFromHprregisteret,
         };
 
         var tokenResponse = await TokenRetriever.GetToken(_builder!, tokenRequest);
 
         var parameters = new Parameters()
         {
-            PrintJwt = getTokenOptions.printToken,
-            PrettyPrintJwt = getTokenOptions.prettyPrintToken,
-            SaveTokenToFile = getTokenOptions.saveTokenToFile,
+            PrintJwt = options.printToken,
+            PrettyPrintJwt = options.prettyPrintToken,
+            SaveTokenToFile = options.saveTokenToFile,
         };
         TokenPrinter.WriteResponse(tokenResponse, parameters);
         IApiCaller apiCaller = new ApiCaller();
