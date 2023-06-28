@@ -1,8 +1,12 @@
 # Konsollverktøy for å hente ut test-token fra HelseIDs Test-token-tjeneste (TTT)
 
-Denne applikasjonen lar deg hente ut token som er signert med samme signeringsnøkkel som «ekte» token fra HelseIDs testmiljø.
+Denne applikasjonen lar deg bruke HelseIDs *test-tokentjeneste* for å hente ut token som er signert med samme signeringsnøkkel som «ekte» token fra HelseIDs testmiljø.
 
-For å ta applikasjonen i bruk må du
+Test-token-tjenesten er satt opp som et REST-API, og finnes på endepunktet [https://helseid-ttt.test.nhn.no/create-test-token](https://helseid-ttt.test.nhn.no/create-test-token). En enkel API-spesifikasjon finnes på adressen [https://helseid-ttt.test.nhn.no/swagger/index.html#/TokenService](https://helseid-ttt.test.nhn.no/swagger/index.html#/TokenService).
+
+Denne applikasjonen viser hvordan Test-token-tjenesten kan konsumeres, og kan eksempelvis også brukes i forbindelse med skripting av uttrekk av test-token.
+
+For å ta applikasjonen i bruk, må du
 
   * Generere et nøkkelpar (privatnøkkel og offentlig nøkkel)
   * Opprette en klientkonfigurasjon i [HelseID Selvbetjening TEST](https://selvbetjening.test.nhn.no/) som gir deg tilgang til TTT (se under).
@@ -27,6 +31,7 @@ Denne siste fila må du senere laste opp til HelseID selvbetjening.
 9. Bruk «Last opp fil», og legg til fila `jwk_pub.json` fra forrige steg
 10. Slå opp klientkonfigurasjonen du har laget, og kopier verdien for Klient-ID
 11. Putt denne klient-ID-en inn i konfigurasjonsfila `config.json` under parameteret `Authentication:ClientId`
+12. Klientkonfigurasjonen krever (foreløpig) en godkjenning; du må vente på denne før du kan ta i bruk klienten.
 
 ## Bruk av applikasjonen for å hente ut et token
 
@@ -34,7 +39,7 @@ Hvis du bruker kommandoen `dotnet run getToken`, vil applikasjonen skrive ut et 
 
 ```
 >dotnet run getToken
-eyJhbGciOiJSUzI1NiIsImtpZCI6IkI0Q0FFNDUyQzhCNkE4OTNCNkE4NDBBQzhDODRGQjA3MEE0MjZFNDEiLCJ4NXQiOiJ0TXJrVXNpMnFKTzJxRUNzaklUN0J3cENia0UiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJuaG46dGVzdDp0ZXN0LWFwaSIsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjQ0MzY2LyIsIm5iZiI6MTY4NzMzNTAxNywiaWF0IjoxNjg3MzM1MDE3LCJleHAiOjE2ODczMzU2MTcsImp0aSI6ImFhMGVlZWY1NjhhNzQyMzliMGFjZTYzNzRhZDY3NmRlIiwiaGVsc2VpZDovL2NsYWltcy9jbGllbnQvY2xpZW50X25hbWUiOiJBQ01FIENsaWVudCIsImNsaWVudF9hbXIiOiJwcml2YXRlX2tleV9qd3QiLCJzY29wZSI6WyJuaG46dGVzdC10b2tlbi10amVuZXN0ZS9zY29wZSJdLCJoZWxzZWlkOi8vY2xhaW1zL2NsaWVudC9hbXIiOiJyc2FfcHJpdmF0ZV9rZXkiLCJoZWxzZWlkOi8vY2xhaW1zL2NsaWVudC9jbGFpbXMvb3JnbnJfcGFyZW50IjoiOTk0NTk4NzU5IiwiY2xpZW50X2lkIjoiODgzNzM0NzUtY2ZiOS00MWQ2LTk4YzMtYTg4ZjA5MmI3OTRiIiwiaWRwIjoidGVzdGlkcC1vaWRjIiwiaGVsc2VpZDovL2NsYWltcy9pZGVudGl0eS9waWQiOiIwMzY3ODgyNjEyOSIsImhlbHNlaWQ6Ly9jbGFpbXMvaWRlbnRpdHkvcGlkX3BzZXVkb255bSI6IjhnYzFKTmRFVEhhK0EvYjdFU0pKWlZGdmxmTndWS05tdXhSbnlaYnJRdmc9IiwiaGVsc2VpZDovL2NsYWltcy9pZGVudGl0eS9zZWN1cml0eV9sZXZlbCI6IjQiLCJoZWxzZWlkOi8vY2xhaW1zL2lkZW50aXR5L2Fzc3VyYW5jZV9sZXZlbCI6ImhpZ2giLCJoZWxzZWlkOi8vY2xhaW1zL2lkZW50aXR5L25ldHdvcmsiOiJpbnRlcm5ldHQiLCJzdWIiOiJmK0hHSG1LSGpaQXd0RCtROEtmRGFSQy9TVjQzdFNzc1pVeTNKR3pua05nPSIsInNpZCI6IjNiMjA2ZWE0YjE5ZjRiODBhMDZiYTc4MWFiMjQ2ZDRhIiwibmFtZSI6IkdSQU5VTEVSVCBOSUxGSVNLIiwiaGVsc2VpZDovL2NsYWltcy9ocHIvaHByX251bWJlciI6IjEyMzQ1Njc4IiwiYW1yIjpbInB3ZCJdfQ.Y31Q-1Krjns5OCbc_1g2qLwYvEzaUiYIOOCWxDNxC0MeG0eIkwJAKWRZuNy9Ms4lm0hng-_v2mp4J5yGnHS503FuopIjYAYIeJQcPTAyRqJUpwYCz3YdgA6e1OmYHw8NbrbRoMN0A7RGVIMAixtKzdnnV3UwI38bR052KS46eKeuDWNbXDteh2fybYlv0q39Yymm1iclFIWKgnnsBRFzQ2wZPyt6R9jijGZySHSkRWTuw-2yG3t1WorH1qcSGi95WXsTs1_k6EA-J2LuLShkev8VoujqZ8fd6Y6Qta8BfODcN92nwrDzUXgUvDb-zjXC5ag7_fSJr8vecHF9f3Ua1A
+eyJhbGciOiJSUzI1NiIsImtpZCI6IjVGN0IzOEJBODA3NkZERThDRDYwMDgwRUFFNkVBOEY0NEY5QU...
 ```
 
 Applikasjonen har forskjellige parametre som kan brukes for å justere hvordan et generert token skal se ut. Disse kan vagt kategoriseres som
@@ -47,6 +52,15 @@ Applikasjonen har forskjellige parametre som kan brukes for å justere hvordan e
 * Metaparametre: brukes for å beskrive bruken av enkelte av parametrene ovenfor
 
 Et par eksempel:
+
+For å liste ut alle kommandoene som er tilgjengelige:
+
+`dotnet run`
+
+For å liste ut alle parametrene som kan brukes med `getToken`-kommandoen:
+
+`dotnet run getToken -- --help`
+
 
 For å få skrevet ut et token i JSON-format som inneholder kun obligatoriske claim:
 
