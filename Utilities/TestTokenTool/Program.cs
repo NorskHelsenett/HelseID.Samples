@@ -65,6 +65,7 @@ public class Program
             SetPidPseudonym =                   options.setPidPseudonym,
             SetSubject =                        options.setSubject,
             GetPersonFromPersontjenesten =      options.getPersonFromPersontjenesten,
+            OnlySetNameForPerson =              options.onlySetNameForPerson,
             GetHprNumberFromHprregisteret =     options.getHprNumberFromHprregisteret,
             // Usage of parameters
             GeneralClaimsParametersGeneration = options.generalClaimsCreation.ToParametersGeneration(),
@@ -88,6 +89,9 @@ public class Program
                 Pid = options.pid.GetEmptyStringIfNotSet(),
                 Network = options.network.GetEmptyStringIfNotSet(),
                 Name = options.name.GetEmptyStringIfNotSet(),
+                GivenName = options.given_name.GetEmptyStringIfNotSet(),
+                MiddleName = options.middle_name.GetEmptyStringIfNotSet(),
+                FamilyName = options.family_name.GetEmptyStringIfNotSet(),
                 Sid = options.sid.GetEmptyStringIfNotSet(),
                 Subject = options.sub.GetEmptyStringIfNotSet(),
                 AssuranceLevel = options.assuranceLevel.GetEmptyStringIfNotSet(),

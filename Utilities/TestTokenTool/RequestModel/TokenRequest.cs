@@ -18,6 +18,8 @@ public class TokenRequest
     public bool SetInvalidAudience { get; set; }
     
     public bool GetPersonFromPersontjenesten { get; set; }
+
+    public bool OnlySetNameForPerson { get; set; }
     
     public bool GetHprNumberFromHprregisteret { get; set; }
 

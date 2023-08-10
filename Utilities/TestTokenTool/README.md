@@ -153,11 +153,23 @@ For å få en liste over alle parametrene, kan du bruke kommandoen
   --getPersonFromPersontjenesten                                [False]
   If this value is set, the PID value will be used to extract person information from Persontjenesten. Requires that the 'pid' parameter is set.
 
+  --onlySetNameForPerson                                        [False]
+  If this value and getPersonFromPersontjenesten are set, only the 'name' claim will be issued, not the claims 'given_name', 'middle_name', or 'family_name'.    
+
   --pidPseudonym                             <TEXT>             []
   The returned token will contain a 'helseid://claims/identity/pid_pseudonym' claim matching the injected value. If setPidPseudonym is true, this option will be overridden.
 
   --name                                     <TEXT>             []
   The returned token will contain a 'name' claim matching the injected value. Requires that the 'getPersonFromPersontjenesten' parameter is not set.
+
+  --given_name                               <TEXT>             []
+  The returned token will contain a 'given_name' claim matching the injected value. Requires that the 'getPersonFromPersontjenesten' parameter is not set.
+
+  --middle_name                              <TEXT>             []
+  The returned token will contain a 'middle_name' claim matching the injected value. Requires that the 'getPersonFromPersontjenesten' parameter is not set.
+
+  --family_name                              <TEXT>             []
+  The returned token will contain a 'family_name' claim matching the injected value. Requires that the 'getPersonFromPersontjenesten' parameter is not set.
 
   --getHprNumberFromHprregisteret                               [False]
   If this value is set, the PID value will be used to extract person information from HPR-registeret.
