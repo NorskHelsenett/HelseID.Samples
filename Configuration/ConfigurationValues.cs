@@ -6,7 +6,7 @@ namespace HelseID.Samples.Configuration;
 public static class ConfigurationValues
 {
     // The URL for HelseID
-    public const string StsUrl = "https://helseid-sts.test.nhn.no";
+    public const string StsUrl = "https://helseid-sts.utvikling.nhn.no";
 
     // Audience and scopes for using the 'regular' sample API:
     public const string SampleApiNameAudience = "nhn:helseid-public-samplecode";
@@ -126,6 +126,7 @@ public static class ConfigurationValues
 
     // Sets both the client credential scope (for claims that the sample API needs) and the client info scope for use against the client info endpoint:
     public const string ClientCredentialsSampleScope = $"{ClientCredentialsScopeForSampleApi} {ClientInfoScope}";
+    public const bool UseDPoP = true;
     public const string ApiAccessSampleScope = $"openid profile offline_access {AuthorizationCodeScopeForSampleApi} {GeneralHelseIdScopes}";
     public const string ApiAccessSampleScopeForMultiTenantApp = $"openid profile offline_access {AuthorizationCodeScopeForSampleApi} {GeneralHelseIdScopes}";
     public const string TokenExchangeSubjectClientScope = $"openid profile offline_access {TokenExchangeApiScope} {GeneralHelseIdScopes}";

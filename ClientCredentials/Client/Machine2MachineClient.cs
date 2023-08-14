@@ -71,11 +71,8 @@ public class Machine2MachineClient
 
     private async Task<TokenResponse> GetAccessTokenFromHelseId(HttpClient httpClient)
     {
-        // The request to HelseID is created:
-        var request = await _tokenRequestBuilder.CreateClientCredentialsTokenRequest(_payloadClaimsCreatorForClientAssertion, _tokenRequestParameters);
-
         // We use the HTTP client to retrieve the response from HelseID:
-        var tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(request);
+        var tokenResponse = await RequestClientCredentialsTokenAsync(httpClient);
 
         if (tokenResponse.IsError || tokenResponse.AccessToken == null)
         {
@@ -85,6 +82,22 @@ public class Machine2MachineClient
         
         WriteAccessTokenFromTokenResult(tokenResponse);
 
+        return tokenResponse;
+    }
+
+    private async Task<TokenResponse> RequestClientCredentialsTokenAsync(HttpClient httpClient)
+    {
+        // The request to HelseID is created:
+        var request = await _tokenRequestBuilder.CreateClientCredentialsTokenRequest(_payloadClaimsCreatorForClientAssertion, _tokenRequestParameters, null);
+        
+        var tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(request);
+
+        if (tokenResponse.IsError && tokenResponse.Error == "use_dpop_nonce" && !string.IsNullOrEmpty(tokenResponse.DPoPNonce))
+        {
+            request = await _tokenRequestBuilder.CreateClientCredentialsTokenRequest(_payloadClaimsCreatorForClientAssertion, _tokenRequestParameters, tokenResponse.DPoPNonce);
+            tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(request);
+        }
+        
         return tokenResponse;
     }
 

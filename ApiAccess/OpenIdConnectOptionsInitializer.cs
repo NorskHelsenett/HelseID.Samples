@@ -20,7 +20,7 @@ namespace HelseId.Samples.ApiAccess;
 public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConnectOptions>
 {
     private readonly IClientAssertionsBuilder _clientAssertionsBuilder;
-    private readonly ISigningJwtTokenCreator _signingJwtTokenCreator;
+    private readonly IJwtTokenCreator _jwtTokenCreator;
     private readonly IUserSessionDataStore _userSessionDataStore;
     private readonly IPayloadClaimsCreatorForClientAssertion _payloadClaimsCreatorForClientAssertion;
     private readonly IPayloadClaimsCreatorForRequestObjects _payloadClaimsCreatorForRequestObjects;
@@ -29,7 +29,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
 
     public OpenIdConnectOptionsInitializer(
         IClientAssertionsBuilder clientAssertionsBuilder,
-        ISigningJwtTokenCreator signingJwtTokenCreator,
+        IJwtTokenCreator jwtTokenCreator,
         IUserSessionDataStore userSessionDataStore,
         IPayloadClaimsCreatorForClientAssertion payloadClaimsCreatorForClientAssertion,
         IPayloadClaimsCreatorForRequestObjects payloadClaimsCreatorForRequestObjects,
@@ -37,7 +37,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         IExpirationTimeCalculator expirationTimeCalculator)
     {
         _clientAssertionsBuilder = clientAssertionsBuilder;
-        _signingJwtTokenCreator = signingJwtTokenCreator;
+        _jwtTokenCreator = jwtTokenCreator;
         _userSessionDataStore = userSessionDataStore;
         _payloadClaimsCreatorForClientAssertion = payloadClaimsCreatorForClientAssertion;
         _payloadClaimsCreatorForRequestObjects = payloadClaimsCreatorForRequestObjects;
@@ -243,7 +243,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             ChildOrganizationNumber = ConfigurationValues.ApiAccessWithRequestObjectChildOrganizationNumber
         };
         // We create a signing token (as used in a client assertion), and use this as a request object: 
-        return _signingJwtTokenCreator.CreateSigningToken(_payloadClaimsCreatorForRequestObjects, payloadClaimParameters);
+        return _jwtTokenCreator.CreateSigningToken(_payloadClaimsCreatorForRequestObjects, payloadClaimParameters);
     }
 
     private async Task UpsertUserSessionData(

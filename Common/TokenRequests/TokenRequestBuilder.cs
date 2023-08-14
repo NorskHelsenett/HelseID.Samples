@@ -1,8 +1,10 @@
 using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Interfaces.ClientAssertions;
 using HelseId.Samples.Common.Interfaces.Endpoints;
+using HelseId.Samples.Common.Interfaces.JwtTokens;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Interfaces.TokenRequests;
+using HelseId.Samples.Common.JwtTokens;
 using HelseId.Samples.Common.Models;
 using IdentityModel;
 using IdentityModel.Client;
@@ -21,15 +23,18 @@ public class TokenRequestBuilder : ITokenRequestBuilder
     private readonly IClientAssertionsBuilder _clientAssertionsBuilder;
     private readonly IHelseIdEndpointsDiscoverer _endpointsDiscoverer;
     private readonly HelseIdConfiguration _configuration;
+    private readonly IJwtTokenCreator _jwtTokenCreator;
 
     public TokenRequestBuilder(
         IClientAssertionsBuilder clientAssertionsBuilder,
         IHelseIdEndpointsDiscoverer endpointsDiscoverer,
-        HelseIdConfiguration configuration)
+        HelseIdConfiguration configuration,
+        IJwtTokenCreator jwtTokenCreator)
     {
         _clientAssertionsBuilder = clientAssertionsBuilder;
         _endpointsDiscoverer = endpointsDiscoverer;
         _configuration = configuration;
+        _jwtTokenCreator = jwtTokenCreator;
     }
 
     public async Task<RefreshTokenRequest> CreateRefreshTokenRequest(
@@ -80,21 +85,27 @@ public class TokenRequestBuilder : ITokenRequestBuilder
 
     public async Task<ClientCredentialsTokenRequest> CreateClientCredentialsTokenRequest(
         IPayloadClaimsCreator payloadClaimsCreator,
-        ClientCredentialsTokenRequestParameters tokenRequestParameters)
+        ClientCredentialsTokenRequestParameters tokenRequestParameters,
+        string? dPoPNonce)
     {
         var tokenEndpoint = await FindTokenEndpoint();
         var clientAssertion = BuildClientAssertion(payloadClaimsCreator, tokenRequestParameters.PayloadClaimParameters);
 
         // This class comes from the IdentityModel library and abstracts a request for a token using the client credential grant 
-        return new ClientCredentialsTokenRequest
+        var request = new ClientCredentialsTokenRequest
         {
             Address = tokenEndpoint,
             ClientAssertion = clientAssertion,
             ClientId = _configuration.ClientId,
             Scope = _configuration.Scope,
             GrantType = OidcConstants.GrantTypes.ClientCredentials,
-            ClientCredentialStyle = ClientCredentialStyle.PostBody
+            ClientCredentialStyle = ClientCredentialStyle.PostBody,
         };
+        if (_configuration.UseDPoP)
+        {
+            request.DPoPProofToken = _jwtTokenCreator.CreateDPoPToken(dPoPNonce, tokenEndpoint);
+        }
+        return request;
     }
 
     private async Task<string> FindTokenEndpoint()

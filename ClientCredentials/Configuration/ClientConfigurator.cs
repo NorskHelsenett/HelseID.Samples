@@ -51,7 +51,7 @@ public class ClientConfigurator
         // This sets up the building of a token request for the client credentials grant
         var configuration = SetUpHelseIdConfiguration(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue);
         var jwtPayloadCreator = new JwtPayloadCreator();
-        var signingJwtTokenCreator = new SigningJwtTokenCreator(jwtPayloadCreator, configuration);
+        var signingJwtTokenCreator = new JwtTokenCreator(jwtPayloadCreator, configuration);
         // Two builder classes are used
         //   * A ClientAssertionsBuilder, which creates a client assertion that will be used
         //     inside the token request to HelseID in order to authenticate this client
@@ -61,7 +61,7 @@ public class ClientConfigurator
         //  The instance of this may or may not create a structured claim for the purpose of
         //  getting back an access token with an underenhet (child organization). 
         var clientAssertionsBuilder = new ClientAssertionsBuilder(signingJwtTokenCreator);
-        return new TokenRequestBuilder(clientAssertionsBuilder, endpointsDiscoverer, configuration);
+        return new TokenRequestBuilder(clientAssertionsBuilder, endpointsDiscoverer, configuration, signingJwtTokenCreator);
     }
 
     private static IClientInfoRetriever SetUpClientInfoRetriever(bool useClientInfoEndpointOptionValue, IHelseIdEndpointsDiscoverer endpointsDiscoverer)

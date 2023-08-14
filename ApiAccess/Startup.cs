@@ -135,7 +135,7 @@ public class Startup
         // Builder for client assertions payloads
         services.AddTransient<IJwtPayloadCreator, JwtPayloadCreator>();
         // Builder for JWT tokens used for client assertions
-        services.AddSingleton<ISigningJwtTokenCreator, SigningJwtTokenCreator>();
+        services.AddSingleton<IJwtTokenCreator, JwtTokenCreator>();
         // Builder for client assertions
         services.AddTransient<IClientAssertionsBuilder, ClientAssertionsBuilder>();
         // Finds the relevant endpoints on the HelseID server

@@ -8,7 +8,8 @@ public interface ITokenRequestBuilder
 {
     Task<ClientCredentialsTokenRequest> CreateClientCredentialsTokenRequest(
         IPayloadClaimsCreator payloadClaimsCreator,
-        ClientCredentialsTokenRequestParameters tokenRequestParameters);
+        ClientCredentialsTokenRequestParameters tokenRequestParameters,
+        string? dPoPNonce);
     
     Task<RefreshTokenRequest> CreateRefreshTokenRequest(
         IPayloadClaimsCreator payloadClaimsCreator,

@@ -55,7 +55,7 @@ public static class Program
         webApplicationBuilder.Services.AddSingleton<IHelseIdEndpointsDiscoverer, HelseIdEndpointsDiscoverer>();
         webApplicationBuilder.Services.AddSingleton<IPayloadClaimsCreatorForClientAssertion, ClientAssertionPayloadClaimsCreator>();
         webApplicationBuilder.Services.AddSingleton<IJwtPayloadCreator, JwtPayloadCreator>();
-        webApplicationBuilder.Services.AddSingleton<ISigningJwtTokenCreator, SigningJwtTokenCreator>();
+        webApplicationBuilder.Services.AddSingleton<IJwtTokenCreator, JwtTokenCreator>();
         // Two builder classes are used for creating the token exchange request to HelseID
         //   * A ClientAssertionsBuilder, which creates a client assertion that will be used
         //     inside the token request to HelseID in order to authenticate this client

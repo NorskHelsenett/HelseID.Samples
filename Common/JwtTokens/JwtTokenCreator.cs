@@ -1,8 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Text.Json.Serialization;
 using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Interfaces.JwtTokens;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Models;
+using IdentityModel;
 using Microsoft.IdentityModel.Tokens;
 
 namespace HelseId.Samples.Common.JwtTokens;
@@ -11,17 +13,50 @@ namespace HelseId.Samples.Common.JwtTokens;
 /// This class creates a JWT token that can be used in client assertions or in request objects.
 /// This class requires an IPayloadClaimsCreator instance that will create the claims that are needed in the token request.
 /// </summary>
-public class SigningJwtTokenCreator : ISigningJwtTokenCreator
+public class JwtTokenCreator : IJwtTokenCreator
 {
     private readonly IJwtPayloadCreator _jwtPayloadCreator;
     private readonly HelseIdConfiguration _configuration;
     
-    public SigningJwtTokenCreator(
+    public JwtTokenCreator(
         IJwtPayloadCreator jwtPayloadCreator,
         HelseIdConfiguration configuration)
     {
         _jwtPayloadCreator = jwtPayloadCreator;
         _configuration = configuration;
+    }
+    
+    public string CreateDPoPToken(string? dPoPNonce, string url)
+    {
+        var securityKey = new JsonWebKey(_configuration.RsaPrivateKeyJwk.JwkValue);
+        var signingCredentials = new SigningCredentials(securityKey, _configuration.RsaPrivateKeyJwk.Algorithm);
+
+        var jwk = new Dictionary<string, string>
+        {
+            ["kty"] = securityKey.Kty,
+            ["n"] = securityKey.N,
+            ["e"] = securityKey.E,
+            ["alg"] = signingCredentials.Algorithm,
+            ["kid"] = securityKey.Kid,
+        };
+
+        var jwtHeader = new JwtHeader(signingCredentials)
+        {
+            [JwtClaimTypes.TokenType] = "dpop+jwt",
+            [JwtClaimTypes.JsonWebKey] = jwk,
+        };
+
+        var payload = new JwtPayload
+        {
+            [JwtClaimTypes.JwtId] = Guid.NewGuid().ToString(),
+            [JwtClaimTypes.DPoPHttpMethod] = "POST",
+            [JwtClaimTypes.DPoPHttpUrl] = url,
+            [JwtClaimTypes.IssuedAt] = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+            [JwtClaimTypes.Nonce] = dPoPNonce,
+        };
+        
+        var jwtSecurityToken = new JwtSecurityToken(jwtHeader, payload);
+        return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
     }
 
     public string CreateSigningToken(IPayloadClaimsCreator payloadClaimsCreator, PayloadClaimParameters payloadClaimParameters)
