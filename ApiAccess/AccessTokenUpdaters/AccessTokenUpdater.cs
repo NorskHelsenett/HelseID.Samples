@@ -89,7 +89,22 @@ public class AccessTokenUpdater : IAccessTokenUpdater
 
         if (tokenResponse.IsError)
         {
-            throw new TokenResponseErrorException(tokenResponse.Error);
+            throw new TokenResponseErrorException(tokenResponse.Error ?? "No token response error found");
+        }
+        
+        if (tokenResponse.AccessToken == null)
+        {
+            throw new TokenResponseErrorException("No access token response found");
+        }
+
+        if (tokenResponse.IdentityToken == null)
+        {
+            throw new TokenResponseErrorException("No identity token response found");
+        }
+
+        if (tokenResponse.RefreshToken == null)
+        {
+            throw new TokenResponseErrorException("No refresh token response found");
         }
         
         return await UpdateUserSessionData(userSessionData, apiIndicators, tokenResponse);
@@ -127,7 +142,7 @@ public class AccessTokenUpdater : IAccessTokenUpdater
             _expirationTimeCalculator.CalculateTokenExpirationTimeUtc(tokenResponse.ExpiresIn);
 
         var accessTokenWithExpiration = new AccessTokenWithExpiration(
-            tokenResponse.AccessToken,
+            tokenResponse.AccessToken!,
             accessTokenExpiresAtUtc);
 
         // The 'rt_expires_in' parameter is specific for HelseID, and is not present in the common library:
@@ -135,8 +150,8 @@ public class AccessTokenUpdater : IAccessTokenUpdater
             _expirationTimeCalculator.CalculateTokenExpirationTimeUtc(
                 tokenResponse.GetRefreshTokenExpiresInValue());
 
-        userSessionData.IdToken = tokenResponse.IdentityToken;
-        userSessionData.RefreshToken = tokenResponse.RefreshToken;
+        userSessionData.IdToken = tokenResponse.IdentityToken!;
+        userSessionData.RefreshToken = tokenResponse.RefreshToken!;
         userSessionData.RefreshTokenExpiresAtUtc = refreshTokenExpiresAtUtc;
         userSessionData.AccessTokens.Add(apiIndicators.ApiAudience, accessTokenWithExpiration);
 

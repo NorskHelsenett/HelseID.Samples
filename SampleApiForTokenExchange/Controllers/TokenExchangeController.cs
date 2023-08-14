@@ -78,7 +78,7 @@ public class TokenExchangeController : ControllerBase
         // We use the HTTP client to retrieve the response from HelseID:
         var tokenResponse = await httpClient.RequestTokenExchangeTokenAsync(request);
 
-        if (tokenResponse.IsError)
+        if (tokenResponse.IsError || tokenResponse.AccessToken == null)
         {
             throw new Exception();
         }

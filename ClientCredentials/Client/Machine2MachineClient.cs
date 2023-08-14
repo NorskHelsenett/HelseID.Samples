@@ -60,7 +60,7 @@ public class Machine2MachineClient
         {
             var tokenResponse = await GetAccessTokenFromHelseId(httpClient);
             _persistedAccessTokenExpiresAt = _expirationTimeCalculator.CalculateTokenExpirationTimeUtc(tokenResponse.ExpiresIn);
-            _persistedAccessToken = tokenResponse.AccessToken;
+            _persistedAccessToken = tokenResponse.AccessToken!;
         }
         else
         {
@@ -77,7 +77,7 @@ public class Machine2MachineClient
         // We use the HTTP client to retrieve the response from HelseID:
         var tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(request);
 
-        if (tokenResponse.IsError)
+        if (tokenResponse.IsError || tokenResponse.AccessToken == null)
         {
             await WriteErrorToConsole(tokenResponse);
             throw new Exception();
