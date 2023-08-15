@@ -23,18 +23,18 @@ public class TokenRequestBuilder : ITokenRequestBuilder
     private readonly IClientAssertionsBuilder _clientAssertionsBuilder;
     private readonly IHelseIdEndpointsDiscoverer _endpointsDiscoverer;
     private readonly HelseIdConfiguration _configuration;
-    private readonly IJwtTokenCreator _jwtTokenCreator;
+    private readonly IDpopProofCreator _dpopProofCreator;
 
     public TokenRequestBuilder(
         IClientAssertionsBuilder clientAssertionsBuilder,
         IHelseIdEndpointsDiscoverer endpointsDiscoverer,
         HelseIdConfiguration configuration,
-        IJwtTokenCreator jwtTokenCreator)
+        IDpopProofCreator dpopProofCreator)
     {
         _clientAssertionsBuilder = clientAssertionsBuilder;
         _endpointsDiscoverer = endpointsDiscoverer;
         _configuration = configuration;
-        _jwtTokenCreator = jwtTokenCreator;
+        _dpopProofCreator = dpopProofCreator;
     }
 
     public async Task<RefreshTokenRequest> CreateRefreshTokenRequest(
@@ -103,7 +103,7 @@ public class TokenRequestBuilder : ITokenRequestBuilder
         };
         if (_configuration.UseDPoP)
         {
-            request.DPoPProofToken = _jwtTokenCreator.CreateDPoPToken(dPoPNonce, tokenEndpoint);
+            request.DPoPProofToken = _dpopProofCreator.CreateDpopProof(dPoPNonce, tokenEndpoint, "POST");
         }
         return request;
     }

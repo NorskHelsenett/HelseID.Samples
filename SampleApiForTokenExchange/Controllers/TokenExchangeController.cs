@@ -55,7 +55,7 @@ public class TokenExchangeController : ControllerBase
         try
         {
             Console.WriteLine("Using the (exchanged) access token to call the sample API");
-            return await _apiConsumer.CallApi(httpClient, ConfigurationValues.SampleApiUrlForM2M, actorAccessToken);
+            return await _apiConsumer.CallApiWithBearerToken(httpClient, ConfigurationValues.SampleApiUrlForM2M, actorAccessToken);
         }
         catch (HttpRequestException e)
         {
