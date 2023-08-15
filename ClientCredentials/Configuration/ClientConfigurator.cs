@@ -36,7 +36,7 @@ public class ClientConfigurator
         var expirationTimeCalculator = new ExpirationTimeCalculator(new DateTimeService());
         var payloadClaimsCreator = SetUpPayloadClaimsCreator(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue);
         var configuration = SetUpHelseIdConfiguration(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue);
-        var dPopProofCreator = new DpopProofCreator(configuration);
+        var dPopProofCreator = new DPoPProofCreator(configuration);
         var apiConsumer = new ApiConsumer(dPopProofCreator);
         
         return new Machine2MachineClient(
@@ -64,7 +64,7 @@ public class ClientConfigurator
         //  The instance of this may or may not create a structured claim for the purpose of
         //  getting back an access token with an underenhet (child organization). 
         var clientAssertionsBuilder = new ClientAssertionsBuilder(signingJwtTokenCreator);
-        var dPopProofCreator = new DpopProofCreator(configuration);
+        var dPopProofCreator = new DPoPProofCreator(configuration);
         return new TokenRequestBuilder(clientAssertionsBuilder, endpointsDiscoverer, configuration, dPopProofCreator);
     }
 

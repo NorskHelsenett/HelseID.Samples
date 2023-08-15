@@ -137,7 +137,7 @@ public class Startup
         // Builder for JWT tokens used for client assertions
         services.AddSingleton<ISigningTokenCreator, SigningTokenCreator>();
         // Builder for DPoP proofs
-        services.AddSingleton<IDpopProofCreator, DpopProofCreator>();
+        services.AddSingleton<IDPoPProofCreator, DPoPProofCreator>();
         // Builder for client assertions
         services.AddTransient<IClientAssertionsBuilder, ClientAssertionsBuilder>();
         // Finds the relevant endpoints on the HelseID server

@@ -10,10 +10,10 @@ namespace HelseId.Samples.Common.ApiConsumers;
 /// </summary>
 public class ApiConsumer : IApiConsumer
 {
-    private readonly IDpopProofCreator _dpopProofCreator;
-    public ApiConsumer(IDpopProofCreator dpopProofCreator)
+    private readonly IDPoPProofCreator _idPoPProofCreator;
+    public ApiConsumer(IDPoPProofCreator idPoPProofCreator)
     {
-        _dpopProofCreator = dpopProofCreator;
+        _idPoPProofCreator = idPoPProofCreator;
     }
     
     public async Task<ApiResponse?> CallApiWithBearerToken(HttpClient httpClient, string apiUrl, string accessToken)
@@ -27,7 +27,7 @@ public class ApiConsumer : IApiConsumer
 
     public async Task<ApiResponse?> CallApiWithDPoPToken(HttpClient httpClient, string apiUrl, string accessToken, string? dPoPNonce)
     {
-        var dPopProof = _dpopProofCreator.CreateDpopProof(dPoPNonce, apiUrl, "GET"); 
+        var dPopProof = _idPoPProofCreator.CreateDPoPProof(apiUrl, "GET", accessToken: accessToken); 
         
         var requestMessage = new HttpRequestMessage(HttpMethod.Get, apiUrl);
         requestMessage.SetDPoPToken(accessToken, dPopProof);

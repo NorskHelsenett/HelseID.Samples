@@ -127,7 +127,7 @@ public class Machine2MachineClient
             ApiResponse? response;
             if (_configuration.UseDPoP)
             {
-                response = await _apiConsumer.CallApiWithDPoPToken(httpClient, ConfigurationValues.SampleApiUrlForM2M, accessToken, dPoPNonce);
+                response = await _apiConsumer.CallApiWithDPoPToken(httpClient, ConfigurationValues.SampleApiUrlForM2MWithDPoP, accessToken, dPoPNonce);
             } else {
                 response = await _apiConsumer.CallApiWithBearerToken(httpClient, ConfigurationValues.SampleApiUrlForM2M, accessToken);
             }

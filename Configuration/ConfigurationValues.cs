@@ -64,8 +64,10 @@ public static class ConfigurationValues
 
     // URLS and resource parameter (url fragment) for the use of the sample API for the client credentials project
     public const string SampleApiMachineClientResource = "machine-clients/greetings";
+    public const string SampleApiMachineClientResourceForDPoP = "machine-clients/dpop-greetings";
 
     public static string SampleApiUrlForM2M = $"https://localhost:{SampleApiPort}/{SampleApiMachineClientResource}";
+    public static string SampleApiUrlForM2MWithDPoP = $"https://localhost:{SampleApiPort}/{SampleApiMachineClientResourceForDPoP}";
 
     // If used, the child organization number (underenhet) must match a number in the client's whitelist as it's held by HelseID:
     public const string ClientCredentialsWithChildOrganizationNumber = "999977776";
