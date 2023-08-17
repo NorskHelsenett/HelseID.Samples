@@ -1,8 +1,5 @@
-using System.Security.Cryptography;
-using System.Text;
+using System.Text.Json;
 using IdentityModel;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
@@ -11,7 +8,7 @@ namespace HelseId.SampleAPI.DPoPValidation;
 public class DPoPProofValidator
 {
     // This is the number of seconds that we allow for the DPoP proof to expire
-    private TimeSpan ProofTokenValidityDuration { get; set; } = TimeSpan.FromSeconds(1);
+    private TimeSpan ProofTokenValidityDuration { get;} = TimeSpan.FromSeconds(1);
     // This is the maximum difference between the client's clock and this application's clock
     private TimeSpan ClientClockSkew { get; set; } = TimeSpan.FromSeconds(5);
     private const string ReplayCachePurpose = "DPoPJwtBearerEvents-DPoPReplay-jti-";
@@ -31,35 +28,36 @@ public class DPoPProofValidator
         SecurityAlgorithms.EcdsaSha512
     };
 
-    private readonly ILogger<DPoPProofValidator> _logger;
     private readonly IReplayCache _replayCache;
     
-    public DPoPProofValidator(IReplayCache replayCache, ILogger<DPoPProofValidator> logger)
+    public DPoPProofValidator(IReplayCache replayCache)
     {
         _replayCache = replayCache;
-        _logger = logger;
     }
 
     public async Task<ValidationResult> Validate(DPoPProofValidationData data)
     {
-        var validationResult = ValidateHeader(data);
+        var validationResult = ValidateCnfClaimFromAccessToken(data);
         if (validationResult.IsError)
         {
-            _logger.LogDebug("Failed to validate the DPoP header");
+            return validationResult;
+        }
+        
+        validationResult = ValidateHeader(data);
+        if (validationResult.IsError)
+        {
             return validationResult;
         }
 
         validationResult = ValidateSignature(data);
         if (validationResult.IsError)
         {
-            _logger.LogDebug("Failed to validate the DPoP signature");
             return validationResult;
         }
 
         validationResult = ValidatePayload(data);
         if (validationResult.IsError)
         {
-            _logger.LogDebug("Failed to validate the DPoP payload");
             return validationResult;
         }
         
@@ -67,12 +65,34 @@ public class DPoPProofValidator
         validationResult = await ValidateReplayAsync(data);
         if (validationResult.IsError)
         {
-            _logger.LogDebug("Detected a replay of the DPoP token");
             return validationResult;
         }
+        
+        return ValidationResult.Success();
+    }
 
-        _logger.LogDebug("Successfully validated the DPoP proof token");
+    private ValidationResult ValidateCnfClaimFromAccessToken(DPoPProofValidationData data)
+    {
+        if (string.IsNullOrEmpty(data.CnfClaimValueFromAccessToken))
+        {
+            return ValidationResult.Error("Missing 'cnf' claim in access token");
+        }
 
+        string? jktContent;
+        try
+        {
+            var jktValue = JsonSerializer.Deserialize<Dictionary<string, string>>(data.CnfClaimValueFromAccessToken);
+            if (jktValue == null || !jktValue.TryGetValue(JwtClaimTypes.ConfirmationMethods.JwkThumbprint, out jktContent))
+            {
+                return ValidationResult.Error("Missing 'jkt' value in 'cnf' claim in access token");
+            }
+        }
+        catch (JsonException)
+        {
+            return ValidationResult.Error("Invalid 'jkt' value in 'cnf' claim in access token");
+        }
+
+        data.JktClaimValueFromAccessToken = jktContent;
         return ValidationResult.Success();
     }
 
@@ -84,9 +104,8 @@ public class DPoPProofValidator
             var handler = new JsonWebTokenHandler();
             token = handler.ReadJsonWebToken(data.ProofToken);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            _logger.LogDebug("Error parsing DPoP token: {error}", ex.Message);
             return ValidationResult.Error("Malformed DPoP token.");
         }
 
@@ -112,7 +131,6 @@ public class DPoPProofValidator
         }
         catch (Exception ex)
         {
-            _logger.LogDebug("Error parsing DPoP jwk value: {error}", ex.Message);
             return ValidationResult.Error("Invalid 'jwk' value.");
         }
 
@@ -121,6 +139,12 @@ public class DPoPProofValidator
             return ValidationResult.Error("'jwk' value contains a private key.");
         }
 
+        if (data.JktClaimValueFromAccessToken != jwk.CreateThumbprint())
+        {
+            return ValidationResult.Error("Failed to validate the 'cnf' claim value against the DPoP proof's public key");
+        }
+
+        // Used for signature validation
         data.JsonWebKey = jwk;
         return ValidationResult.Success();
     }
@@ -143,13 +167,11 @@ public class DPoPProofValidator
         }
         catch (Exception ex)
         {
-            _logger.LogDebug("Error parsing DPoP token: {error}", ex.Message);
             return ValidationResult.Error("Invalid signature on DPoP token.");
         }
 
         if (tokenValidationResult.Exception != null)
         {
-            _logger.LogDebug("Error parsing DPoP token: {error}", tokenValidationResult.Exception.Message);
             return ValidationResult.Error("Invalid signature on DPoP token.");
         }
 
@@ -170,8 +192,7 @@ public class DPoPProofValidator
             return ValidationResult.Error("Invalid 'ath' value.");
         }
 
-        var accessTokenHash = HashAccessToken(data.AccessToken);
-        if (accessTokenHash != accessTokenHashFromProof)
+        if (data.AccessTokenHash != accessTokenHashFromProof)
         {
             return ValidationResult.Error("Invalid 'ath' value.");
         }
@@ -212,32 +233,43 @@ public class DPoPProofValidator
             return ValidationResult.Error("Missing 'iat' value.");
         }
 
-        // This validates the 'iat' (issued at) value for the DPoP proof.
+        // This validates the 'iat' (issued at time) value for the DPoP proof.
         // Another way of validating the time origin of the proof is to use a nonce,
         // as described in https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-16.html#name-resource-server-provided-no
-        if (IsExpired(issuedAtTime.Value))
+        if (IssuedAtTimeIsInvalid(issuedAtTime.Value))
         {
             return ValidationResult.Error("Invalid 'iat' value.");
         }
         
         return ValidationResult.Success();
     }
-
-    private static string HashAccessToken(string accessToken)
+    
+    private bool IssuedAtTimeIsInvalid(long issuedAtTime)
     {
-        using var sha = SHA256.Create();
+        var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var start = now + (int)ClientClockSkew.TotalSeconds;
+        // The 'issued at' time is in the future
+        if (start < issuedAtTime)
+        {
+            return true;
+        }
 
-        var bytes = Encoding.UTF8.GetBytes(accessToken);
-        var hash = sha.ComputeHash(bytes);
+        var expiration = issuedAtTime + (int)ProofTokenValidityDuration.TotalSeconds;
+        var end = now - (int)ClientClockSkew.TotalSeconds;
+        // The DPoP proof has expired
+        if (expiration < end)
+        {
+            return true;
+        }
 
-        return Base64Url.Encode(hash);
+        return false;
     }
 
     private async Task<ValidationResult> ValidateReplayAsync(DPoPProofValidationData data)
     {
         if (await _replayCache.ExistsAsync(ReplayCachePurpose, data.TokenId!))
         {
-            return ValidationResult.Error("Detected DPoP proof token replay.");
+            return ValidationResult.Error("Detected a DPoP proof token replay.");
         }
 
         // The client clock skew is doubled because the clock may be either before or after the correct time 
@@ -247,28 +279,5 @@ public class DPoPProofValidator
         await _replayCache.AddAsync(ReplayCachePurpose, data.TokenId!, DateTimeOffset.UtcNow.Add(cacheDuration));
 
         return ValidationResult.Success();
-    }
-
-    private bool IsExpired(long issuedAtTime)
-    {
-        var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        var start = now + (int)ClientClockSkew.TotalSeconds;
-        if (start < issuedAtTime)
-        {
-            var diff = issuedAtTime - now;
-            _logger.LogDebug("Expiration check failed. Creation time was too far in the future. The time being checked was {iat}, and the clock is now {now}. The time difference is {diff} seconds", issuedAtTime, now, diff);
-            return true;
-        }
-
-        var expiration = issuedAtTime + (int)ProofTokenValidityDuration.TotalSeconds;
-        var end = now - (int)ClientClockSkew.TotalSeconds;
-        if (expiration < end)
-        {
-            var diff = now - expiration;
-            _logger.LogDebug("Expiration check failed. Expiration has already happened. The expiration was at {exp}, and the clock is now {now}. The time difference is {diff} seconds", expiration, now, diff);
-            return true;
-        }
-
-        return false;
     }
 }

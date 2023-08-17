@@ -4,7 +4,6 @@ using HelseId.Samples.Common.Interfaces.Endpoints;
 using HelseId.Samples.Common.Interfaces.JwtTokens;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Interfaces.TokenRequests;
-using HelseId.Samples.Common.JwtTokens;
 using HelseId.Samples.Common.Models;
 using IdentityModel;
 using IdentityModel.Client;
