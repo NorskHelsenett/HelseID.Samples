@@ -7,7 +7,6 @@ using HelseId.Samples.ApiAccess.Stores;
 using HelseId.Samples.ApiAccess.ViewModels;
 using HelseId.Samples.Common.ApiConsumers;
 using HelseId.Samples.Common.ClientAssertions;
-using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Endpoints;
 using HelseId.Samples.Common.Interfaces.ApiConsumers;
 using HelseId.Samples.Common.Interfaces.ClientAssertions;
@@ -25,6 +24,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace HelseId.Samples.ApiAccess;
@@ -78,9 +78,9 @@ public class Startup
         services.AddControllersWithViews();
 
         // Create a settings instance. These can be injected into other objects, for instance the HomeController 
-        services.AddSingleton<Settings>(_settings);
+        services.AddSingleton(_settings);
         // We need the HelseIdConfiguration instance as a service as well:
-        services.AddSingleton<HelseIdConfiguration>(_settings.HelseIdConfiguration);
+        services.AddSingleton(_settings.HelseIdConfiguration);
 
         // Services for calculating the expiration time for tokens
         var dateTimeService = new DateTimeService();
@@ -105,7 +105,7 @@ public class Startup
             services.AddSingleton<IPayloadClaimsCreatorForRequestObjects>(new NullPayloadClaimsCreatorForRequestObjects());
         }
 
-        var clientAssertionPayloadClaimsCreator = new ClientAssertionPayloadClaimsCreator(dateTimeService); 
+        var clientAssertionPayloadClaimsCreator = new ClientAssertionPayloadClaimsCreator(dateTimeService);
         if (_settings.ClientType == ClientType.ApiAccessForMultiTenantClient)
         {
             // We need payload claims for the token request, both the "default" type and for the multi-tenant organization number:
@@ -183,7 +183,7 @@ public class Startup
             .AddOpenIdConnect(openIdConnectOptions =>
             {
                 // We need to extract the OpenID Connect options initializer from the service provider:
-                var serviceProvider = services.BuildServiceProvider();
+                var serviceProvider =  services.BuildServiceProvider();
                 var  initializer = serviceProvider.GetService<IConfigureNamedOptions<OpenIdConnectOptions>>();
                 initializer!.Configure(nameof(OpenIdConnectOptionsInitializer), openIdConnectOptions);
             });
@@ -197,6 +197,12 @@ public class Startup
         {
             config.AddPolicy(SecurityLevelClaimPolicy, securityLevelClaimPolicy);
         });
+        
+        // We need to replace the OpenIdConnectHandler with our own when DPoP is required
+        if (_settings.UseDPoP)
+        {
+            services.Replace(ServiceDescriptor.Transient<OpenIdConnectHandler, OpenIdConnectHandlerForDPoP>());
+        }
     }
 
     private WebApplication Configure(WebApplication webApplication) 

@@ -14,8 +14,14 @@
 
   <ItemGroup>
     <PackageReference Include="IdentityModel" Version="6.1.0" />
+    <PackageReference Include="IdentityModel.AspNetCore.OAuth2Introspection" Version="6.2.0" />
+    <PackageReference Include="IdentityModel.OidcClient" Version="5.2.1" />
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.10" />
+    <PackageReference Include="Microsoft.IdentityModel.Abstractions" Version="6.32.1" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="6.32.1" />
+    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="6.32.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.32.1" />
   </ItemGroup>
 

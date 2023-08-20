@@ -26,6 +26,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
     private readonly IPayloadClaimsCreatorForRequestObjects _payloadClaimsCreatorForRequestObjects;
     private readonly Settings _settings;
     private readonly IExpirationTimeCalculator _expirationTimeCalculator;
+    private readonly IDPoPProofCreator _dPoPProofCreator;
 
     public OpenIdConnectOptionsInitializer(
         IClientAssertionsBuilder clientAssertionsBuilder,
@@ -34,7 +35,8 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         IPayloadClaimsCreatorForClientAssertion payloadClaimsCreatorForClientAssertion,
         IPayloadClaimsCreatorForRequestObjects payloadClaimsCreatorForRequestObjects,
         Settings settings,
-        IExpirationTimeCalculator expirationTimeCalculator)
+        IExpirationTimeCalculator expirationTimeCalculator,
+        IDPoPProofCreator dPoPProofCreator)
     {
         _clientAssertionsBuilder = clientAssertionsBuilder;
         _signingTokenCreator = signingTokenCreator;
@@ -43,6 +45,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         _payloadClaimsCreatorForRequestObjects = payloadClaimsCreatorForRequestObjects;
         _settings = settings;
         _expirationTimeCalculator = expirationTimeCalculator;
+        _dPoPProofCreator = dPoPProofCreator;
     }
 
     // This gets called from the Startup class
@@ -89,10 +92,9 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         // This matches the value set on the HelseID clients:
         openIdConnectOptions.SignedOutCallbackPath = "/signout-callback-oidc";
 
-        // We use POST as the authentication method
+        // We use POST as the authentication method; the default method is GET
         openIdConnectOptions.AuthenticationMethod = OpenIdConnectRedirectBehavior.FormPost;
     }
-
     
     private void SetUpScopes(OpenIdConnectOptions openIdConnectOptions)
     {
@@ -131,6 +133,37 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             // Asserts the client by using the generated Jwt (the value from the type)
             authCodeReceivedContext.TokenEndpointRequest.ClientAssertion = clientAssertion.Value;
 
+            if (_settings.UseDPoP)
+            {
+                //_dPoPProofCreator.CreateDPoPProof();
+            }
+            /*
+            var dPoPKeyStore = context.HttpContext.RequestServices.GetRequiredService<IDPoPKeyStore>();
+
+            var key = await dPoPKeyStore.GetKeyAsync(_clientName);
+            if (key != null)
+            {
+                var jkt = _dPoPProofService.GetProofKeyThumbprint(new DPoPProofRequest
+                {
+                    Url = context.ProtocolMessage.AuthorizationEndpoint,
+                    Method = "GET",
+                    DPoPJsonWebKey = key.JsonWebKey,
+                });
+
+                // checking for null allows for opt-out from using DPoP
+                if (jkt != null)
+                {
+                    // we store the proof key here to associate it with the access token returned
+                    context.Properties.SetProofKey(key.JsonWebKey);
+
+                    // pass jkt to authorize endpoint
+                    context.ProtocolMessage.Parameters[OidcConstants.AuthorizeRequest.DPoPKeyThumbprint] = jkt;
+                }
+            }
+            */
+            
+            
+            
             return Task.CompletedTask;
         };
 
@@ -175,12 +208,6 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             // Invoked before redirecting to the identity provider to authenticate. This can be used to
             // set a ProtocolMessage.State that will be persisted through the authentication process.
             // The ProtocolMessage can also be used to add or customize parameters sent to the identity provider.
-            var customOpenIdConnectMessageParameters =
-                new CustomOpenIdConnectMessageParameters
-                {
-                    RequestObject = CreateRequestObject(),
-                    ResourceIndicators = _settings.HelseIdConfiguration.ResourceIndicators,
-                }; 
             
             // For certain features, we need to establish a custom request message for creating
             // request objects or resource indicators.  The implementation of the former ('resource')
@@ -189,6 +216,13 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             // is not currently implemented
             if (redirectContext.ProtocolMessage.RequestType == OpenIdConnectRequestType.Authentication)
             {
+                var customOpenIdConnectMessageParameters =
+                    new CustomOpenIdConnectMessageParameters
+                    {
+                        RequestObject = CreateRequestObject(),
+                        ResourceIndicators = _settings.HelseIdConfiguration.ResourceIndicators,
+                    }; 
+
                 // We need a custom class for creating the message to the authorization endpoint:
                 var customProtocolMessage = new CustomOpenIdConnectMessage(
                     customOpenIdConnectMessageParameters,

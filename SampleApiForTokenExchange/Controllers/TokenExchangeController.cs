@@ -73,7 +73,8 @@ public class TokenExchangeController : ControllerBase
             new TokenExchangeTokenRequestParameters
             {
                 SubjectToken = subjectToken,
-            });
+            },
+            null);
 
         // We use the HTTP client to retrieve the response from HelseID:
         var tokenResponse = await httpClient.RequestTokenExchangeTokenAsync(request);

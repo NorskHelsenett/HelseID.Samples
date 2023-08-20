@@ -87,6 +87,11 @@ public class AccessTokenUpdater : IAccessTokenUpdater
     {
         var tokenResponse = await GetRefreshTokenResponseFromHelseId(httpClient, userSessionData, apiIndicators);
 
+        if (tokenResponse.IsError && tokenResponse.Error == "use_dpop_nonce")
+        {
+            tokenResponse = await GetRefreshTokenResponseFromHelseId(httpClient, userSessionData, apiIndicators, tokenResponse.DPoPNonce);
+        }
+        
         if (tokenResponse.IsError)
         {
             throw new TokenResponseErrorException(tokenResponse.Error ?? "No token response error found");
@@ -113,12 +118,13 @@ public class AccessTokenUpdater : IAccessTokenUpdater
     private async Task<TokenResponse> GetRefreshTokenResponseFromHelseId(
         HttpClient httpClient,
         UserSessionData userSessionData,
-        ApiIndicators apiIndicators)
+        ApiIndicators apiIndicators, 
+        string? dPoPNonce = null)
     {
         var tokenRequestParameters = CreateRefreshTokenRequestParameters(userSessionData, apiIndicators);
-
+        
         // If the value for refreshToken is null, we expect this method to fail
-        var request = await _tokenRequestBuilder.CreateRefreshTokenRequest(_payloadClaimsCreatorForClientAssertion, tokenRequestParameters!);
+        var request = await _tokenRequestBuilder.CreateRefreshTokenRequest(_payloadClaimsCreatorForClientAssertion, tokenRequestParameters!, dPoPNonce);
 
         // Send request using IdentityModel extension method
         return await httpClient.RequestRefreshTokenAsync(request);

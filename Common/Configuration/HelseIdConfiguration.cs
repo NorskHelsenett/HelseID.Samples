@@ -10,14 +10,12 @@ public class HelseIdConfiguration
         string clientId,
         string scope,
         string stsUrl,
-        bool useDPoP,
         List<string>? resourceIndicators = null)
     {
         RsaPrivateKeyJwk = rsaPrivateKeyJwk;
         ClientId = clientId;
         Scope = scope;
         StsUrl = stsUrl;
-        UseDPoP = useDPoP;
         if (resourceIndicators != null)
         {
             ResourceIndicators = resourceIndicators;
@@ -37,5 +35,5 @@ public class HelseIdConfiguration
     // These are used for clients that are using resource indicators against the authorization and token endpoints:
     public List<string> ResourceIndicators { get; } = new();
     
-    public bool UseDPoP { get; }
+    public bool UseDPoP { get; set; }
 }

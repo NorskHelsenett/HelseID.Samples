@@ -13,9 +13,16 @@ public interface ITokenRequestBuilder
     
     Task<RefreshTokenRequest> CreateRefreshTokenRequest(
         IPayloadClaimsCreator payloadClaimsCreator,
-        RefreshTokenRequestParameters tokenRequestParameters);
+        RefreshTokenRequestParameters tokenRequestParameters,
+        string? dPoPNonce);
     
     Task<TokenExchangeTokenRequest> CreateTokenExchangeTokenRequest(
         IPayloadClaimsCreator payloadClaimsCreator,
-        TokenExchangeTokenRequestParameters tokenRequestParameters);
+        TokenExchangeTokenRequestParameters tokenRequestParameters,
+        string? dPoPNonce);
+
+    Task<AuthorizationCodeTokenRequest> CreateAuthorizationCodeTokenRequest(
+        IPayloadClaimsCreator payloadClaimsCreator,
+        AuthorizationCodeTokenRequestParameters tokenRequestParameters,
+        string? dPoPNonce);
 }
