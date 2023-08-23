@@ -20,9 +20,10 @@ public interface ITokenRequestBuilder
         IPayloadClaimsCreator payloadClaimsCreator,
         TokenExchangeTokenRequestParameters tokenRequestParameters,
         string? dPoPNonce);
-
+/*
     Task<AuthorizationCodeTokenRequest> CreateAuthorizationCodeTokenRequest(
         IPayloadClaimsCreator payloadClaimsCreator,
         AuthorizationCodeTokenRequestParameters tokenRequestParameters,
         string? dPoPNonce);
+        */
 }

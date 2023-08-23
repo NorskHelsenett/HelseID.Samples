@@ -86,7 +86,7 @@ public class TokenRequestBuilder : ITokenRequestBuilder
             SubjectToken = tokenRequestParameters.SubjectToken,
         };
     }
-
+/*
     public async Task<AuthorizationCodeTokenRequest> CreateAuthorizationCodeTokenRequest(
         IPayloadClaimsCreator payloadClaimsCreator,
         AuthorizationCodeTokenRequestParameters tokenRequestParameters,
@@ -113,7 +113,7 @@ public class TokenRequestBuilder : ITokenRequestBuilder
         }
         return request;
     }
-
+*/
     public async Task<ClientCredentialsTokenRequest> CreateClientCredentialsTokenRequest(
         IPayloadClaimsCreator payloadClaimsCreator,
         ClientCredentialsTokenRequestParameters tokenRequestParameters,

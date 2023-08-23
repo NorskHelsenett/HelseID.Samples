@@ -74,6 +74,10 @@ public class Startup
 
     private void ConfigureServices(IServiceCollection services) 
     {
+        // For DPoP:
+        // services.AddHttpContextAccessor();
+
+        
         // Add services to the container.
         services.AddControllersWithViews();
 
