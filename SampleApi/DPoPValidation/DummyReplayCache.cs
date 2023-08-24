@@ -25,6 +25,6 @@ public class DummyReplayCache : IReplayCache
 
     public async Task<bool> ExistsAsync(string purpose, string handle)
     {
-        return (await _cache.GetAsync(Prefix + purpose + handle, default)) != null;
+        return (await _cache.GetAsync(Prefix + purpose + handle)) != null;
     }
 }

@@ -6,7 +6,7 @@ namespace HelseID.Samples.Configuration;
 public static class ConfigurationValues
 {
     // The URL for HelseID
-    public const string StsUrl = "https://helseid-sts.utvikling.nhn.no";
+    public const string StsUrl = "https://helseid-sts.test.nhn.no";
 
     // Audience and scopes for using the 'regular' sample API:
     public const string SampleApiNameAudience = "nhn:helseid-public-samplecode";
@@ -57,17 +57,17 @@ public static class ConfigurationValues
     public const string ResourceIndicatorsResource1 = "resource-indicator-client-1/greetings";
     public const string ResourceIndicatorsResource2 = "resource-indicator-client-2/greetings";
 
-    public static string SampleApiUrl = $"https://localhost:{SampleApiPort}/{AuthCodeClientResource}";
-    public static string SampleApiUrlForTokenExchange = $"https://localhost:{SampleApiForTokenExchangePort}/{TokenExchangeResource}";
-    public static string SampleApiUrlForResourceIndicators1 = $"https://localhost:{SampleApiForResourceIndicators1Port}/{ResourceIndicatorsResource1}";
-    public static string SampleApiUrlForResourceIndicators2 = $"https://localhost:{SampleApiForResourceIndicators2Port}/{ResourceIndicatorsResource2}";
+    public static readonly string SampleApiUrl = $"https://localhost:{SampleApiPort}/{AuthCodeClientResource}";
+    public static readonly string SampleApiUrlForTokenExchange = $"https://localhost:{SampleApiForTokenExchangePort}/{TokenExchangeResource}";
+    public static readonly string SampleApiUrlForResourceIndicators1 = $"https://localhost:{SampleApiForResourceIndicators1Port}/{ResourceIndicatorsResource1}";
+    public static readonly string SampleApiUrlForResourceIndicators2 = $"https://localhost:{SampleApiForResourceIndicators2Port}/{ResourceIndicatorsResource2}";
 
     // URLS and resource parameter (url fragment) for the use of the sample API for the client credentials project
     public const string SampleApiMachineClientResource = "machine-clients/greetings";
     public const string SampleApiMachineClientResourceForDPoP = "machine-clients/dpop-greetings";
 
-    public static string SampleApiUrlForM2M = $"https://localhost:{SampleApiPort}/{SampleApiMachineClientResource}";
-    public static string SampleApiUrlForM2MWithDPoP = $"https://localhost:{SampleApiPort}/{SampleApiMachineClientResourceForDPoP}";
+    public static readonly string SampleApiUrlForM2M = $"https://localhost:{SampleApiPort}/{SampleApiMachineClientResource}";
+    public static readonly string SampleApiUrlForM2MWithDPoP = $"https://localhost:{SampleApiPort}/{SampleApiMachineClientResourceForDPoP}";
 
     // If used, the child organization number (underenhet) must match a number in the client's whitelist as it's held by HelseID:
     public const string ClientCredentialsWithChildOrganizationNumber = "999977776";

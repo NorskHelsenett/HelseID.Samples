@@ -25,7 +25,7 @@ public class ApiConsumer : IApiConsumer
         return await CallApi(httpClient, apiUrl);
     }
 
-    public async Task<ApiResponse?> CallApiWithDPoPToken(HttpClient httpClient, string apiUrl, string accessToken, string? dPoPNonce)
+    public async Task<ApiResponse?> CallApiWithDPoPToken(HttpClient httpClient, string apiUrl, string accessToken, string? dPoPNonce = null)
     {
         var dPopProof = _idPoPProofCreator.CreateDPoPProof(apiUrl, "GET", accessToken: accessToken); 
         

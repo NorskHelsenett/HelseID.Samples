@@ -129,7 +129,7 @@ public class DPoPProofValidator
         {
             jwk = new JsonWebKey(jwkJson);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return ValidationResult.Error("Invalid 'jwk' value.");
         }
@@ -165,7 +165,7 @@ public class DPoPProofValidator
             var handler = new JsonWebTokenHandler();
             tokenValidationResult = handler.ValidateToken(data.ProofToken, tvp);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return ValidationResult.Error("Invalid signature on DPoP token.");
         }

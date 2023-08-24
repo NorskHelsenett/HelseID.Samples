@@ -26,8 +26,6 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
     private readonly IPayloadClaimsCreatorForRequestObjects _payloadClaimsCreatorForRequestObjects;
     private readonly Settings _settings;
     private readonly IExpirationTimeCalculator _expirationTimeCalculator;
-    private readonly IDPoPProofCreator _dPoPProofCreator;
-    //private readonly IHttpContextAccessor _httpContextAccessor;
 
     public OpenIdConnectOptionsInitializer(
         IClientAssertionsBuilder clientAssertionsBuilder,
@@ -36,9 +34,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         IPayloadClaimsCreatorForClientAssertion payloadClaimsCreatorForClientAssertion,
         IPayloadClaimsCreatorForRequestObjects payloadClaimsCreatorForRequestObjects,
         Settings settings,
-        IExpirationTimeCalculator expirationTimeCalculator,
-        IDPoPProofCreator dPoPProofCreator)
-      //  IHttpContextAccessor httpContextAccessor)
+        IExpirationTimeCalculator expirationTimeCalculator)
     {
         _clientAssertionsBuilder = clientAssertionsBuilder;
         _signingTokenCreator = signingTokenCreator;
@@ -47,8 +43,6 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         _payloadClaimsCreatorForRequestObjects = payloadClaimsCreatorForRequestObjects;
         _settings = settings;
         _expirationTimeCalculator = expirationTimeCalculator;
-        _dPoPProofCreator = dPoPProofCreator;
-        //_httpContextAccessor = httpContextAccessor;
     }
 
     // This gets called from the Startup class
@@ -97,16 +91,6 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
 
         // We use POST as the authentication method; the default method is GET
         openIdConnectOptions.AuthenticationMethod = OpenIdConnectRedirectBehavior.FormPost;
-
-        /*
-        if (_settings.UseDPoP)
-        {
-            openIdConnectOptions.BackchannelHttpHandler = new DPoPProofTokenHandler(_httpContextAccessor)
-            {
-                InnerHandler = openIdConnectOptions.BackchannelHttpHandler ?? new HttpClientHandler()
-            };
-        }
-        */
     }
     
     private void SetUpScopes(OpenIdConnectOptions openIdConnectOptions)
@@ -150,32 +134,6 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             {
                 //_dPoPProofCreator.CreateDPoPProof();
             }
-            /*
-            var dPoPKeyStore = context.HttpContext.RequestServices.GetRequiredService<IDPoPKeyStore>();
-
-            var key = await dPoPKeyStore.GetKeyAsync(_clientName);
-            if (key != null)
-            {
-                var jkt = _dPoPProofService.GetProofKeyThumbprint(new DPoPProofRequest
-                {
-                    Url = context.ProtocolMessage.AuthorizationEndpoint,
-                    Method = "GET",
-                    DPoPJsonWebKey = key.JsonWebKey,
-                });
-
-                // checking for null allows for opt-out from using DPoP
-                if (jkt != null)
-                {
-                    // we store the proof key here to associate it with the access token returned
-                    context.Properties.SetProofKey(key.JsonWebKey);
-
-                    // pass jkt to authorize endpoint
-                    context.ProtocolMessage.Parameters[OidcConstants.AuthorizeRequest.DPoPKeyThumbprint] = jkt;
-                }
-            }
-            */
-            
-            
             
             return Task.CompletedTask;
         };
@@ -393,85 +351,4 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
 
         return result;
     }
-}
-
-class DPoPProofTokenHandler : DelegatingHandler
-{
-    // private readonly IDPoPProofService _dPoPProofService;
-    // private readonly IDPoPNonceStore _dPoPNonceStore;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    /// <summary>
-    /// ctor
-    /// </summary>
-    /// <param name="dPoPProofService"></param>
-    /// <param name="dPoPNonceStore"></param>
-    /// <param name="httpContextAccessor"></param>
-    public DPoPProofTokenHandler(
-        // IDPoPProofService dPoPProofService,
-        // IDPoPNonceStore dPoPNonceStore,
-        IHttpContextAccessor httpContextAccessor)
-    {
-        // _dPoPProofService = dPoPProofService;
-        // _dPoPNonceStore = dPoPNonceStore;
-        _httpContextAccessor = httpContextAccessor;
-    }
-
-    /// <inheritdoc/>
-    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-    {
-        //await SetDPoPProofTokenAsync(request, cancellationToken).ConfigureAwait(false);
-        var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
-
-        /*
-        var dPoPNonce = response.GetDPoPNonce();
-
-        // retry if 401
-        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized && response.IsDPoPError())
-        {
-            response.Dispose();
-
-            await SetDPoPProofTokenAsync(request, cancellationToken, dPoPNonce).ConfigureAwait(false);
-            return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
-        }
-        else if (dPoPNonce != null)
-        {
-            await _dPoPNonceStore.StoreNonceAsync(new DPoPNonceContext
-            {
-                Url = request.GetDPoPUrl(),
-                Method = request.Method.ToString(),
-            }, dPoPNonce);
-        }
-*/
-        return response;
-    }
-/*
-    /// <summary>
-    /// Creates a DPoP proof token and attaches it to the request.
-    /// </summary>
-    protected virtual async Task SetDPoPProofTokenAsync(HttpRequestMessage request, CancellationToken cancellationToken, string? dpopNonce = null)
-    {
-        var jwk = _httpContextAccessor.HttpContext?.GetOutboundProofKey();
-
-        if (!string.IsNullOrEmpty(jwk))
-        {
-            // remove any old headers
-            request.ClearDPoPProofToken();
-
-            // create proof
-            var proofToken = await _dPoPProofService.CreateProofTokenAsync(new DPoPProofRequest
-            {
-                Url = request.GetDPoPUrl(),
-                Method = request.Method.ToString(),
-                DPoPJsonWebKey = jwk,
-                DPoPNonce = dpopNonce,
-            });
-
-            if (proofToken != null)
-            {
-                request.SetDPoPProofToken(proofToken.ProofToken);
-            }
-        }
-    }
-    */
 }

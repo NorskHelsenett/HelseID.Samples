@@ -9,6 +9,7 @@ using HelseId.Samples.Common.Interfaces.TokenRequests;
 using HelseId.Samples.Common.Models;
 using HelseID.Samples.Configuration;
 using IdentityModel.Client;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HelseId.Samples.ApiAccess.AccessTokenUpdaters;
 
@@ -87,7 +88,7 @@ public class AccessTokenUpdater : IAccessTokenUpdater
     {
         var tokenResponse = await GetRefreshTokenResponseFromHelseId(httpClient, userSessionData, apiIndicators);
 
-        if (tokenResponse.IsError && tokenResponse.Error == "use_dpop_nonce")
+        if (tokenResponse.IsError && !tokenResponse.DPoPNonce.IsNullOrEmpty())
         {
             tokenResponse = await GetRefreshTokenResponseFromHelseId(httpClient, userSessionData, apiIndicators, tokenResponse.DPoPNonce);
         }

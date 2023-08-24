@@ -23,16 +23,26 @@ public class DPoPProofCreator : IDPoPProofCreator
     
     public string CreateDPoPProof(string url, string httpMethod, string? dPoPNonce = null, string? accessToken = null)
     {
-        var securityKey = new JsonWebKey(_configuration.RsaPrivateKeyJwk.JwkValue);
-        var signingCredentials = new SigningCredentials(securityKey, _configuration.RsaPrivateKeyJwk.Algorithm);
+        var securityKey = new JsonWebKey(_configuration.PrivateKeyJwk.JwkValue);
+        var signingCredentials = new SigningCredentials(securityKey, _configuration.PrivateKeyJwk.Algorithm);
 
-        var jwk = new Dictionary<string, string>
+        var jwk = securityKey.Kty switch
         {
-            ["kty"] = securityKey.Kty,
-            ["n"] = securityKey.N,
-            ["e"] = securityKey.E,
-            ["alg"] = signingCredentials.Algorithm,
-            ["kid"] = securityKey.Kid,
+            JsonWebAlgorithmsKeyTypes.EllipticCurve => new Dictionary<string, string>
+            {
+                [JsonWebKeyParameterNames.Kty] = securityKey.Kty,
+                [JsonWebKeyParameterNames.X] = securityKey.X,
+                [JsonWebKeyParameterNames.Y] = securityKey.Y,
+                [JsonWebKeyParameterNames.Crv] = signingCredentials.Algorithm,
+            },
+            JsonWebAlgorithmsKeyTypes.RSA => new Dictionary<string, string>
+            {
+                [JsonWebKeyParameterNames.Kty] = securityKey.Kty,
+                [JsonWebKeyParameterNames.N] = securityKey.N,
+                [JsonWebKeyParameterNames.E] = securityKey.E,
+                [JsonWebKeyParameterNames.Alg] = signingCredentials.Algorithm,
+            },
+            _ => throw new InvalidOperationException("Invalid key type for DPoP proof.")
         };
 
         var jwtHeader = new JwtHeader(signingCredentials)

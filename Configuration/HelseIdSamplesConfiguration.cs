@@ -8,12 +8,12 @@ namespace HelseID.Samples.Configuration;
 public class HelseIdSamplesConfiguration : HelseIdConfiguration
 {
     private HelseIdSamplesConfiguration(
-                SecurityKey rsaPrivateKeyJwk,
+                SecurityKey privateKeyJwk,
                 string clientId,
                 string scope,
                 List<string>? resourceIndicators = null) :
             base(
-                rsaPrivateKeyJwk,
+                privateKeyJwk,
                 clientId,
                 scope,
                 ConfigurationValues.StsUrl,

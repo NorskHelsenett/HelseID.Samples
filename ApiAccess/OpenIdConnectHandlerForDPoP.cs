@@ -1,5 +1,3 @@
-using System.Globalization;
-using System.Net;
 using System.Text.Encodings.Web;
 using HelseId.Samples.Common.Interfaces.Endpoints;
 using HelseId.Samples.Common.Interfaces.JwtTokens;
@@ -19,9 +17,8 @@ public class OpenIdConnectHandlerForDPoP : OpenIdConnectHandler
 {
     private readonly IDPoPProofCreator _dPoPProofCreator;
     private readonly ITokenRequestBuilder _tokenRequestBuilder;
-    private IHelseIdEndpointsDiscoverer _endpointsDiscoverer;
+    private readonly IHelseIdEndpointsDiscoverer _endpointsDiscoverer;
     private readonly IPayloadClaimsCreatorForClientAssertion _payloadClaimsCreator;
-    private OpenIdConnectConfiguration? _configuration;
 
     public OpenIdConnectHandlerForDPoP(
         IDPoPProofCreator dPoPProofCreator,
@@ -42,72 +39,36 @@ public class OpenIdConnectHandlerForDPoP : OpenIdConnectHandler
 
     protected override async Task<OpenIdConnectMessage> RedeemAuthorizationCodeAsync(OpenIdConnectMessage tokenEndpointRequest)
     {
+        // HelseID will require a DPoP nonce from the client. When this nonce is not set,
+        // the Resource Server (HelseID) will return a 400 response, with a DPoP nonce in a header.
+        // This nonce can then be used in a second call to the Resource Server
+
         Logger.LogDebug("Creating first call for getting a DPoP token.");
-
-        var tokenEndpoint = await _endpointsDiscoverer.GetTokenEndpointFromHelseId();
         
-        var dPoPProof = _dPoPProofCreator.CreateDPoPProof(tokenEndpoint, "POST", null);
-        // Remove any residual DPoP header:
-        Backchannel.DefaultRequestHeaders.Remove(OidcConstants.HttpHeaders.DPoP);
-        Backchannel.DefaultRequestHeaders.Add(OidcConstants.HttpHeaders.DPoP, dPoPProof);
-        
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, tokenEndpoint);
-        requestMessage.Content = new FormUrlEncodedContent(tokenEndpointRequest.Parameters);
-        requestMessage.Version = Backchannel.DefaultRequestVersion;
+        var authorizationCodeTokenRequestParameters = new AuthorizationCodeTokenRequestParameters(
+            tokenEndpointRequest.Parameters["code"],
+            tokenEndpointRequest.Parameters["code_verifier"],
+            tokenEndpointRequest.Parameters["redirect_uri"], 
+            new List<string>());
 
-        string responseContent;
-        var responseMessage = await Backchannel.SendAsync(requestMessage, Context.RequestAborted);
-        try
-        {
-            responseContent = await responseMessage.Content.ReadAsStringAsync(Context.RequestAborted);
-        }
-        catch (Exception ex)
-        {
-            throw new OpenIdConnectProtocolException($"Failed to parse token response body as JSON. Status Code: {(int)responseMessage.StatusCode}. Content-Type: {responseMessage.Content.Headers.ContentType}", ex);
-        }
+        var authCodeRequest = await _tokenRequestBuilder.CreateAuthorizationCodeTokenRequest(_payloadClaimsCreator, authorizationCodeTokenRequestParameters, null);
 
-        var message = new OpenIdConnectMessage(responseContent);
-        if (responseMessage.StatusCode != HttpStatusCode.BadRequest ||
-            !responseMessage.Headers.Contains(OidcConstants.HttpHeaders.DPoPNonce) ||
-            message.Error != "use_dpop_nonce")
+        var tokenResponse = await Backchannel.RequestAuthorizationCodeTokenAsync(authCodeRequest);
+        if (!tokenResponse.IsError || string.IsNullOrEmpty(tokenResponse.DPoPNonce))
         {
             throw new OpenIdConnectProtocolException("Expected a DPoP nonce to be returned from the authorization server.");
         }
-
-        // We got the nonce from HelseID; use it to get a DPoP token
-        responseMessage.Headers.TryGetValues(OidcConstants.HttpHeaders.DPoPNonce, out var nonce);
-        dPoPProof = _dPoPProofCreator.CreateDPoPProof(tokenEndpoint, "POST", nonce?.SingleOrDefault());
-        // Replace the DPoP proof:
+        
+        var tokenEndpoint = await _endpointsDiscoverer.GetTokenEndpointFromHelseId();
+        // We got the nonce from HelseID; use it to get a DPoP proof
+        var dPoPProof = _dPoPProofCreator.CreateDPoPProof(tokenEndpoint, "POST", tokenResponse.DPoPNonce);
+        // Remove any existing DPoP proof and set the new DPoP proof:
         Backchannel.DefaultRequestHeaders.Remove(OidcConstants.HttpHeaders.DPoP);
         Backchannel.DefaultRequestHeaders.Add(OidcConstants.HttpHeaders.DPoP, dPoPProof);
         
         var result = await base.RedeemAuthorizationCodeAsync(tokenEndpointRequest);
         // Remove the residual DPoP header:
         Backchannel.DefaultRequestHeaders.Remove(OidcConstants.HttpHeaders.DPoP);
-
         return result;
-
-/*
-        var parameters = tokenEndpointRequest.Parameters;
-        var resource = new List<string>();
-        var authorizationCodeTokenRequestParameters = new AuthorizationCodeTokenRequestParameters(parameters["code"], parameters["code_verifier"], parameters["redirect_uri"], resource);
-        var authCodeRequest = await _tokenRequestBuilder.CreateAuthorizationCodeTokenRequest(_payloadClaimsCreator, authorizationCodeTokenRequestParameters, null);
-
-        var tokenResponse = await Backchannel.RequestAuthorizationCodeTokenAsync(authCodeRequest);
-        if (tokenResponse.IsError && tokenResponse.Error == "use_dpop_nonce" && !string.IsNullOrEmpty(tokenResponse.DPoPNonce))
-        {
-            // Expected result when doing DPoP
-            authCodeRequest = await _tokenRequestBuilder.CreateAuthorizationCodeTokenRequest(_payloadClaimsCreator, authorizationCodeTokenRequestParameters, tokenResponse.DPoPNonce);
-            tokenResponse = await Backchannel.RequestAuthorizationCodeTokenAsync(authCodeRequest);
-        }
-
-        if (tokenResponse.IsError)
-        {
-            throw new OpenIdConnectProtocolException(tokenResponse.Error, tokenResponse.Exception);
-        }
-
-        var responseContent = await tokenResponse.HttpResponse.Content.ReadAsStringAsync(Context.RequestAborted);
-        return new OpenIdConnectMessage(responseContent);
-        */
     }
 }
