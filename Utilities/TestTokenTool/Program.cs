@@ -71,6 +71,7 @@ public class Program
             GeneralClaimsParametersGeneration = options.generalClaimsCreation.ToParametersGeneration(),
             UserClaimsParametersGeneration =    options.userClaimsCreation.ToParametersGeneration(),
             CreateDokumentdelingClaims =        options.createDokumentdelingClaims,
+            CreateDPoPTokenWithDPoPProof =      options.createDPoPTokenWithDPoPProof,
             HeaderParameters = new HeaderParameters()
             {
                 Typ = options.typHeader.GetEmptyStringIfNotSet(), 
@@ -112,16 +113,36 @@ public class Program
             },
             DokumentdelingClaimsParameters = new DokumentdelingClaimsParameters
             {
-              CareRelationshipDepartmentId  = options.careRelationshipDepartmentId,
-              CareRelationshipDepartmentName = options.careRelationshipDepartmentName,
-              CareRelationshipHealthcareServiceCode = options.careRelationshipHealthcareServiceCode,
-              CareRelationshipHealthcareServiceText = options.careRelationshipHealthcareServiceText,
-              CareRelationshipPurposeOfUseCode = options.careRelationshipPurposeOfUseCode,
-              CareRelationshipPurposeOfUseText = options.careRelationshipPurposeOfUseText,
-              CareRelationshipPurposeOfUseDetailsCode = options.careRelationshipPurposeOfUseDetailsCode,
-              CareRelationshipPurposeOfUseDetailsText = options.careRelationshipPurposeOfUseDetailsText, 
-              CareRelationshipTracingRefId = options.careRelationshipTracingRefId,
+                CareRelationshipDepartmentId  = options.careRelationshipDepartmentId,
+                CareRelationshipDepartmentName = options.careRelationshipDepartmentName,
+                CareRelationshipHealthcareServiceCode = options.careRelationshipHealthcareServiceCode,
+                CareRelationshipHealthcareServiceText = options.careRelationshipHealthcareServiceText,
+                CareRelationshipPurposeOfUseCode = options.careRelationshipPurposeOfUseCode,
+                CareRelationshipPurposeOfUseText = options.careRelationshipPurposeOfUseText,
+                CareRelationshipPurposeOfUseDetailsCode = options.careRelationshipPurposeOfUseDetailsCode,
+                CareRelationshipPurposeOfUseDetailsText = options.careRelationshipPurposeOfUseDetailsText, 
+                CareRelationshipTracingRefId = options.careRelationshipTracingRefId,
             },
+            DPoPProofParameters = new DPoPProofParameters
+            {
+                HtmClaimValue = options.htmClaimValue,
+                DontSetHtmClaimValue = options.dontSetHtmClaimValue,
+                HtuClaimValue = options.htuClaimValue,
+                DontSetHtuClaimValue = options.dontSetHtuClaimValue,
+                DontSetAlgHeader = options.dontSetAlgHeader,
+                DontSetJtiClaim = options.dontSetJtiClaim,
+                DontSetJwkHeader = options.dontSetJwkHeader,
+                SetAnInvalidSignature = options.setAnInvalidSignature,
+                DontSetAthClaimValue = options.dontSetAthClaimValue,
+                PrivateKeyForProofCreation = options.privateKeyForProofCreation,
+                SetAlgHeaderToNone = options.setAlgHeaderToNone,
+                SetInvalidTypHeaderValue = options.setInvalidTypHeaderValue,
+                SetIatValueInTheFuture = options.setIatValueInTheFuture,
+                SetIatValueInThePast = options.setIatValueInThePast,
+                SetJwkHeaderWithPrivateKey = options.setJwkHeaderWithPrivateKey,
+                SetAlgHeaderToAnSymmetricAlgorithm = options.setAlgHeaderToAnSymmetricAlgorithm,
+                SetInvalidDPoPProofJwt = options.setInvalidDPoPProofJwt,
+            }
         };
 
         var tokenResponse = await TokenRetriever.GetToken(_builder!, tokenRequest);

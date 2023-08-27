@@ -246,3 +246,60 @@ For å få en liste over alle parametrene, kan du bruke kommandoen
   --createDokumentdelingClaims                                  [False]
   Create claims for dokumentdeling
 ```
+### Brukerparametre: for å justere claim og bevis for DPoP
+```
+  --createDPoPTokenWithDPoPProof
+  This will create a DPoP proof and a corresponding 'cnf' claim in the returned token
+
+  --htuClaimValue                          <TEXT>             []
+  This parameter will be set as the 'htu' claim value in the DPoP proof. If 'createDPoPTokenWithDPoPProof' is set, and 'dontSetHtuClaimValue' is not set, this parameter must have a value.
+
+  --dontSetHtuClaimValue
+  If this value is set, the 'htu' claim value in the DPoP proof will not be set
+    
+  --htmClaimValue                          <TEXT>             []
+  This parameter will be set as the 'htm' claim value for the DPoP proof. If 'createDPoPTokenWithDPoPProof' is set, and 'dontSetHtmClaimValue' is not set, this parameter must have a value. Accepted values are methods as described in RFC9110 (https://www.rfc-editor.org/rfc/rfc9110#name-method-definitions)
+
+  --dontSetHtmClaimValue
+  If this value is set, the 'htm' claim value in the DPoP proof will not be set
+  
+  --setIatValueInThePast                   [False]
+  If this value is set, the 'iat' value in the DPoP proof will be set several minutes in the past
+  
+  --setIatValueInTheFuture                 [False]
+  If this value is set, the 'iat' value in the DPoP proof will be set several minutes into the future
+  
+  --dontSetAthClaimValue                   [False]
+  If this value is set, the 'ath' claim in the DPoP proof will not be set
+  
+  --privateKeyForProofCreation             <TEXT>             []
+  If set with a valid jwk, the DPoP proof will be signed with this key"
+  
+  --setInvalidDPoPProofJwt                 [False]
+  If this value is set, the 'jwk' claim value in the DPoP proof header will not be valid
+  
+  --dontSetAlgHeader                       [False]
+  If this value is set, the 'alg' claim in the DPoP proof header will not be set
+  
+  --dontSetJwkHeader                       [False]
+  If this value is set, the 'jwk' claim in the DPoP proof header will not be set
+  
+  --dontSetJtiClaim                        [False]
+  If this value is set, the 'jti' claim in the DPoP proof will not be set
+  
+  --setAlgHeaderToNone                     [False]
+  If this value is set, the 'alg' claim in the DPoP proof header will not be set
+  
+  --setAlgHeaderToAnSymmetricAlgorithm     [False]
+  If this value is set, the 'alg' claim value in the DPoP proof header will display a symmetric algorithm
+  
+  --setJwkHeaderWithPrivateKey             [False]
+  If this value is set, the 'jwk' claim value in the DPoP proof header will include a private key
+  
+  --setInvalidTypHeaderValue               [False]
+  If this value is set, the 'typ' claim in the DPoP proof header will have an invalid value    
+  
+  --setAnInvalidSignature                  [False]
+  If this value is set, the DPoP proof will have been signed by another key than the one expected
+```
+
