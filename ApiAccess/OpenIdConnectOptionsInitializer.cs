@@ -130,11 +130,6 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             // Asserts the client by using the generated Jwt (the value from the type)
             authCodeReceivedContext.TokenEndpointRequest.ClientAssertion = clientAssertion.Value;
 
-            if (_settings.UseDPoP)
-            {
-                //_dPoPProofCreator.CreateDPoPProof();
-            }
-            
             return Task.CompletedTask;
         };
 

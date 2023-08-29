@@ -6,5 +6,5 @@ public interface IApiConsumer
 {
     Task<ApiResponse?> CallApiWithBearerToken(HttpClient httpClient, string apiUrl, string accessToken);
     
-    Task<ApiResponse?> CallApiWithDPoPToken(HttpClient httpClient, string apiUrl, string accessToken, string? nonce = null);
+    Task<ApiResponse?> CallApiWithDPoPToken(HttpClient httpClient, string apiUrl, string accessToken);
 }
