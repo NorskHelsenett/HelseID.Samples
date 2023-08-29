@@ -34,7 +34,7 @@ public class Program
             },
             Help = new AppHelpSettings
             {
-                TextStyle = HelpTextStyle.Basic,
+                TextStyle = HelpTextStyle.Detailed,
                 UsageAppName = "dotnet run",
             }
         };
@@ -126,22 +126,9 @@ public class Program
             DPoPProofParameters = new DPoPProofParameters
             {
                 HtmClaimValue = options.htmClaimValue,
-                DontSetHtmClaimValue = options.dontSetHtmClaimValue,
                 HtuClaimValue = options.htuClaimValue,
-                DontSetHtuClaimValue = options.dontSetHtuClaimValue,
-                DontSetAlgHeader = options.dontSetAlgHeader,
-                DontSetJtiClaim = options.dontSetJtiClaim,
-                DontSetJwkHeader = options.dontSetJwkHeader,
-                SetAnInvalidSignature = options.setAnInvalidSignature,
-                DontSetAthClaimValue = options.dontSetAthClaimValue,
                 PrivateKeyForProofCreation = options.privateKeyForProofCreation,
-                SetAlgHeaderToNone = options.setAlgHeaderToNone,
-                SetInvalidTypHeaderValue = options.setInvalidTypHeaderValue,
-                SetIatValueInTheFuture = options.setIatValueInTheFuture,
-                SetIatValueInThePast = options.setIatValueInThePast,
-                SetJwkHeaderWithPrivateKey = options.setJwkHeaderWithPrivateKey,
-                SetAlgHeaderToAnSymmetricAlgorithm = options.setAlgHeaderToAnSymmetricAlgorithm,
-                SetInvalidDPoPProofJwt = options.setInvalidDPoPProofJwt,
+                InvalidDPoPProofParameters = options.invalidDPoPProof,
             }
         };
 

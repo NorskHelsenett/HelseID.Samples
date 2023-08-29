@@ -1,6 +1,7 @@
 using CommandDotNet;
 using TestTokenTool.Constants;
 using TestTokenTool.InputParameters;
+using TestTokenTool.RequestModel;
 
 // ReSharper disable InconsistentNaming
 
@@ -131,36 +132,10 @@ public class GetTokenOptions : IArgumentModel
     public bool createDPoPTokenWithDPoPProof { get; set; } = false;
     [Option(Description = "This parameter will be set as the 'htu' claim value in the DPoP proof. If 'createDPoPTokenWithDPoPProof' is set, and 'dontSetHtuClaimValue' is not set, this parameter must have a value.")]
     public string htuClaimValue { get; set; } = string.Empty;
-    [Option(Description = "If this value is set, the 'htu' claim value in the DPoP proof will not be set")]
-    public bool dontSetHtuClaimValue { get; set; } = false;
     [Option(Description = "This parameter will be set as the 'htm' claim value for the DPoP proof. If 'createDPoPTokenWithDPoPProof' is set, and 'dontSetHtmClaimValue' is not set, this parameter must have a value. Accepted values are methods as described in RFC9110 (https://www.rfc-editor.org/rfc/rfc9110#name-method-definitions)")]
     public string htmClaimValue { get; set; } = string.Empty;
-    [Option(Description = "If this value is set, the 'htm' claim value in the DPoP proof will not be set")]
-    public bool dontSetHtmClaimValue { get; set; } = false;
-    [Option(Description = "If this value is set, the 'iat' value in the DPoP proof will be set several minutes in the past")]
-    public bool setIatValueInThePast { get; set; } = false;
-    [Option(Description = "If this value is set, the 'iat' value in the DPoP proof will be set several minutes into the future")]
-    public bool setIatValueInTheFuture { get; set; } = false;
-    [Option(Description = "If this value is set, the 'ath' claim in the DPoP proof will not be set")]
-    public bool dontSetAthClaimValue { get; set; } = false;
     [Option(Description = "If set with a valid jwk, the DPoP proof will be signed with this key")]
     public string privateKeyForProofCreation { get; set; } = string.Empty;
-    [Option(Description = "If this value is set, the 'jwk' claim value in the DPoP proof header will not be valid")]
-    public bool setInvalidDPoPProofJwt { get; set; } = false;
-    [Option(Description = "If this value is set, the 'alg' claim in the DPoP proof header will not be set")]
-    public bool dontSetAlgHeader { get; set; } = false;
-    [Option(Description = "If this value is set, the 'jwk' claim in the DPoP proof header will not be set")]
-    public bool dontSetJwkHeader { get; set; } = false;
-    [Option(Description = "If this value is set, the 'jti' claim in the DPoP proof will not be set")]
-    public bool dontSetJtiClaim { get; set; } = false;
-    [Option(Description = "If this value is set, the 'alg' claim in the DPoP proof header will not be set")]
-    public bool setAlgHeaderToNone { get; set; } = false;
-    [Option(Description = "If this value is set, the 'alg' claim value in the DPoP proof header will display a symmetric algorithm")]
-    public bool setAlgHeaderToAnSymmetricAlgorithm { get; set; } = false;
-    [Option(Description = "If this value is set, the 'jwk' claim value in the DPoP proof header will include a private key")]
-    public bool setJwkHeaderWithPrivateKey { get; set; } = false;
-    [Option(Description = "If this value is set, the 'typ' claim in the DPoP proof header will have an invalid value")]
-    public bool setInvalidTypHeaderValue { get; set; } = false;
-    [Option(Description = "If this value is set, the DPoP proof will have been signed by another key than the one expected")]
-    public bool setAnInvalidSignature { get; set; } = false;
+    [Option(Description = "If this value is set, an invalid DPoP proof will we returned")]
+    public InvalidDPoPProofParameters invalidDPoPProof { get; set; } = InvalidDPoPProofParameters.None;
 }
