@@ -63,12 +63,8 @@ public class DPoPProofValidator
         
         // Check for a replayed DPoP proof
         validationResult = await ValidateReplayAsync(data);
-        if (validationResult.IsError)
-        {
-            return validationResult;
-        }
-        
-        return ValidationResult.Success();
+
+        return validationResult;
     }
 
     private ValidationResult ValidateCnfClaimFromAccessToken(DPoPProofValidationData data)

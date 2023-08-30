@@ -74,6 +74,11 @@ For å hente ut navn fra Persontjenesten og HPR-nummer fra HPR-registeret:
 For å få en liste over alle parametrene, kan du bruke kommandoen
 `dotnet run getToken -- --help`
 
+
+For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen):
+`dotnet run getToken --createDPoPTokenWithDPoPProof --htuClaimValue https://localhost:5081/machine-clients/dpop-greetings --htmClaimValue GET --callApi
+`
+
 ### Parametre for å beskrive utput
 
 ```

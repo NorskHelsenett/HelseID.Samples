@@ -142,6 +142,7 @@ public class Program
             PrettyPrintJwt = options.prettyPrintToken,
             SaveTokenToFile = options.saveTokenToFile,
             UseDPoP = options.createDPoPTokenWithDPoPProof,
+            CallApi = options.callApi,
         };
         TokenPrinter.WriteResponse(tokenResponse, parameters);
         IApiCaller apiCaller = new ApiCaller();

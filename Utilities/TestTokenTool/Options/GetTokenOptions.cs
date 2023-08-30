@@ -134,8 +134,10 @@ public class GetTokenOptions : IArgumentModel
     public string htuClaimValue { get; set; } = string.Empty;
     [Named(Description = "This parameter will be set as the 'htm' claim value for the DPoP proof. If 'createDPoPTokenWithDPoPProof' is set, and 'dontSetHtmClaimValue' is not set, this parameter must have a value. Accepted values are methods as described in RFC9110 (https://www.rfc-editor.org/rfc/rfc9110#name-method-definitions)")]
     public string htmClaimValue { get; set; } = string.Empty;
-    [Named(Description = "If set with a valid jwk, the DPoP proof will be signed with this key")]
-    public string privateKeyForProofCreation { get; set; } = string.Empty;
     [Named(Description = "If this value is set, an invalid DPoP proof will we returned")]
     public InvalidDPoPProofParameters invalidDPoPProof { get; set; } = InvalidDPoPProofParameters.None;
+    [Named(DescriptionLines = new[] {"If set with a valid jwk, the DPoP proof will be signed with this key", "", "API options:"})]
+    public string privateKeyForProofCreation { get; set; } = string.Empty;
+    [Named(Description = "If this value is set, the application will call the sample API with the returned token")]
+    public bool callApi { get; set; } = false;
 }

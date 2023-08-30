@@ -1,13 +1,12 @@
 {
   "Authentication": {
     "StsUrl": "https://helseid-sts.test.nhn.no/",
-    "ClientId": "d943779b-6834-45b7-856a-15700ac9e334",
+    "ClientId": "YOUR_CLIENT_ID_HERE",
     "Scope": "nhn:helseid-test-token-tjeneste/tokengenerering-med-clientid",
     "SigningKeyAlgorithm": "RS512",
     "SaveAccessToken": "true"
   },
   "TTT": {
-    "service-endpoint_test": "https://helseid-ttt.test.nhn.no/create-test-token",
-    "service-endpoint" : "https://localhost:7094/create-test-token"
+    "service-endpoint": "https://helseid-ttt.test.nhn.no/create-test-token"
   }
 }
