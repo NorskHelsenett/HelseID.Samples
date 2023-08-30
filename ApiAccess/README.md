@@ -100,6 +100,10 @@ The use of *contextual claims* allows a client to send a structured claim as cli
 dotnet run --use-contextual-claims
 ```
 
+#### To use DPoP (Demonstrating Proof-of-Possession) tokens against the sample API:
+```
+dotnet run --use-dpop
+```
 
 ### To list all options:
 ```

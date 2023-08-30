@@ -8,13 +8,21 @@ public interface ITokenRequestBuilder
 {
     Task<ClientCredentialsTokenRequest> CreateClientCredentialsTokenRequest(
         IPayloadClaimsCreator payloadClaimsCreator,
-        ClientCredentialsTokenRequestParameters tokenRequestParameters);
+        ClientCredentialsTokenRequestParameters tokenRequestParameters,
+        string? dPoPNonce);
     
     Task<RefreshTokenRequest> CreateRefreshTokenRequest(
         IPayloadClaimsCreator payloadClaimsCreator,
-        RefreshTokenRequestParameters tokenRequestParameters);
+        RefreshTokenRequestParameters tokenRequestParameters,
+        string? dPoPNonce);
     
     Task<TokenExchangeTokenRequest> CreateTokenExchangeTokenRequest(
         IPayloadClaimsCreator payloadClaimsCreator,
-        TokenExchangeTokenRequestParameters tokenRequestParameters);
+        TokenExchangeTokenRequestParameters tokenRequestParameters,
+        string? dPoPNonce);
+
+    Task<AuthorizationCodeTokenRequest> CreateAuthorizationCodeTokenRequest(
+        IPayloadClaimsCreator payloadClaimsCreator,
+        AuthorizationCodeTokenRequestParameters tokenRequestParameters,
+        string? dPoPNonce);
 }

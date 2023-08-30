@@ -149,7 +149,7 @@ public class HomeController : Controller
             var accessToken = await _accessTokenUpdater.GetValidAccessToken(httpClient, HttpContext.User, apiIndicators);
 
             // We use the token to call the API endpoint
-            var apiResponse = await _apiConsumer.CallApi(httpClient, apiUrl, accessToken);
+            var apiResponse = await _apiConsumer.CallApiWithBearerToken(httpClient, apiUrl, accessToken);
 
             return View("Login", await _viewModelCreator.GetApiResponseViewModel(
                 claimsPrincipal: HttpContext.User,

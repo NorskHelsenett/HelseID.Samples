@@ -14,16 +14,16 @@ namespace HelseId.Samples.Common.ClientAssertions;
 /// </summary>
 public class ClientAssertionsBuilder : IClientAssertionsBuilder
 {
-    private readonly ISigningJwtTokenCreator _signingJwtTokenCreator;
+    private readonly ISigningTokenCreator _isSigningTokenCreator;
     
-    public ClientAssertionsBuilder(ISigningJwtTokenCreator signingJwtTokenCreator)
+    public ClientAssertionsBuilder(ISigningTokenCreator isSigningTokenCreator)
     {
-        _signingJwtTokenCreator = signingJwtTokenCreator;
+        _isSigningTokenCreator = isSigningTokenCreator;
     }
 
     public ClientAssertion BuildClientAssertion(IPayloadClaimsCreator payloadClaimsCreator, PayloadClaimParameters payloadClaimParameters)
     {
-        var token = _signingJwtTokenCreator.CreateSigningToken(payloadClaimsCreator, payloadClaimParameters);
+        var token = _isSigningTokenCreator.CreateSigningToken(payloadClaimsCreator, payloadClaimParameters);
         
         // Uncomment if you'd like to inspect the token that is sent to HelseID as part of the client assertion
         // Console.WriteLine("This is the security token that is sent to HelseID as part of the client assertion:");

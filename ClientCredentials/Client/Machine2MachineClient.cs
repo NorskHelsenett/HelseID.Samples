@@ -1,3 +1,4 @@
+using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Interfaces;
 using HelseId.Samples.Common.Interfaces.ApiConsumers;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
@@ -14,6 +15,7 @@ public class Machine2MachineClient
     private ITokenRequestBuilder _tokenRequestBuilder;
     private IApiConsumer _apiConsumer;
     private ClientCredentialsTokenRequestParameters _tokenRequestParameters;
+    private readonly HelseIdConfiguration _configuration;
     private IExpirationTimeCalculator _expirationTimeCalculator;
     private DateTime _persistedAccessTokenExpiresAt = DateTime.MinValue;
     private string _persistedAccessToken = string.Empty;
@@ -27,7 +29,8 @@ public class Machine2MachineClient
         IClientInfoRetriever clientInfoRetriever,
         IExpirationTimeCalculator expirationTimeCalculator,
         IPayloadClaimsCreatorForClientAssertion payloadClaimsCreatorForClientAssertion,
-        ClientCredentialsTokenRequestParameters tokenRequestParameters)
+        ClientCredentialsTokenRequestParameters tokenRequestParameters,
+        HelseIdConfiguration configuration)
     {
         _tokenRequestBuilder = tokenRequestBuilder;
         _apiConsumer = apiConsumer;
@@ -38,6 +41,7 @@ public class Machine2MachineClient
         _expirationTimeCalculator = expirationTimeCalculator;
         _payloadClaimsCreatorForClientAssertion = payloadClaimsCreatorForClientAssertion;
         _tokenRequestParameters = tokenRequestParameters;
+        _configuration = configuration;
     }
 
     public async Task CallApiWithToken()
@@ -60,7 +64,7 @@ public class Machine2MachineClient
         {
             var tokenResponse = await GetAccessTokenFromHelseId(httpClient);
             _persistedAccessTokenExpiresAt = _expirationTimeCalculator.CalculateTokenExpirationTimeUtc(tokenResponse.ExpiresIn);
-            _persistedAccessToken = tokenResponse.AccessToken;
+            _persistedAccessToken = tokenResponse.AccessToken!;
         }
         else
         {
@@ -71,13 +75,10 @@ public class Machine2MachineClient
 
     private async Task<TokenResponse> GetAccessTokenFromHelseId(HttpClient httpClient)
     {
-        // The request to HelseID is created:
-        var request = await _tokenRequestBuilder.CreateClientCredentialsTokenRequest(_payloadClaimsCreatorForClientAssertion, _tokenRequestParameters);
-
         // We use the HTTP client to retrieve the response from HelseID:
-        var tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(request);
+        var tokenResponse = await RequestClientCredentialsTokenAsync(httpClient);
 
-        if (tokenResponse.IsError)
+        if (tokenResponse.IsError || tokenResponse.AccessToken == null)
         {
             await WriteErrorToConsole(tokenResponse);
             throw new Exception();
@@ -85,6 +86,22 @@ public class Machine2MachineClient
         
         WriteAccessTokenFromTokenResult(tokenResponse);
 
+        return tokenResponse;
+    }
+
+    private async Task<TokenResponse> RequestClientCredentialsTokenAsync(HttpClient httpClient)
+    {
+        // The request to HelseID is created:
+        var request = await _tokenRequestBuilder.CreateClientCredentialsTokenRequest(_payloadClaimsCreatorForClientAssertion, _tokenRequestParameters, null);
+        
+        var tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(request);
+
+        if (_configuration.UseDPoP && tokenResponse.IsError && tokenResponse.Error == "use_dpop_nonce" && !string.IsNullOrEmpty(tokenResponse.DPoPNonce))
+        {
+            request = await _tokenRequestBuilder.CreateClientCredentialsTokenRequest(_payloadClaimsCreatorForClientAssertion, _tokenRequestParameters, tokenResponse.DPoPNonce);
+            tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(request);
+        }
+        
         return tokenResponse;
     }
 
@@ -105,7 +122,13 @@ public class Machine2MachineClient
         try
         {
             Console.WriteLine("Using the access token to call the sample API");
-            var response = await _apiConsumer.CallApi(httpClient, ConfigurationValues.SampleApiUrlForM2M, accessToken);
+            ApiResponse? response;
+            if (_configuration.UseDPoP)
+            {
+                response = await _apiConsumer.CallApiWithDPoPToken(httpClient, ConfigurationValues.SampleApiUrlForM2MWithDPoP, accessToken);
+            } else {
+                response = await _apiConsumer.CallApiWithBearerToken(httpClient, ConfigurationValues.SampleApiUrlForM2M, accessToken);
+            }
             var notPresent = "<not present>";
             var supplierOrganization = OrganizationStore.GetOrganization(response?.SupplierOrganizationNumber);
             var parentOrganization = OrganizationStore.GetOrganization(response?.ParentOrganizationNumber);
