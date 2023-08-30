@@ -7,13 +7,13 @@ namespace HelseID.Samples.Configuration;
 /// </summary>
 public class HelseIdSamplesConfiguration : HelseIdConfiguration
 {
-    public HelseIdSamplesConfiguration(
-                SecurityKey rsaPrivateKeyJwk,
+    private HelseIdSamplesConfiguration(
+                SecurityKey privateKeyJwk,
                 string clientId,
                 string scope,
                 List<string>? resourceIndicators = null) :
             base(
-                rsaPrivateKeyJwk,
+                privateKeyJwk,
                 clientId,
                 scope,
                 ConfigurationValues.StsUrl,

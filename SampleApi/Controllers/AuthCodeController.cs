@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace HelseId.SampleAPI.Controllers;
 
 [ApiController]
-[Authorize(Policy=Startup.AuthCodePolicy, AuthenticationSchemes = Startup.TokenAuthenticationScheme)] // Authentication is needed to access the API
+[Authorize(Policy=Startup.AuthCodePolicy, AuthenticationSchemes = Startup.BearerTokenAuthenticationScheme)] // Authentication is needed to access the API
 public class AuthCodeController: ControllerBase
 {
     private readonly IApiResponseCreator _responseCreator;

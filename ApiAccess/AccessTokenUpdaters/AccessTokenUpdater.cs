@@ -9,6 +9,7 @@ using HelseId.Samples.Common.Interfaces.TokenRequests;
 using HelseId.Samples.Common.Models;
 using HelseID.Samples.Configuration;
 using IdentityModel.Client;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HelseId.Samples.ApiAccess.AccessTokenUpdaters;
 
@@ -87,9 +88,29 @@ public class AccessTokenUpdater : IAccessTokenUpdater
     {
         var tokenResponse = await GetRefreshTokenResponseFromHelseId(httpClient, userSessionData, apiIndicators);
 
+        if (tokenResponse.IsError && !tokenResponse.DPoPNonce.IsNullOrEmpty())
+        {
+            tokenResponse = await GetRefreshTokenResponseFromHelseId(httpClient, userSessionData, apiIndicators, tokenResponse.DPoPNonce);
+        }
+        
         if (tokenResponse.IsError)
         {
-            throw new TokenResponseErrorException(tokenResponse.Error);
+            throw new TokenResponseErrorException(tokenResponse.Error ?? "No token response error found");
+        }
+        
+        if (tokenResponse.AccessToken == null)
+        {
+            throw new TokenResponseErrorException("No access token response found");
+        }
+
+        if (tokenResponse.IdentityToken == null)
+        {
+            throw new TokenResponseErrorException("No identity token response found");
+        }
+
+        if (tokenResponse.RefreshToken == null)
+        {
+            throw new TokenResponseErrorException("No refresh token response found");
         }
         
         return await UpdateUserSessionData(userSessionData, apiIndicators, tokenResponse);
@@ -98,12 +119,13 @@ public class AccessTokenUpdater : IAccessTokenUpdater
     private async Task<TokenResponse> GetRefreshTokenResponseFromHelseId(
         HttpClient httpClient,
         UserSessionData userSessionData,
-        ApiIndicators apiIndicators)
+        ApiIndicators apiIndicators, 
+        string? dPoPNonce = null)
     {
         var tokenRequestParameters = CreateRefreshTokenRequestParameters(userSessionData, apiIndicators);
-
+        
         // If the value for refreshToken is null, we expect this method to fail
-        var request = await _tokenRequestBuilder.CreateRefreshTokenRequest(_payloadClaimsCreatorForClientAssertion, tokenRequestParameters!);
+        var request = await _tokenRequestBuilder.CreateRefreshTokenRequest(_payloadClaimsCreatorForClientAssertion, tokenRequestParameters!, dPoPNonce);
 
         // Send request using IdentityModel extension method
         return await httpClient.RequestRefreshTokenAsync(request);
@@ -127,7 +149,7 @@ public class AccessTokenUpdater : IAccessTokenUpdater
             _expirationTimeCalculator.CalculateTokenExpirationTimeUtc(tokenResponse.ExpiresIn);
 
         var accessTokenWithExpiration = new AccessTokenWithExpiration(
-            tokenResponse.AccessToken,
+            tokenResponse.AccessToken!,
             accessTokenExpiresAtUtc);
 
         // The 'rt_expires_in' parameter is specific for HelseID, and is not present in the common library:
@@ -135,8 +157,8 @@ public class AccessTokenUpdater : IAccessTokenUpdater
             _expirationTimeCalculator.CalculateTokenExpirationTimeUtc(
                 tokenResponse.GetRefreshTokenExpiresInValue());
 
-        userSessionData.IdToken = tokenResponse.IdentityToken;
-        userSessionData.RefreshToken = tokenResponse.RefreshToken;
+        userSessionData.IdToken = tokenResponse.IdentityToken!;
+        userSessionData.RefreshToken = tokenResponse.RefreshToken!;
         userSessionData.RefreshTokenExpiresAtUtc = refreshTokenExpiresAtUtc;
         userSessionData.AccessTokens.Add(apiIndicators.ApiAudience, accessTokenWithExpiration);
 

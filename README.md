@@ -39,6 +39,7 @@ See [SampleApi/README.md](SampleApi/README.md) for more information.
 
 HelseID supports the use of several grants, that is, the resource owner's (user or enterprise) authorization used by the client to obtain an access token. Code samples are provided for different scenarios, and each will use at least one grant type. The following grants are provided:
 
+These samples can also be configured to request a DPoP (Demonstrating Proof-of-Possession)-bound token.
 
 ### Machine-to-machine sample
 
