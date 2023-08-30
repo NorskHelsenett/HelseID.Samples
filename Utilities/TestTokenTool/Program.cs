@@ -31,6 +31,8 @@ public class Program
             Arguments = new ArgumentAppSettings
             {
                 BooleanMode = BooleanMode.Implicit,
+                SkipArityValidation = true,
+                DefaultArgumentMode = ArgumentMode.Operand,
             },
             Help = new AppHelpSettings
             {
@@ -139,6 +141,7 @@ public class Program
             PrintJwt = options.printToken,
             PrettyPrintJwt = options.prettyPrintToken,
             SaveTokenToFile = options.saveTokenToFile,
+            UseDPoP = options.createDPoPTokenWithDPoPProof,
         };
         TokenPrinter.WriteResponse(tokenResponse, parameters);
         IApiCaller apiCaller = new ApiCaller();

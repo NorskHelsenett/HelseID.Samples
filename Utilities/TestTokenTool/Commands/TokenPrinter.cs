@@ -39,6 +39,21 @@ internal static class TokenPrinter
             {
                 SaveTokenToFile(jwtInput);
             }
+
+            var dPoPProof = result.SuccessResponse.DPoPProof;
+
+            if (!string.IsNullOrEmpty(dPoPProof))
+            {
+                if (parameters.PrintJwt)
+                {
+                    PrintDPoPPRoof(dPoPProof);
+                }
+
+                if (parameters.PrettyPrintJwt)
+                {
+                    PrettyPrintToken(dPoPProof, isDPoPProof:true);
+                }
+            }
         }
     }
 
@@ -47,7 +62,13 @@ internal static class TokenPrinter
         Console.WriteLine(jwtInput);
     }
 
-    private static void PrettyPrintToken(string jwtInput)
+    private static void PrintDPoPPRoof(string jwtInput)
+    {
+        Console.WriteLine("DPoP proof:");
+        Console.WriteLine(jwtInput);
+    }
+    
+    private static void PrettyPrintToken(string jwtInput, bool isDPoPProof = false)
     {
         var previousColour = Console.ForegroundColor;
         var jwtHandler = new JwtSecurityTokenHandler();
@@ -59,12 +80,18 @@ internal static class TokenPrinter
             return;
         }
 
-        Console.WriteLine("Token response in JSON format:");
+        if (isDPoPProof)
+        {
+            Console.WriteLine("DPoP proof response in JSON format:");
+        }
+        else
+        {
+            Console.WriteLine("Token response in JSON format:");
+        }
 
         var token = jwtHandler.ReadJwtToken(jwtInput);
 
         Console.ForegroundColor = ConsoleColor.Red;
-        var foo = JsonPrettify(token.Header.SerializeToJson());
         Console.Write(JsonPrettify(token.Header.SerializeToJson()));
         
         Console.ForegroundColor = ConsoleColor.Cyan;

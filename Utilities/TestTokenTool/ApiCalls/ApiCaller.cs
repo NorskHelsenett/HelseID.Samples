@@ -17,7 +17,15 @@ public class ApiCaller : IApiCaller
         using var httpClient = new HttpClient();
         AuthorizationHeaderExtensions.SetBearerToken(httpClient, jwtInput);
 
-        var httpResponse = await httpClient.GetStringAsync("https://localhost:5081/machine-clients/greetings");
-        Console.WriteLine(httpResponse);
+        if (parameters.UseDPoP)
+        {
+            var httpResponse = await httpClient.GetStringAsync("https://localhost:5081/machine-clients/greetings");
+            Console.WriteLine(httpResponse);
+        }
+        else
+        {
+            var httpResponse = await httpClient.GetStringAsync("https://localhost:5081/machine-clients/greetings");
+            Console.WriteLine(httpResponse);
+        }        
     }
 }
