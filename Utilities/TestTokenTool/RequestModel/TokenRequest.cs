@@ -7,6 +7,8 @@ public class TokenRequest
     
     public ParametersGeneration UserClaimsParametersGeneration { get; set; }
 
+    public bool CreateDPoPTokenWithDPoPProof { get; set; }
+    
     public bool CreateDokumentdelingClaims { get; set; }
 
     public bool SignJwtWithInvalidSigningKey { get; set; } 
@@ -38,4 +40,6 @@ public class TokenRequest
     public TillitsrammeverkClaimsParameters TillitsrammeverkClaimsParameters { get; set; } = new();
 
     public DokumentdelingClaimsParameters DokumentdelingClaimsParameters { get; set; } = new();
+    
+    public DPoPProofParameters DPoPProofParameters { get; set; } = new();
 }

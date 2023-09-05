@@ -9,4 +9,6 @@ public class Parameters
     public bool SaveTokenToFile { get; set; }
 
     public bool CallApi { get; set; }
+    
+    public bool UseDPoP { get; set; }
 }

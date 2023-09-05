@@ -7,6 +7,6 @@
     "SaveAccessToken": "true"
   },
   "TTT": {
-    "service-endpoint": "https://helseid-ttt.test.nhn.no/create-test-token",
+    "service-endpoint": "https://helseid-ttt.test.nhn.no/create-test-token"
   }
 }

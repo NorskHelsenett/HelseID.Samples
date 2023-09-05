@@ -74,6 +74,11 @@ For å hente ut navn fra Persontjenesten og HPR-nummer fra HPR-registeret:
 For å få en liste over alle parametrene, kan du bruke kommandoen
 `dotnet run getToken -- --help`
 
+
+For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen):
+`dotnet run getToken --createDPoPTokenWithDPoPProof --htuClaimValue https://localhost:5081/machine-clients/dpop-greetings --htmClaimValue GET --callApi
+`
+
 ### Parametre for å beskrive utput
 
 ```
@@ -246,3 +251,22 @@ For å få en liste over alle parametrene, kan du bruke kommandoen
   --createDokumentdelingClaims                                  [False]
   Create claims for dokumentdeling
 ```
+### Brukerparametre: for å justere claim og bevis for DPoP
+```
+  --createDPoPTokenWithDPoPProof
+  This will create a DPoP proof and a corresponding 'cnf' claim in the returned token
+
+  --htuClaimValue                          <TEXT>             []
+  This parameter will be set as the 'htu' claim value in the DPoP proof. If 'createDPoPTokenWithDPoPProof' is set, and 'dontSetHtuClaimValue' is not set, this parameter must have a value.
+    
+  --htmClaimValue                          <TEXT>             []
+  This parameter will be set as the 'htm' claim value for the DPoP proof. If 'createDPoPTokenWithDPoPProof' is set, and 'dontSetHtmClaimValue' is not set, this parameter must have a value. Accepted values are methods as described in RFC9110 (https://www.rfc-editor.org/rfc/rfc9110#name-method-definitions)
+  
+  --privateKeyForProofCreation             <TEXT>             []
+  If set with a valid jwk, the DPoP proof will be signed with this key"
+
+  --invalidDPoPProof                         <INVALIDDPOPPROOFPARAMETERS>
+  If this value is set, an invalid DPoP proof will we returned
+  Allowed values: None, DontSetHtuClaimValue, DontSetHtmClaimValue, SetIatValueInThePast, SetIatValueInTheFuture, DontSetAthClaimValue, DontSetAlgHeader, DontSetJwkHeader, DontSetJtiClaim, SetAlgHeaderToASymmetricAlgorithm, SetPrivateKeyInJwkHeader, SetInvalidTypHeaderValue, SetAnInvalidSignature   
+```
+

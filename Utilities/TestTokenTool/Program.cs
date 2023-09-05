@@ -31,10 +31,12 @@ public class Program
             Arguments = new ArgumentAppSettings
             {
                 BooleanMode = BooleanMode.Implicit,
+                SkipArityValidation = true,
+                DefaultArgumentMode = ArgumentMode.Operand,
             },
             Help = new AppHelpSettings
             {
-                TextStyle = HelpTextStyle.Basic,
+                TextStyle = HelpTextStyle.Detailed,
                 UsageAppName = "dotnet run",
             }
         };
@@ -71,6 +73,7 @@ public class Program
             GeneralClaimsParametersGeneration = options.generalClaimsCreation.ToParametersGeneration(),
             UserClaimsParametersGeneration =    options.userClaimsCreation.ToParametersGeneration(),
             CreateDokumentdelingClaims =        options.createDokumentdelingClaims,
+            CreateDPoPTokenWithDPoPProof =      options.createDPoPTokenWithDPoPProof,
             HeaderParameters = new HeaderParameters()
             {
                 Typ = options.typHeader.GetEmptyStringIfNotSet(), 
@@ -112,16 +115,23 @@ public class Program
             },
             DokumentdelingClaimsParameters = new DokumentdelingClaimsParameters
             {
-              CareRelationshipDepartmentId  = options.careRelationshipDepartmentId,
-              CareRelationshipDepartmentName = options.careRelationshipDepartmentName,
-              CareRelationshipHealthcareServiceCode = options.careRelationshipHealthcareServiceCode,
-              CareRelationshipHealthcareServiceText = options.careRelationshipHealthcareServiceText,
-              CareRelationshipPurposeOfUseCode = options.careRelationshipPurposeOfUseCode,
-              CareRelationshipPurposeOfUseText = options.careRelationshipPurposeOfUseText,
-              CareRelationshipPurposeOfUseDetailsCode = options.careRelationshipPurposeOfUseDetailsCode,
-              CareRelationshipPurposeOfUseDetailsText = options.careRelationshipPurposeOfUseDetailsText, 
-              CareRelationshipTracingRefId = options.careRelationshipTracingRefId,
+                CareRelationshipDepartmentId  = options.careRelationshipDepartmentId,
+                CareRelationshipDepartmentName = options.careRelationshipDepartmentName,
+                CareRelationshipHealthcareServiceCode = options.careRelationshipHealthcareServiceCode,
+                CareRelationshipHealthcareServiceText = options.careRelationshipHealthcareServiceText,
+                CareRelationshipPurposeOfUseCode = options.careRelationshipPurposeOfUseCode,
+                CareRelationshipPurposeOfUseText = options.careRelationshipPurposeOfUseText,
+                CareRelationshipPurposeOfUseDetailsCode = options.careRelationshipPurposeOfUseDetailsCode,
+                CareRelationshipPurposeOfUseDetailsText = options.careRelationshipPurposeOfUseDetailsText, 
+                CareRelationshipTracingRefId = options.careRelationshipTracingRefId,
             },
+            DPoPProofParameters = new DPoPProofParameters
+            {
+                HtmClaimValue = options.htmClaimValue,
+                HtuClaimValue = options.htuClaimValue,
+                PrivateKeyForProofCreation = options.privateKeyForProofCreation,
+                InvalidDPoPProofParameters = options.invalidDPoPProof,
+            }
         };
 
         var tokenResponse = await TokenRetriever.GetToken(_builder!, tokenRequest);
@@ -131,6 +141,8 @@ public class Program
             PrintJwt = options.printToken,
             PrettyPrintJwt = options.prettyPrintToken,
             SaveTokenToFile = options.saveTokenToFile,
+            UseDPoP = options.createDPoPTokenWithDPoPProof,
+            CallApi = options.callApi,
         };
         TokenPrinter.WriteResponse(tokenResponse, parameters);
         IApiCaller apiCaller = new ApiCaller();
