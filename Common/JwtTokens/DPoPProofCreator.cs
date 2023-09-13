@@ -33,7 +33,7 @@ public class DPoPProofCreator : IDPoPProofCreator
                 [JsonWebKeyParameterNames.Kty] = securityKey.Kty,
                 [JsonWebKeyParameterNames.X] = securityKey.X,
                 [JsonWebKeyParameterNames.Y] = securityKey.Y,
-                [JsonWebKeyParameterNames.Crv] = signingCredentials.Algorithm,
+                [JsonWebKeyParameterNames.Crv] = securityKey.Crv,
             },
             JsonWebAlgorithmsKeyTypes.RSA => new Dictionary<string, string>
             {
