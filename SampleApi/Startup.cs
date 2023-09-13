@@ -1,10 +1,12 @@
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using HelseId.SampleApi.Configuration;
 using HelseId.SampleAPI.Controllers;
 using HelseId.SampleAPI.DPoPValidation;
 using HelseId.SampleApi.Interfaces;
 using IdentityModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace HelseId.SampleAPI;
 
@@ -33,16 +35,18 @@ public  class Startup
         var webApplication = webApplicationBuilder.Build();
 
         ConfigureServices(webApplication);
-
+        
         return webApplication;
     }
 
     private void AddServices(WebApplicationBuilder webApplicationBuilder)
     {
+        webApplicationBuilder.Services.AddSwaggerGen();
+        
         // Create singleton from instance
         webApplicationBuilder.Services.AddSingleton(_settings);
         webApplicationBuilder.Services.AddSingleton<IApiResponseCreator, ApiResponseCreator>();
-        
+
         webApplicationBuilder.Services.AddMvc(option => option.EnableEndpointRouting = false);
         webApplicationBuilder.Services.AddControllers();
         webApplicationBuilder.Services.AddEndpointsApiExplorer();
@@ -166,6 +170,15 @@ public  class Startup
 
     private void ConfigureServices(WebApplication webApplication)
     {
+        // Set up functionality for getting a bearer token (see extend-swagger.js for details):
+        webApplication.UseStaticFiles();
+        webApplication.UseSwagger();
+        webApplication.UseSwaggerUI(options =>
+        {
+            options.UseRequestInterceptor("(req) => { return setBearerTokenInRequest(req); }");
+            options.InjectJavascript("extend-swagger.js");
+        });
+
         // Configure the HTTP request pipeline.
         webApplication.UseHttpsRedirection();
         webApplication.UseAuthentication();
