@@ -35,6 +35,8 @@ public class GetTokenOptions : IArgumentModel
     public string? typHeader { get; set; } = string.Empty;
     // -----------------------------------------
     // General parameters
+    [Named(Description = "The returned token will contain an issuer claim that matches the injected value")]
+    public IssuerEnvironment issuerEnvironment { get; set; } = IssuerEnvironment.Test;
     [Named(Description = "The returned token will contain a 'client_amr' claim matching the injected value")]
     public string? clientAmr { get; set; } = string.Empty;
     [Named(Description = "The returned token will contain a 'helseid://claims/client/amr' claim matching the injected value")]
