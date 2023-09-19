@@ -7,6 +7,8 @@ public class TokenRequest
     
     public ParametersGeneration UserClaimsParametersGeneration { get; set; }
 
+    public IssuerEnvironment IssuerEnvironment { get; set; }
+
     public bool CreateDPoPTokenWithDPoPProof { get; set; }
     
     public bool CreateDokumentdelingClaims { get; set; }

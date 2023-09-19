@@ -96,7 +96,7 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen):
 ```
   --signJwtWithInvalidSigningKey                                [False]
   The returned token will be signed with an invalid signing key
-
+  
   --setInvalidIssuer                                            [False]
   The returned token will contain an invalid 'iss' claim
 
@@ -116,6 +116,10 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen):
 ```
 ### Generelle parametre: for å justere standard-claim som beskriver aspekter med en (fiktiv) klient
 ```
+  --issuerEnvironment
+  The returned token will contain an issuer claim that matches the injected value
+  Allowed values: Test, IntTest, Development
+    
   --clientAmr                                <TEXT>             []
   The returned token will contain a 'client_amr' claim matching the injected value
 

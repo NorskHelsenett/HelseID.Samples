@@ -70,6 +70,7 @@ public class Program
             OnlySetNameForPerson =              options.onlySetNameForPerson,
             GetHprNumberFromHprregisteret =     options.getHprNumberFromHprregisteret,
             // Usage of parameters
+            IssuerEnvironment =                 options.issuerEnvironment,
             GeneralClaimsParametersGeneration = options.generalClaimsCreation.ToParametersGeneration(),
             UserClaimsParametersGeneration =    options.userClaimsCreation.ToParametersGeneration(),
             CreateDokumentdelingClaims =        options.createDokumentdelingClaims,
