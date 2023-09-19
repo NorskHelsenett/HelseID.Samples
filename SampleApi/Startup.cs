@@ -175,7 +175,10 @@ public  class Startup
         webApplication.UseSwagger();
         webApplication.UseSwaggerUI(options =>
         {
-            options.UseRequestInterceptor("(req) => { return setBearerTokenInRequest(req); }");
+            // The address for the test token proxy should be set in the appsettings.json file:
+            var testTokenProxyEndpointAddress = webApplication.Configuration.GetSection("TestTokenProxyEndpointAddress").Get<string>();
+            // This is needed in order to get the access token from the test token service proxy:
+            options.UseRequestInterceptor($"(req) => {{ return setBearerTokenInRequest(req, '{testTokenProxyEndpointAddress}'); }} ");
             options.InjectJavascript("extend-swagger.js");
         });
 
