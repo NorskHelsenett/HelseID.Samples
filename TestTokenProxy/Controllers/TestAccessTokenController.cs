@@ -12,9 +12,11 @@ namespace TestTokenProxy.Controllers;
 [ApiController]
 public class TestAccessTokenController : ControllerBase
 {
-    private const string ApiKey = "6e46177a-5525-4655-b24a-e1ce502c49cd";
-    private const string Audience = "nhn:helseid-public-samplecode";
-    private const string TestTokenServiceEndpoint = "https://helseid-ttt.test.nhn.no/create-test-token-with-key";
+    
+    
+    private const string ApiKeyConfig = "ApiKey";
+    private const string AudienceConfig = "Audience";
+    private const string TestTokenServiceEndpointConfig = "TestTokenServiceEndpoint";
 
     private enum TokenCreationParameter
     {
@@ -24,11 +26,18 @@ public class TestAccessTokenController : ControllerBase
         CreateTokenWithDPoP = 3,
     }
 
+    private readonly IConfiguration _configuration;
+    public TestAccessTokenController(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+    
     [AllowAnonymous]
     [HttpPost]
     [Route("test-token")]
     public async Task<ActionResult<TestTokenResult>> TestToken([FromBody] TestTokenParameters testTokenParameters)
     {
+        
         var tokenCreationParameter = GetTokenCreationParameter(testTokenParameters);
 
         if (tokenCreationParameter == TokenCreationParameter.None)
@@ -39,7 +48,7 @@ public class TestAccessTokenController : ControllerBase
         var body = CreateBody(tokenCreationParameter);
         using var httpClient = CreateHttpClient();
         var httpResponse = await httpClient
-            .PostAsync(TestTokenServiceEndpoint,
+            .PostAsync(_configuration[TestTokenServiceEndpointConfig],
                 new StringContent(body, Encoding.UTF8, "application/json"));
 
         TokenResponse? tokenResponse = null;
@@ -77,11 +86,11 @@ public class TestAccessTokenController : ControllerBase
         return new JsonResult(result);
     }
 
-    private static HttpClient CreateHttpClient()
+    private HttpClient CreateHttpClient()
     {
         var httpClient = new HttpClient();
-        httpClient.DefaultRequestHeaders.Add("X-Auth-Key", ApiKey);
-        httpClient.DefaultRequestHeaders.Add("Audience", Audience);
+        httpClient.DefaultRequestHeaders.Add("X-Auth-Key", _configuration[ApiKeyConfig]);
+        httpClient.DefaultRequestHeaders.Add("Audience", _configuration[AudienceConfig]);
         return httpClient;
     }
 
