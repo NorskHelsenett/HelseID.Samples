@@ -1,12 +1,10 @@
 using System.Security.Claims;
-using System.Text.RegularExpressions;
 using HelseId.SampleApi.Configuration;
 using HelseId.SampleAPI.Controllers;
 using HelseId.SampleAPI.DPoPValidation;
 using HelseId.SampleApi.Interfaces;
 using IdentityModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace HelseId.SampleAPI;
 
@@ -94,7 +92,7 @@ public  class Startup
 
                 options.Events.OnMessageReceived = context =>
                 {
-                    // Per HelseIDs security profile, an API endpoint can accept *either*
+                    // Per HelseID's security profile, an API endpoint can accept *either*
                     // a DPoP access token *or* a Bearer access token, but not both.
 
                     // This ensures that the received access token is a DPoP token:
