@@ -60,10 +60,14 @@ public static class ConfigurationValues
     public const string ResourceIndicatorsResource1 = "resource-indicator-client-1/greetings";
     public const string ResourceIndicatorsResource2 = "resource-indicator-client-2/greetings";
 
+    public const string TestTokenProxyResource = "test-token";
+
     public static readonly string SampleApiUrl = $"https://localhost:{SampleApiPort}/{AuthCodeClientResource}";
     public static readonly string SampleApiUrlForTokenExchange = $"https://localhost:{SampleApiForTokenExchangePort}/{TokenExchangeResource}";
     public static readonly string SampleApiUrlForResourceIndicators1 = $"https://localhost:{SampleApiForResourceIndicators1Port}/{ResourceIndicatorsResource1}";
     public static readonly string SampleApiUrlForResourceIndicators2 = $"https://localhost:{SampleApiForResourceIndicators2Port}/{ResourceIndicatorsResource2}";
+
+    public static readonly string TestTokenProxyUrl = $"https://localhost:{TestTokenProxyServerPort}/{TestTokenProxyResource}";
 
     // URLS and resource parameter (url fragment) for the use of the sample API for the client credentials project
     public const string SampleApiMachineClientResource = "machine-clients/greetings";

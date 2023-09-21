@@ -32,7 +32,7 @@ public class TestAccessTokenController : ControllerBase
     
     [AllowAnonymous]
     [HttpPost]
-    [Route("test-token")]
+    [Route(ConfigurationValues.TestTokenProxyResource)]
     public async Task<ActionResult<TestTokenResult>> TestToken([FromBody] TestTokenParameters testTokenParameters)
     {
         // This method calls the HelseID Test Token Service (TTT) and returns a token per the input parameters 
@@ -108,7 +108,7 @@ public class TestAccessTokenController : ControllerBase
                 // Client Credentials token:
                 bodyObject.generalClaimsParameters = new
                 {
-                    scope = new List<string> {"nhn:helseid-public-samplecode/client-credentials"},
+                    scope = new List<string> {ConfigurationValues.ClientCredentialsScopeForSampleApi},
                 };
                 break;
             case TokenCreationParameter.CreateTokenWithUser:
@@ -116,19 +116,20 @@ public class TestAccessTokenController : ControllerBase
                 bodyObject.userClaimsParametersGeneration = 1; // 1: GenerateOnlyDefault
                 bodyObject.generalClaimsParameters = new
                 {
-                    scope = new List<string> {"nhn:helseid-public-samplecode/authorization-code"},
+                    scope = new List<string> {ConfigurationValues.AuthorizationCodeScopeForSampleApi},
                 };
                 break;
             case TokenCreationParameter.CreateTokenWithDPoP:
                 // Client credentials token w/DPoP:
                 bodyObject.generalClaimsParameters = new
                 {
-                    scope = new List<string> {"nhn:helseid-public-samplecode/client-credentials"},
+                    scope = new List<string> {ConfigurationValues.ClientCredentialsScopeForSampleApi},
                 };
+                // This sets up the DPoP proof:
                 bodyObject.createDPoPTokenWithDPoPProof = true;
                 bodyObject.dPoPProofParameters = new
                 {
-                    htuClaimValue = "https://localhost:5081/machine-clients/dpop-greetings",
+                    htuClaimValue = ConfigurationValues.SampleApiUrlForM2MWithDPoP,
                     htmClaimValue = "GET",
                 };
                 break;

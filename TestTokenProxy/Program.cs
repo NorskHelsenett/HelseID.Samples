@@ -5,13 +5,13 @@ const string allowSpecificOrigins = "_allowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+// We need to enable options for CORS from the Swagger UI: 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(allowSpecificOrigins,
         policy =>
         {
-            policy.WithOrigins("https://localhost:5081")
-                .AllowAnyHeader();
+            policy.WithOrigins($"https://localhost:{ConfigurationValues.SampleApiPort}").AllowAnyHeader();
         });
 });
 
