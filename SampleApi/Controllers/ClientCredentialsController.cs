@@ -3,11 +3,11 @@ using HelseId.Samples.Common.Models;
 using HelseID.Samples.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+    
 namespace HelseId.SampleAPI.Controllers;
 
 [ApiController]
-[Authorize(Policy = Startup.ClientCredentialsPolicy, AuthenticationSchemes = Startup.TokenAuthenticationScheme)]
+[Authorize(Policy = Startup.ClientCredentialsPolicy, AuthenticationSchemes = Startup.BearerTokenAuthenticationScheme)]
 public class ClientCredentialsController : ControllerBase
 {
     private readonly IApiResponseCreator _responseCreator;

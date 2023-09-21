@@ -9,10 +9,10 @@ namespace HelseId.Samples.Common.PayloadClaimsCreators;
 /// structure which HelseID can recognize.
 ///
 /// The purpose of this is to request a claim in the access token that
-/// contains a specified underenhet (child organization) for our call to
+/// contains a specified child organization (underenhet) for our call to
 /// the Sample API.
 ///
-/// The underenhet (child organization) requested must be present in a
+/// The child organization requested must be present in a
 /// list connected to the client in HelseID.
 /// </summary>
 public class PayloadClaimsCreatorWithChildOrgNumber : IPayloadClaimsCreator {
@@ -26,7 +26,7 @@ public class PayloadClaimsCreatorWithChildOrgNumber : IPayloadClaimsCreator {
             throw new Exception("Need payload claim parameters with child organization number");
         }
         
-        // When the client requires an underenhet (child organization) claim, HelseID will 
+        // When the client requires a child organization claim, HelseID will 
         // require an authorization details claim with the following structure:
         //
         //  "authorization_details":{

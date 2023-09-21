@@ -7,4 +7,6 @@ public enum ClientType
     ApiAccessWithRequestObject,
     ApiAccessWithTokenExchange,
     ApiAccessWithResourceIndicators,
+    ApiAccessForMultiTenantClient,
+    ApiAccessWithContextualClaims,
 }

@@ -14,8 +14,7 @@ restricted access to the client credentials).
      |            |                                  |               |
      +------------+                                  +---------------+
 ```
-This sample is created as a command-line application. It demonstrates how to generate a signed 
-JSON Web Token (JWT) which then is used to request access to a HelseID. The code for this functionality can be found in the `TokenRequests` folder.
+This sample is created as a command-line application. It demonstrates how to generate a signed JSON Web Token (JWT) which then is used to request access to a HelseID. The code for this functionality can be found in the `TokenRequests` folder.
 
 When HelseID approves the request, an access token is returned. The application then uses the access token to access
 the [Sample API](../../SampleAPI/README.md).
@@ -41,22 +40,35 @@ The [.NET 7 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) is requ
 
 First, you will need to start the [Sample API project](../SampleAPI/README.md) in a separate terminal. Then, you can run this application, either with or without a request for a child organization number. 
 
-#### To run the sample without an underenhet, enter the following on the command line inside this folder:
+#### To run the default sample, enter the following on the command line inside this folder
 ```
 dotnet run
 ```
 
-#### To run the sample with the use of a child organization number (underenhet):
+#### To run the sample with the use of a child organization number
+This makes use of a child organization number. The organization must be whitelisted in HelseID.
 ```
 dotnet run --use-child-org-number
 ```
 
-#### To consume the clientinfo endpoint:
+#### To run the sample as an app that uses multi-tenancy
+
+This option makes use of both parent and child units in the call to the token endpoint 
+````
+dotnet run --use-multi-tenant-pattern
+````
+
+#### To consume the clientinfo endpoint
 ```
 dotnet run --use-client-info-endpoint
 ```
 
-#### To list all options:
+#### To use DPoP (Demonstrating Proof-of-Possession) tokens against the sample API:
+```
+dotnet run --use-dpop
+```
+
+#### To list all options
 ```
 dotnet run -- --help
 ```

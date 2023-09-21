@@ -11,10 +11,10 @@ The [.NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) is requ
 ## Usage
 
 ```
-dotnet run rsa|ecdsa [keyname]
+dotnet run -- --key-type rsa|ec --prefix <file-prefix>
 ```
 
-Replace `keyname` with a descriptive name of your key. It will be part of the filenames. For example, `dotnet run rsa test` will create two files: 'test_jwk.json' and 'test_jwk_pub.json'. The first file contains the whole key pair (including the private key), while the second file only contains the public key.
+Replace `<file-prefix>` with a descriptive name of your key. It will be part of the filenames. For example, `dotnet run -- --key-type rsa --prefix test` will create two files: 'test_jwk.json' and 'test_jwk_pub.json'. The first file contains the whole key pair (including the private key), while the second file only contains the public key.
 
 ## Build exe
 

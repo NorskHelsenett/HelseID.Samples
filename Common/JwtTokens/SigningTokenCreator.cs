@@ -11,19 +11,19 @@ namespace HelseId.Samples.Common.JwtTokens;
 /// This class creates a JWT token that can be used in client assertions or in request objects.
 /// This class requires an IPayloadClaimsCreator instance that will create the claims that are needed in the token request.
 /// </summary>
-public class SigningJwtTokenCreator : ISigningJwtTokenCreator
+public class SigningTokenCreator : ISigningTokenCreator
 {
     private readonly IJwtPayloadCreator _jwtPayloadCreator;
     private readonly HelseIdConfiguration _configuration;
     
-    public SigningJwtTokenCreator(
+    public SigningTokenCreator(
         IJwtPayloadCreator jwtPayloadCreator,
         HelseIdConfiguration configuration)
     {
         _jwtPayloadCreator = jwtPayloadCreator;
         _configuration = configuration;
     }
-
+    
     public string CreateSigningToken(IPayloadClaimsCreator payloadClaimsCreator, PayloadClaimParameters payloadClaimParameters)
     {
         var header = CreateJwtHeaderWithSigningCredentials();
@@ -49,7 +49,7 @@ public class SigningJwtTokenCreator : ISigningJwtTokenCreator
 
     private SigningCredentials GetClientAssertionSigningCredentials()
     {
-        var securityKey = new JsonWebKey(_configuration.RsaPrivateKeyJwk.JwkValue);
-        return new SigningCredentials(securityKey, _configuration.RsaPrivateKeyJwk.Algorithm);
+        var securityKey = new JsonWebKey(_configuration.PrivateKeyJwk.JwkValue);
+        return new SigningCredentials(securityKey, _configuration.PrivateKeyJwk.Algorithm);
     }
 }

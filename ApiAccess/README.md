@@ -1,14 +1,13 @@
 ## User Authentication Sample with API access
 
-This code example does two things:
-* It logs on a user by using the [Authorization Code Flow](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
+This code example allows you to do two things:
+* You can log on as a user by using the [Authorization Code Flow](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
 * You can also connect to the sample API by using an access token
 
 ### Prerequisites
 If you want to use HelseID not only to log on as a user, but also to connect to an API, you'll need to run the [Sample API](../SampleAPI/README.md):
 
-* Go to the `SampleAPI` folder and run the commando `dotnet run`.
-
+* Go to the `SampleAPI` folder and run the command `dotnet run`.
 
 ### Architecture
 
@@ -30,9 +29,9 @@ When you start the sample with `dotnet run` on the command line, you'll need to 
 Now listening on: https://localhost:5151
 Application started. Press Ctrl+C to shut down.
 ```
-the default is `https://localhost:5151`, but you can change the port number in the file `ConfigurationValues.cs`in the `Configuration` folder in the hieararchy above this folder. If you want to change the port number, change the `ApiAccessWebServerPort`constant in that file.
+the default address is `https://localhost:5151`, but you can change the port number in the file [`ConfigurationValues.cs`](../Configuration/ConfigurationValues.cs) in the `Configuration` folder in the hierarchy above this folder. If you want to change the port number, change the `ApiAccessWebServerPort`constant in that file.
 
-Click "Login", and use the "Test IDP". Then log in as a well known test person. You should be redirected back to the application at `https://localhost:5151`.
+Click "Login" and use the "Test IDP". Then log in as a well-known test person. You should be redirected back to the application at `https://localhost:5151`.
 
 ### API Access
 
@@ -40,7 +39,7 @@ Next, we can get access to the [Sample API](./SampleApi/README.md) by running th
 
 This is done by using the access token that we got from the authentication process as a bearer token when accessing the Sample API.
 
-The access token is set as a ``Bearer`` token in the Authorization Header, after which we call the API and retrive the result.
+The access token is set as a ``Bearer`` token in the Authorization Header, after which we call the API and retrieve the result.
 
 ### Requirements
 
@@ -61,22 +60,25 @@ To run the sample as a user login only application, start the application with t
 dotnet run --user-login-only
 ```
 
-### Use of request objects (for use of a child organization number):
-If you want to send an underenhet (child org. no) as part of the claim to the API, you will need to set this underenhet as part of a request object that is sent to HelseID. If
-this underenhet is present in the client in HelseID, you will receive a claim of type `helseid://claims/client/claims/orgnr_child` as part of the access token. To do this, you can start the application with the extra option:
+### Use of request objects (for use of a child organization number)
+If you want to send a child organization number (underenhet) as part of the claim to the API, you will need to set this organization number as part of a request object that is sent to HelseID. If
+this organization number is attached to the client in HelseID, you will receive a claim of type `helseid://claims/client/claims/orgnr_child` as part of the access token. To do this, you can start the application with the extra option:
 
 ```
 dotnet run --use-request-objects
 ```
 
-### Use of resource indicators:
-If you want to use the resource indicators sample, you will need to start the application with an extra option:
+### Use of resource indicators
+If you need to access more than one API, the preferred solution is to use `resource indicators` as part of the call to HelseID.
+To use the resource indicators sample, you will need to start the application with an extra option:
 
 ```
 dotnet run --use-resource-indicators
 ```
 
-### Use of token exchange:
+You will also need to start two instances of the [Sample API project](../SampleAPI/README.md). See the [readme](../SampleAPI/README.md) file in that folder for more information on how to do this. 
+
+### Use of token exchange
 If you want to use the token exchange sample, you will need to start the application with an extra option:
 
 ```
@@ -84,6 +86,23 @@ dotnet run --use-token-exchange
 ```
 In addition to start the [Sample API project](../SampleAPI/README.md), you will also need to start the [Sample API for token exchange project](../SampleApiForTokenExchange/README.md). Look into that project folder for more information.
 
+### Use of multi-tenancy
+*Multi-tenancy* is a pattern that allows multiple consumers of a software vendor to use the same instance of the vendor’s software. The consequence of this is that a multi-tenant system can set the parent organization number for a token request. In order to do this, use the extra option
+
+```
+dotnet run --use-multi-tenant
+```
+
+### Use of contextual claims
+The use of *contextual claims* allows a client to send a structured claim as client assertion to HelseID. This claim will then be attached to the returned access token. In order to sample this functionality, use the extra option
+```
+dotnet run --use-contextual-claims
+```
+
+#### To use DPoP (Demonstrating Proof-of-Possession) tokens against the sample API:
+```
+dotnet run --use-dpop
+```
 
 ### To list all options:
 ```

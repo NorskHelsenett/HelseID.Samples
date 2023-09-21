@@ -6,7 +6,9 @@ public class ApiResponse
 {
     public string? Greeting { get; set; }
     
-    public string? OrganizationNumber { get; set; }
+    public string? ParentOrganizationNumber { get; set; }
 
     public string? ChildOrganizationNumber { get; set; }
+    
+    public string? SupplierOrganizationNumber { get; set; }
 }

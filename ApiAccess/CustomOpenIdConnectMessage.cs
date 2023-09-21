@@ -40,6 +40,7 @@ internal class CustomOpenIdConnectMessage : OpenIdConnectMessage
             strBuilder.Append("\" />");
         }
 
+        // Extension for request object:
         if (_messageParameters.HasRequestObject)
         {
             // Create a request object
@@ -49,6 +50,7 @@ internal class CustomOpenIdConnectMessage : OpenIdConnectMessage
             strBuilder.Append("\" />");
         }
 
+        // Extension for resource indicators:
         foreach (var resource in _messageParameters.ResourceIndicators)
         {
             // Add resource indicators (if any)

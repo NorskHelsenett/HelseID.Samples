@@ -1,4 +1,3 @@
-using System.Text.Json;
 using HelseId.Samples.ApiAccess.Configuration;
 using HelseId.Samples.ApiAccess.Exceptions;
 using HelseId.Samples.ApiAccess.Interfaces.Stores;
@@ -21,7 +20,7 @@ namespace HelseId.Samples.ApiAccess;
 public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConnectOptions>
 {
     private readonly IClientAssertionsBuilder _clientAssertionsBuilder;
-    private readonly ISigningJwtTokenCreator _signingJwtTokenCreator;
+    private readonly ISigningTokenCreator _signingTokenCreator;
     private readonly IUserSessionDataStore _userSessionDataStore;
     private readonly IPayloadClaimsCreatorForClientAssertion _payloadClaimsCreatorForClientAssertion;
     private readonly IPayloadClaimsCreatorForRequestObjects _payloadClaimsCreatorForRequestObjects;
@@ -30,7 +29,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
 
     public OpenIdConnectOptionsInitializer(
         IClientAssertionsBuilder clientAssertionsBuilder,
-        ISigningJwtTokenCreator signingJwtTokenCreator,
+        ISigningTokenCreator signingTokenCreator,
         IUserSessionDataStore userSessionDataStore,
         IPayloadClaimsCreatorForClientAssertion payloadClaimsCreatorForClientAssertion,
         IPayloadClaimsCreatorForRequestObjects payloadClaimsCreatorForRequestObjects,
@@ -38,7 +37,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         IExpirationTimeCalculator expirationTimeCalculator)
     {
         _clientAssertionsBuilder = clientAssertionsBuilder;
-        _signingJwtTokenCreator = signingJwtTokenCreator;
+        _signingTokenCreator = signingTokenCreator;
         _userSessionDataStore = userSessionDataStore;
         _payloadClaimsCreatorForClientAssertion = payloadClaimsCreatorForClientAssertion;
         _payloadClaimsCreatorForRequestObjects = payloadClaimsCreatorForRequestObjects;
@@ -90,10 +89,10 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         // This matches the value set on the HelseID clients:
         openIdConnectOptions.SignedOutCallbackPath = "/signout-callback-oidc";
 
-        // We use POST as the authentication method
+        // We use POST as the authentication method; the default method is GET
         openIdConnectOptions.AuthenticationMethod = OpenIdConnectRedirectBehavior.FormPost;
     }
-
+    
     private void SetUpScopes(OpenIdConnectOptions openIdConnectOptions)
     {
         openIdConnectOptions.Scope.Clear();
@@ -175,12 +174,6 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             // Invoked before redirecting to the identity provider to authenticate. This can be used to
             // set a ProtocolMessage.State that will be persisted through the authentication process.
             // The ProtocolMessage can also be used to add or customize parameters sent to the identity provider.
-            var customOpenIdConnectMessageParameters =
-                new CustomOpenIdConnectMessageParameters
-                {
-                    RequestObject = CreateRequestObject(),
-                    ResourceIndicators = _settings.HelseIdConfiguration.ResourceIndicators,
-                }; 
             
             // For certain features, we need to establish a custom request message for creating
             // request objects or resource indicators.  The implementation of the former ('resource')
@@ -189,6 +182,13 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             // is not currently implemented
             if (redirectContext.ProtocolMessage.RequestType == OpenIdConnectRequestType.Authentication)
             {
+                var customOpenIdConnectMessageParameters =
+                    new CustomOpenIdConnectMessageParameters
+                    {
+                        RequestObject = CreateRequestObject(),
+                        ResourceIndicators = _settings.HelseIdConfiguration.ResourceIndicators,
+                    }; 
+
                 // We need a custom class for creating the message to the authorization endpoint:
                 var customProtocolMessage = new CustomOpenIdConnectMessage(
                     customOpenIdConnectMessageParameters,
@@ -243,7 +243,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             ChildOrganizationNumber = ConfigurationValues.ApiAccessWithRequestObjectChildOrganizationNumber
         };
         // We create a signing token (as used in a client assertion), and use this as a request object: 
-        return _signingJwtTokenCreator.CreateSigningToken(_payloadClaimsCreatorForRequestObjects, payloadClaimParameters);
+        return _signingTokenCreator.CreateSigningToken(_payloadClaimsCreatorForRequestObjects, payloadClaimParameters);
     }
 
     private async Task UpsertUserSessionData(
@@ -258,6 +258,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         userSessionData.IdToken = openIdConnectMessage.IdToken;
         userSessionData.RefreshToken = openIdConnectMessage.RefreshToken;
         userSessionData.RefreshTokenExpiresAtUtc = refreshTokenExpiresAtUtc;
+        userSessionData.SessionId = sessionId;
 
         // The resource indicator application is a special case: we get an access token that has more than one
         // audience (i.e. the audience for both resources that were requested). Hence, we don't want to
@@ -329,6 +330,20 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             // This value will typically be assigned to a logged on user:
             result.ChildOrganizationNumber = ConfigurationValues.ApiAccessWithRequestObjectChildOrganizationNumber;
         }
+
+        if (_settings.ClientType == ClientType.ApiAccessForMultiTenantClient)
+        {
+            // This instructs the payload claim creator for multi-tenancy to not create an 'authorization_details' claim
+            // (it is not validated with the code grant).
+            result.IsAuthCodeRequest = true;
+        }
+
+        if (_settings.ClientType == ClientType.ApiAccessWithContextualClaims)
+        {
+            // This sets the contextual claim type for the call to HelseID:
+            result.ContextualClaimType = ConfigurationValues.TestContextClaim;
+        }
+
         return result;
     }
 }

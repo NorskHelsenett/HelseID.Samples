@@ -4,10 +4,11 @@
 
 # HelseID samples
 
-HelseID is a national authentication service for the health sector in Norway. 
-These code samples are targeted at technical personel such as application architects and developers.  
+HelseID is a national authentication service for the healthcare sector in Norway. 
+These code samples are targeted at technical personnel such as application architects and developers.  
 
 If you experience trouble while checking out this repository because of long paths, update your git config by running:  
+
 `git config --global core.longpaths true`
 
 ## Prerequisite knowledge
@@ -16,15 +17,17 @@ As HelseID is based on the [OAuth 2.0 framework](https://oauth.net/2/), both the
 ### General information
 The examples connect to the HelseID **test** environment. For each example, there exists a corresponding client in HelseID. The sample code will be able to use 1) a client ID in connection with 2) a self-issued client assertion signed with a [JWK-encoded](https://www.rfc-editor.org/rfc/rfc7517) private key in order to authenticate against HelseID.
 
+For all samples that requires user authentication you can use our "TestIDP" which provides a way to simulate user login without the need for actual test users.
+
 #### Important notice
 
 Please be advised that the sample code does not in any way represent working code for a production environment. In particular, special care **MUST** be taken in order to secure the private keys that the code uses to authenticate against HelseID.
 
 ## Basic samples
 
-HelseID supports the use of several grants, that is, the resource owner's (user or enterprise) authorization used by the client to obtain an access token. Code samples are provided for different scenarios, and each will use at least one grant type. The following grants are provided:
+These samples use either machine-to-machine or user logon authentication methods.
 
-#### Sample API
+### Sample API
 
 The code can be found in the `SampleAPI` folder.
 
@@ -32,7 +35,13 @@ Most of the HelseID samples demonstrate how a client can access an API. Therefor
 
 See [SampleApi/README.md](SampleApi/README.md) for more information.
 
-#### Machine-to-machine sample
+### Grant types
+
+HelseID supports the use of several grants, that is, the resource owner's (user or enterprise) authorization used by the client to obtain an access token. Code samples are provided for different scenarios, and each will use at least one grant type. The following grants are provided:
+
+These samples can also be configured to request a DPoP (Demonstrating Proof-of-Possession)-bound token.
+
+### Machine-to-machine sample
 
 The code can be found in the `ClientCredentials` folder.
 
@@ -44,7 +53,7 @@ When using this sample, you will also need to start the [sample API](./SampleApi
 
 See [ClientCredentials/README.md](ClientCredentials/README.md) for more information.
 
-#### User authentication/API access sample
+### User authentication/API access sample
 
 The code can be found in the `SampleApi` folder.
 
@@ -56,9 +65,9 @@ You can use this sample for user login only, or, if you want to access an API, y
 This sample also exhibits the use of the [Refresh Token Grant](https://www.rfc-editor.org/rfc/rfc6749#section-1.5).
 
 
-See [APIAccess/README.md](UserAuthentication/README.md) for more information.
+See [APIAccess/README.md](ApiAccess/README.md) for more information.
 
-#### Token exchange sample
+### Token exchange sample
 
 The code can be found in the `SampleApiForTokenExchange` folder.
 
@@ -74,15 +83,15 @@ If you wish to use this sample, you will need to start both
 
 For use in "native clients", i.e. applications that does not run in a web client, we have created a set of simple examples for the use of a system browser for login against HelseID. These examples can be found in the `NativeClients`folder.
 
-#### <a name="APIAccessResourceIndicators"></a> Simple API access with API login
+### <a name="APIAccessResourceIndicators"></a> Simple API access with API login
 
 The sample demonstrates a simple user login. See [NativeClients/SimpleNativeClientWithUserLoginAndApiCall/README.md](NativeClients/SimpleNativeClientWithUserLoginAndApiCall/README.md) for more information.
 
-#### <a name="APIAccessResourceIndicators"></a> Simple API access with resource indicators
+### <a name="APIAccessResourceIndicators"></a> Simple API access with resource indicators
 
 The sample demonstrates how resource indicators are used to download multiple access tokens without performing multiple calls to the authorization endpoint. Each access token can then be used to call a specified API. See [NativeClients/SimpleResourceIndicatorsDemo/README.md](NativeClients/SimpleResourceIndicatorsDemo/README.md) for more information.
 
-#### <a name="RequestObjects"></a> Request objects
+### <a name="RequestObjects"></a> Request objects
 
 The sample demonstrates how to use request objects for client authentication against HelseID. See [NativeClients/SimpleRequestObjectsDemo](NativeClients/SimpleRequestObjectsDemo/README.md).
 
@@ -94,11 +103,11 @@ In the folder [Node.js/ClientAuthentication](./Node.js/ClientAuthentication/READ
 
 We've created a set of samples for more advanced cases.
 
-#### <a name="BFF"></a> Backend for frontend (BFF)
+### <a name="BFF"></a> Backend for frontend (BFF)
 
 See [HelseId.Core.BFF.Sample](https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.Core.BFF.Sample).
 
-#### <a name="PersontjenestenSamples"></a> Persontjenesten samples
+### <a name="PersontjenestenSamples"></a> Persontjenesten samples
 
 Running samples for Persontjenesten API clients that exchange valid tokens with HelseID.
 
@@ -118,7 +127,7 @@ A command line program to generate a key pair as a JSON Web Key (JWK). The sampl
 
 ## Other resources
 
-An exellent introductory guide to OAuth 2 can be found [here](https://www.oauth.com/)
+An excellent introductory guide to OAuth 2 can be found [here](https://www.oauth.com/)
 
 You can find the OAuth 2 specs here: [https://oauth.net/specs/](https://oauth.net/specs/)
 
