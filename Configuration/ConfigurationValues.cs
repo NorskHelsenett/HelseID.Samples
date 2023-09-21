@@ -51,6 +51,9 @@ public static class ConfigurationValues
     // Port number for the API Access project
     public const int ApiAccessWebServerPort = 5151;
 
+    // Port number for the Test Token Proxy project
+    public const int TestTokenProxyServerPort = 5152;
+
     // URLS and resource parameters (url fragments) for the use of the sample APIs for the API access project
     public const string AuthCodeClientResource = "user-login-clients/greetings";
     public const string TokenExchangeResource = "token-exchange-clients/greetings";

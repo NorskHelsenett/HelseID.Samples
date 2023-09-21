@@ -1,3 +1,5 @@
+using HelseID.Samples.Configuration;
+
 const string allowSpecificOrigins = "_allowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +13,11 @@ builder.Services.AddCors(options =>
             policy.WithOrigins("https://localhost:5081")
                 .AllowAnyHeader();
         });
+});
+
+builder.WebHost.ConfigureKestrel(option =>
+{
+    option.ListenLocalhost(ConfigurationValues.TestTokenProxyServerPort, listenOptions => listenOptions.UseHttps());
 });
 
 var app = builder.Build();
