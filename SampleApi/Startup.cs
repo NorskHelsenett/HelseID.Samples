@@ -33,16 +33,18 @@ public  class Startup
         var webApplication = webApplicationBuilder.Build();
 
         ConfigureServices(webApplication);
-
+        
         return webApplication;
     }
 
     private void AddServices(WebApplicationBuilder webApplicationBuilder)
     {
+        webApplicationBuilder.Services.AddSwaggerGen();
+        
         // Create singleton from instance
         webApplicationBuilder.Services.AddSingleton(_settings);
         webApplicationBuilder.Services.AddSingleton<IApiResponseCreator, ApiResponseCreator>();
-        
+
         webApplicationBuilder.Services.AddMvc(option => option.EnableEndpointRouting = false);
         webApplicationBuilder.Services.AddControllers();
         webApplicationBuilder.Services.AddEndpointsApiExplorer();
@@ -90,7 +92,7 @@ public  class Startup
 
                 options.Events.OnMessageReceived = context =>
                 {
-                    // Per HelseIDs security profile, an API endpoint can accept *either*
+                    // Per HelseID's security profile, an API endpoint can accept *either*
                     // a DPoP access token *or* a Bearer access token, but not both.
 
                     // This ensures that the received access token is a DPoP token:
@@ -166,6 +168,18 @@ public  class Startup
 
     private void ConfigureServices(WebApplication webApplication)
     {
+        // Set up functionality for getting a bearer token (see extend-swagger.js for details):
+        webApplication.UseStaticFiles();
+        webApplication.UseSwagger();
+        webApplication.UseSwaggerUI(options =>
+        {
+            // The address for the test token proxy should be set in the appsettings.json file:
+            var testTokenProxyEndpointAddress = webApplication.Configuration.GetSection("TestTokenProxyEndpointAddress").Get<string>();
+            // This is needed in order to get the access token from the test token service proxy:
+            options.UseRequestInterceptor($"(req) => {{ return setBearerTokenInRequest(req, '{testTokenProxyEndpointAddress}'); }} ");
+            options.InjectJavascript("extend-swagger.js");
+        });
+
         // Configure the HTTP request pipeline.
         webApplication.UseHttpsRedirection();
         webApplication.UseAuthentication();
