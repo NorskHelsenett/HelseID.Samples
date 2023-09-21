@@ -7,8 +7,7 @@ This code example allows you to do two things:
 ### Prerequisites
 If you want to use HelseID not only to log on as a user, but also to connect to an API, you'll need to run the [Sample API](../SampleAPI/README.md):
 
-* Go to the `SampleAPI` folder and run the commando `dotnet run`.
-
+* Go to the `SampleAPI` folder and run the command `dotnet run`.
 
 ### Architecture
 
