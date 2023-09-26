@@ -115,10 +115,12 @@ public class DPoPProofValidator
             return ValidationResult.Error("Invalid 'alg' value.");
         }
 
-        if (!token.TryGetHeaderValue<string>(JwtClaimTypes.JsonWebKey, out var jwkJson))
+        if (!token.TryGetHeaderValue<IDictionary<string, object>>(JwtClaimTypes.JsonWebKey, out var jwkValues))
         {
-            return ValidationResult.Error("Missing 'jwk' value.");
+            return ValidationResult.Error("Invalid 'jwk' value.");
         }
+
+        var jwkJson = JsonSerializer.Serialize(jwkValues);
         
         JsonWebKey jwk;
         try
