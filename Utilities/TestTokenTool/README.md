@@ -92,6 +92,20 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen):
   -s | --saveTokenToFile                                        [False]
   The returned token is saved to a file named 'token.jwt'
 ```
+### Metaparametre: brukes for å beskrive bruken av enkelte av parametrene nedenfor
+```
+  --generalClaimsCreation                    <CLAIMGENERATION>  [DefaultWithParameterValues]
+  Instructs how common claims are created
+  Allowed values: None, Default, ParameterValues, DefaultWithParameterValues
+
+  --userClaimsCreation                       <CLAIMGENERATION>  [DefaultWithParameterValues]
+  Instructs how user claims are created
+  Allowed values: None, Default, ParameterValues, DefaultWithParameterValues
+
+  --createDokumentdelingClaims                                  [False]
+  Create claims for dokumentdeling
+  
+```
 ### Parametre for å lage ugyldige claims
 ```
   --signJwtWithInvalidSigningKey                                [False]
@@ -241,19 +255,7 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen):
 
   --careRelationshipTracingRefId             <TEXT>             []
   Parameter for use in 'dokumentdeling' claims
-```
-### Metaparametre: brukes for å beskrive bruken av enkelte av parametrene ovenfor
-```
-  --generalClaimsCreation                    <CLAIMGENERATION>  [DefaultWithParameterValues]
-  Instructs how common claims are created
-  Allowed values: None, Default, ParameterValues, DefaultWithParameterValues
 
-  --userClaimsCreation                       <CLAIMGENERATION>  [DefaultWithParameterValues]
-  Instructs how user claims are created
-  Allowed values: None, Default, ParameterValues, DefaultWithParameterValues
-
-  --createDokumentdelingClaims                                  [False]
-  Create claims for dokumentdeling
 ```
 ### Brukerparametre: for å justere claim og bevis for DPoP
 ```
