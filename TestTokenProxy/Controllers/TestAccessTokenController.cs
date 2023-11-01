@@ -29,13 +29,13 @@ public class TestAccessTokenController : ControllerBase
     {
         _configuration = configuration;
     }
-    
+
     [AllowAnonymous]
     [HttpPost]
     [Route(ConfigurationValues.TestTokenProxyResource)]
     public async Task<ActionResult<TestTokenResult>> TestToken([FromBody] TestTokenParameters testTokenParameters)
     {
-        // This method calls the HelseID Test Token Service (TTT) and returns a token per the input parameters 
+        // This method calls the HelseID Test Token Service (TTT) and returns a token per the input parameters
         var tokenCreationParameter = GetTokenCreationParameter(testTokenParameters);
 
         if (tokenCreationParameter == TokenCreationParameter.None)
@@ -91,6 +91,7 @@ public class TestAccessTokenController : ControllerBase
             case "/" + ConfigurationValues.ResourceIndicatorsResource2:
                 return TokenCreationParameter.CreateTokenWithUser;
             case "/" + ConfigurationValues.SampleApiMachineClientResourceForDPoP:
+            case "/" + ConfigurationValues.AuthCodeClientResourceForDPoP:
                 return TokenCreationParameter.CreateTokenWithDPoP;
             default:
                 return TokenCreationParameter.None;
@@ -137,7 +138,7 @@ public class TestAccessTokenController : ControllerBase
 
         return JsonSerializer.Serialize(bodyObject);
     }
-    
+
     private HttpClient CreateHttpClient()
     {
         var httpClient = new HttpClient();

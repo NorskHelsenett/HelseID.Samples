@@ -7,17 +7,17 @@ using Microsoft.AspNetCore.Mvc;
 namespace HelseId.SampleAPI.Controllers;
 
 [ApiController]
-[Authorize(Policy = Startup.ClientCredentialsPolicy, AuthenticationSchemes = Startup.DPoPTokenAuthenticationScheme)]
-public class DPoPClientCredentialsController : ControllerBase
+[Authorize(Policy = Startup.AuthCodePolicy, AuthenticationSchemes = Startup.DPoPTokenAuthenticationScheme)]
+public class DPoPAuthCodeController : ControllerBase
 {
     private readonly IApiResponseCreator _responseCreator;
-    public DPoPClientCredentialsController(IApiResponseCreator responseCreator)
+    public DPoPAuthCodeController(IApiResponseCreator responseCreator)
     {
         _responseCreator = responseCreator;
     }
 
     [HttpGet]
-    [Route(ConfigurationValues.SampleApiMachineClientResourceForDPoP)]
+    [Route(ConfigurationValues.AuthCodeClientResourceForDPoP)]
     public ActionResult<ApiResponse> GetGreetings()
     {
         // Get the claims of the current principal (a system user, not a personal user)

@@ -12,7 +12,7 @@ namespace HelseId.SampleAPI;
 public  class Startup
 {
     private readonly Settings _settings;
-    
+
     public const string DPoPTokenAuthenticationScheme = "dpop_token_authentication_scheme";
     public const string BearerTokenAuthenticationScheme = "bearer_token_authentication_scheme";
     public const string AuthCodePolicy = "auth_code_policy";
@@ -34,14 +34,14 @@ public  class Startup
         var webApplication = webApplicationBuilder.Build();
 
         ConfigureServices(webApplication);
-        
+
         return webApplication;
     }
 
     private void AddServices(WebApplicationBuilder webApplicationBuilder)
     {
         webApplicationBuilder.Services.AddSwaggerGen();
-        
+
         // Create singleton from instance
         webApplicationBuilder.Services.AddSingleton(_settings);
         webApplicationBuilder.Services.AddSingleton<IApiResponseCreator, ApiResponseCreator>();
@@ -64,7 +64,7 @@ public  class Startup
 
                 // Validation parameters are in agreement with HelseIDs requirements:
                 // https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/284229708/Guidelines+for+using+JSON+Web+Tokens+JWTs
-                // These (and a few others) are all true by default
+                // The following parameters (and a few others) are all true by default, but set to true here for instructive purposes:
                 options.TokenValidationParameters.ValidateLifetime = true;
                 options.TokenValidationParameters.ValidateIssuer = true;
                 options.TokenValidationParameters.ValidateAudience = true;
@@ -81,7 +81,7 @@ public  class Startup
 
                 // Validation parameters are in agreement with HelseIDs requirements:
                 // https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/284229708/Guidelines+for+using+JSON+Web+Tokens+JWTs
-                // These (and a few others) are all true by default
+                // The following parameters (and a few others) are all true by default, but set to true here for instructive purposes:
                 options.TokenValidationParameters.ValidateLifetime = true;
                 options.TokenValidationParameters.ValidateIssuer = true;
                 options.TokenValidationParameters.ValidateAudience = true;
@@ -109,25 +109,25 @@ public  class Startup
                     return Task.CompletedTask;
                 };
 
-                options.Events.OnTokenValidated = async tokenValidatedContext => 
+                options.Events.OnTokenValidated = async tokenValidatedContext =>
                 {
                     // This functionality validates the DPoP proof
                     // https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-16.html#name-checking-dpop-proofs
 
                     // Get the DPoP proof:
                     var request = tokenValidatedContext.HttpContext.Request;
-                    if (!request.GetDPoPProof(out var dPopProof)) 
+                    if (!request.GetDPoPProof(out var dPopProof))
                     {
                         tokenValidatedContext.Fail("Missing DPoP proof");
                         return;
                     }
-                     
+
                     // Get the access token:
                     request.GetDPoPAccessToken(out var accessToken);
 
                     // Get the cnf claim from the access token:
                     var cnfClaimValue = tokenValidatedContext.Principal!.FindFirstValue(JwtClaimTypes.Confirmation);
-                    
+
                     var data = new DPoPProofValidationData(request, dPopProof!, accessToken!, cnfClaimValue);
 
                     var dPopProofValidator = tokenValidatedContext.HttpContext.RequestServices.GetRequiredService<DPoPProofValidator>();
@@ -140,7 +140,7 @@ public  class Startup
             });
 
         webApplicationBuilder.Services.AddAuthorization(options =>
-        {   
+        {
             // Add a policy for verifying scopes and claims for a logged on user
             options.AddPolicy(
                 AuthCodePolicy,
@@ -150,12 +150,12 @@ public  class Startup
 
             // Add a policy for verifying scopes for client credentials
             options.AddPolicy(
-                ClientCredentialsPolicy, 
+                ClientCredentialsPolicy,
                 policy =>
                 {
                     policy.RequireClaim("scope", _settings.ClientCredentialsApiScopeForSampleApi);
                 });
-        });        
+        });
     }
 
     private void SetUpKestrel(WebApplicationBuilder webApplicationBuilder)
