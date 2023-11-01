@@ -10,7 +10,7 @@ public static class ConfigurationValues
 
     // Audience and scopes for using the 'regular' sample API:
     public const string SampleApiNameAudience = "nhn:helseid-public-samplecode";
-    
+
     public const string ClientCredentialsScopeForSampleApi = $"{SampleApiNameAudience}/client-credentials";
 
     public const string AuthorizationCodeScopeForSampleApi = $"{SampleApiNameAudience}/authorization-code";
@@ -29,7 +29,7 @@ public static class ConfigurationValues
 
     // The scope that is needed for access to the clientinfo_endpoint on HelseID (https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/492044292/Client+Info+Endpoint):
     private const string ClientInfoScope = "helseid://scopes/client/info";
-    
+
     // The claim that is needed for use of contextual claims:
     public const string TestContextClaim = "helseid://claims/external/test-context";
 
@@ -56,6 +56,7 @@ public static class ConfigurationValues
 
     // URLS and resource parameters (url fragments) for the use of the sample APIs for the API access project
     public const string AuthCodeClientResource = "user-login-clients/greetings";
+    public const string AuthCodeClientResourceForDPoP = "user-login-clients/dpop-greetings";
     public const string TokenExchangeResource = "token-exchange-clients/greetings";
     public const string ResourceIndicatorsResource1 = "resource-indicator-client-1/greetings";
     public const string ResourceIndicatorsResource2 = "resource-indicator-client-2/greetings";
@@ -113,12 +114,12 @@ public static class ConfigurationValues
     // We can also use an elliptic curve algorithm if we wish (this has nothing to do with the setup of the actual client)
     private const string EllipticCurvePrivateKey = "{ 'kty': 'EC', 'd': 'BG3mkAdvG0rWnahVtIaCfj2yOH-m0FZbbEOlwXOEIeiBRwYFQEPAII_dVSYNZX-l', 'use': 'sig', 'crv': 'P-384', 'x': 'khAS2R2atO0i7Y7O257HsDeXkp7Rt_D-4HWv5Q3kJBuWw43I9NcTCmGEQZjoP5EL', 'y': '3NxlAKU0SNfnKgvse4NhUz-Bqy7yONtDBxWBxvw1ZtQ82P6jdBFIPrO5u8UMPb7Y', 'alg': 'ES384'}";
     private static readonly SecurityKey CommonEllipticCurveKey = new(EllipticCurvePrivateKey, SecurityAlgorithms.EcdsaSha384);
-    public static readonly SecurityKey UserAuthenticationPrivateKeyJwk = CommonEllipticCurveKey; 
+    public static readonly SecurityKey UserAuthenticationPrivateKeyJwk = CommonEllipticCurveKey;
 
     // -----------------------------------------------------------------------------------------------------------------
     // Client IDs:
     // -----------------------------------------------------------------------------------------------------------------
-    // In HelseID, these are normally set as GUIDS, here we have named them for better readability 
+    // In HelseID, these are normally set as GUIDS, here we have named them for better readability
     // -----------------------------------------------------------------------------------------------------------------
     public const string ClientCredentialsSampleClientId = "helseid-sample-client-credentials";
     public const string ClientCredentialsSampleForMultiTenantClientId = "helseid-sample-client-credentials-for-multitenant-app";
@@ -131,7 +132,7 @@ public static class ConfigurationValues
     public const string ApiAccessSampleClientIdWithRequestObject = "helseid-sample-request-objects-console";
     public const string ApiAccessResourceIndicatorClientId = "helseid-sample-resource-indicators";
     public const string UserAuthenticationClientId = "helseid-sample-client-authentication";
-    
+
     // -----------------------------------------------------------------------------------------------------------------
     // Client scopes:
     // -----------------------------------------------------------------------------------------------------------------
