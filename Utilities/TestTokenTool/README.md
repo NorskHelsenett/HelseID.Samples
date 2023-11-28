@@ -102,8 +102,8 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen):
   Instructs how user claims are created
   Allowed values: None, Default, ParameterValues, DefaultWithParameterValues
 
-  --createDokumentdelingClaims                                  [False]
-  Create claims for dokumentdeling
+  --createTillitsrammeverkClaims                               [False]
+  Create claims for tillitsrammeverk
   
 ```
 ### Parametre for å lage ugyldige claims
@@ -209,52 +209,52 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen):
   --sub                                      <TEXT>             []
   The returned token will contain a 'sub' claim matching the injected value
 ```
-### Parametre for tillitsrammeverket: brukes for å injisere verdier i en claim-struktur som brukes i forbindelse med dokumentdeling
+### Parametre for tillitsrammeverket: brukes for å injisere verdier i en claim-struktur som brukes i forbindelse med tillitsrammeverket (dokumentdeling)
 ```
-  --legalEntityId                            <TEXT>             []
+  --practitionerAuthorizationCode            <TEXT>                        []
   Parameter for use in 'tillitsrammeverk' claims
 
-  --legalEntityName                          <TEXT>             []
+  --practitionerAuthorizationText            <TEXT>                        []
   Parameter for use in 'tillitsrammeverk' claims
 
-  --pointOfCareId                            <TEXT>             []
+  --practitionerLegalEntityId                <TEXT>                        []
   Parameter for use in 'tillitsrammeverk' claims
 
-  --pointOfCareName                          <TEXT>             []
+  --practitionerLegalEntityName              <TEXT>                        []
   Parameter for use in 'tillitsrammeverk' claims
 
-  --practitionerAuthorizationCode            <TEXT>             []
+  --practitionerPointOfCareId                <TEXT>                        []
   Parameter for use in 'tillitsrammeverk' claims
 
-  --practitionerAuthorizationText            <TEXT>             []
+  --practitionerPointOfCareName              <TEXT>                        []
   Parameter for use in 'tillitsrammeverk' claims
 
-  --careRelationshipDepartmentId             <TEXT>             []
-  Parameter for use in 'dokumentdeling' claims
+  --practitionerDepartmentId                 <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
 
-  --careRelationshipDepartmentName           <TEXT>             []
-  Parameter for use in 'dokumentdeling' claims
+  --practitionerDepartmentName               <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
 
-  --careRelationshipHealthcareServiceCode    <TEXT>             []
-  Parameter for use in 'dokumentdeling' claims
+  --careRelationshipHealthcareServiceCode    <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
 
-  --careRelationshipHealthcareServiceText    <TEXT>             []
-  Parameter for use in 'dokumentdeling' claims
+  --careRelationshipHealthcareServiceText    <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
 
-  --careRelationshipPurposeOfUseCode         <TEXT>             []
-  Parameter for use in 'dokumentdeling' claims
+  --careRelationshipPurposeOfUseCode         <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
 
-  --careRelationshipPurposeOfUseText         <TEXT>             []
-  Parameter for use in 'dokumentdeling' claims
+  --careRelationshipPurposeOfUseText         <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
 
-  --careRelationshipPurposeOfUseDetailsCode  <TEXT>             []
-  Parameter for use in 'dokumentdeling' claims
+  --careRelationshipPurposeOfUseDetailsCode  <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
 
-  --careRelationshipPurposeOfUseDetailsText  <TEXT>             []
-  Parameter for use in 'dokumentdeling' claims
+  --careRelationshipPurposeOfUseDetailsText  <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
 
-  --careRelationshipTracingRefId             <TEXT>             []
-  Parameter for use in 'dokumentdeling' claims
+  --careRelationshipTracingRefId             <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
 
 ```
 ### Brukerparametre: for å justere claim og bevis for DPoP

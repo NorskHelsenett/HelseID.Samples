@@ -74,7 +74,7 @@ public class Program
             IssuerEnvironment =                 options.issuerEnvironment,
             GeneralClaimsParametersGeneration = options.generalClaimsCreation.ToParametersGeneration(),
             UserClaimsParametersGeneration =    options.userClaimsCreation.ToParametersGeneration(),
-            CreateDokumentdelingClaims =        options.createDokumentdelingClaims,
+            CreateTillitsrammeverkClaims =      options.createTillitsrammeverkClaims,
             CreateDPoPTokenWithDPoPProof =      options.createDPoPTokenWithDPoPProof,
             HeaderParameters = new HeaderParameters()
             {
@@ -110,15 +110,13 @@ public class Program
             {
                 PractitionerAuthorizationCode = options.practitionerAuthorizationCode,
                 PractitionerAuthorizationText = options.practitionerAuthorizationText, 
-                LegalEntityId = options.legalEntityId,
-                LegalEntityName = options.legalEntityName,
-                PointOfCareId = options.pointOfCareId,
-                PointOfCareName = options.pointOfCareName,
-            },
-            DokumentdelingClaimsParameters = new DokumentdelingClaimsParameters
-            {
-                CareRelationshipDepartmentId  = options.careRelationshipDepartmentId,
-                CareRelationshipDepartmentName = options.careRelationshipDepartmentName,
+                PractitionerLegalEntityId = options.practitionerLegalEntityId,
+                PractitionerLegalEntityName = options.practitionerLegalEntityName,
+                PractitionerPointOfCareId = options.practitionerPointOfCareId,
+                PractitionerPointOfCareName = options.practitionerPointOfCareName,
+                PractitionerDepartmentId  = options.practitionerDepartmentId,
+                PractitionerDepartmentName = options.practitionerDepartmentName,
+                
                 CareRelationshipHealthcareServiceCode = options.careRelationshipHealthcareServiceCode,
                 CareRelationshipHealthcareServiceText = options.careRelationshipHealthcareServiceText,
                 CareRelationshipPurposeOfUseCode = options.careRelationshipPurposeOfUseCode,
