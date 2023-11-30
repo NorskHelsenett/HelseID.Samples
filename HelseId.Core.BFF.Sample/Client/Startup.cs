@@ -161,7 +161,7 @@ namespace HelseId.Core.BFF.Sample.Client
                 .Build();
             var apiScopePolicy = new AuthorizationPolicyBuilder()
                 .Combine(authenticatedHidUserPolicy)
-                .RequireScope(apiScope)
+                .RequireClaim("scope", apiScope)
                 .Build();
 
             services.AddAuthorization(config =>

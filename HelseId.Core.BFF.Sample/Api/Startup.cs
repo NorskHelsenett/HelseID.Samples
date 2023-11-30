@@ -92,7 +92,7 @@ namespace HelseId.Core.BFF.Sample.Api
                         .Build();
                     var apiAccessPolicy = new AuthorizationPolicyBuilder()
                         .Combine(authenticatedHidUserPolicy)
-                        .RequireScope(_configuration["HelseId:ApiScope"])
+                        .RequireClaim("scope", _configuration["HelseId:ApiScope"]!)
                         .Build();
 
                     config.DefaultPolicy = apiAccessPolicy;
