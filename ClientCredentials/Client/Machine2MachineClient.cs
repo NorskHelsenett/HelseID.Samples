@@ -58,6 +58,8 @@ public class Machine2MachineClient
     {
         if (DateTime.UtcNow > _persistedAccessTokenExpiresAt)
         {
+            var BackchannelHandler = new HttpClientHandler { UseProxy = true };
+
             var tokenResponse = await GetAccessTokenFromHelseId(httpClient);
             _persistedAccessTokenExpiresAt = _expirationTimeCalculator.CalculateTokenExpirationTimeUtc(tokenResponse.ExpiresIn);
             _persistedAccessToken = tokenResponse.AccessToken;

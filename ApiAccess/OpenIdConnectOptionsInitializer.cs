@@ -60,8 +60,8 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
 
     private void OpenIdConnectOptionsManagement(OpenIdConnectOptions openIdConnectOptions)
     {
-        // Application-specific configuration for the OpenID Connect handler
-        // (we read data from ../Configuration/HelseIdSamplesConfiguration.cs)
+        
+        openIdConnectOptions.BackchannelHttpHandler = new HttpClientHandler { UseProxy = true };
         openIdConnectOptions.Authority = _settings.HelseIdConfiguration.StsUrl;
         openIdConnectOptions.ClientId = _settings.HelseIdConfiguration.ClientId;
         SetUpScopes(openIdConnectOptions);
