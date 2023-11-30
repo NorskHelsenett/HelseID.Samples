@@ -51,8 +51,8 @@ namespace HelseId.Core.BFF.Sample.Client.Services
             var response = await Get(path, accessToken, cancellationToken);
             response.EnsureSuccessStatusCode();
 
-            var contentStream = await response.Content.ReadAsStreamAsync();
-            return await JsonSerializer.DeserializeAsync<T>(contentStream, cancellationToken: cancellationToken);
+            var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+            return (await JsonSerializer.DeserializeAsync<T>(contentStream, cancellationToken: cancellationToken))!;
         }
 
         public async Task<HttpResponseMessage> Forward(
