@@ -61,6 +61,8 @@ namespace HelseId.Core.BFF.Sample.Client
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
+            var apiScope = _configuration["ApiScope"];
+
             services.AddAuthentication(options =>
                 {
                     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -100,6 +102,8 @@ namespace HelseId.Core.BFF.Sample.Client
                     {
                         options.Scope.Add(scope.Trim());
                     }
+
+                    options.Scope.Add(apiScope);
 
                     options.SaveTokens = true;
 
@@ -146,7 +150,7 @@ namespace HelseId.Core.BFF.Sample.Client
                 .Build();
             var apiScopePolicy = new AuthorizationPolicyBuilder()
                 .Combine(authenticatedHidUserPolicy)
-                .RequireScope(_configuration["ApiScope"])
+                .RequireScope(apiScope)
                 .Build();
 
             services.AddAuthorization(config =>
@@ -216,7 +220,7 @@ namespace HelseId.Core.BFF.Sample.Client
 
             app.UseProtectPaths(new ProtectPathsOptions("HidAuthenticated", "/Forbidden")
             {
-                Exclusions = new List<PathString> {"/favicon.ico"}
+                Exclusions = new List<PathString> { "/favicon.ico" }
             });
             app.UseDefaultFiles();
             app.UseStaticFiles();
