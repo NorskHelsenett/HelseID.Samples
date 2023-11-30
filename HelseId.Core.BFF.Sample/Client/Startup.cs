@@ -42,7 +42,7 @@ namespace HelseId.Core.BFF.Sample.Client
             // Access token is automatically included and refreshed with 'AddUserAccessTokenHandler'.
             services.AddHttpClient<IApiClient, ApiClient>(client =>
             {
-                client.BaseAddress = new Uri(_configuration["ApiUrl"]);
+                client.BaseAddress = new Uri(_configuration["ApiUrl"]!);
                 client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
             }).AddUserAccessTokenHandler();
 
@@ -63,13 +63,13 @@ namespace HelseId.Core.BFF.Sample.Client
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
-            var hidConfigSection = _configuration.GetSection("HelseId");
-            var hidOptions = hidConfigSection.Get<HelseIdAuthOptions>();
+            var hidConfigSection = _configuration.GetRequiredSection("HelseId");
+            var hidOptions = hidConfigSection.Get<HelseIdAuthOptions>()!;
             services.AddOptions<HelseIdAuthOptions>()
                 .Bind(hidConfigSection)
                 .ValidateDataAnnotations();
 
-            var apiScope = _configuration["ApiScope"];
+            var apiScope = _configuration["ApiScope"]!;
 
             services.AddAuthentication(options =>
                 {
