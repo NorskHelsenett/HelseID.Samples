@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using HelseId.Core.BFF.Sample.Client.Infrastructure.AutomaticTokenManagement;
 using HelseId.Core.BFF.Sample.Client.Middleware;
 using HelseId.Core.BFF.Sample.Client.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -11,7 +10,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +19,9 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Serilog;
 using HelseId.Core.BFF.Sample.WebCommon.Identity;
 using HelseId.Core.BFF.Sample.WebCommon.Middleware;
+using IdentityModel;
+using HelseId.Core.BFF.Sample.Client.Auth;
+using Duende.AccessTokenManagement;
 
 namespace HelseId.Core.BFF.Sample.Client
 {
@@ -31,18 +32,19 @@ namespace HelseId.Core.BFF.Sample.Client
 
         public Startup(IConfiguration configuration, IHostEnvironment env)
         {
-            this._configuration = configuration;
+            _configuration = configuration;
             _env = env;
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHttpContextAccessor();
+            // Client used to make calls to the API.
+            // Access token is automatically included and refreshed with 'AddUserAccessTokenHandler'.
             services.AddHttpClient<IApiClient, ApiClient>(client =>
             {
                 client.BaseAddress = new Uri(_configuration["ApiUrl"]);
                 client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
-            });
+            }).AddUserAccessTokenHandler();
 
             if (_env.IsDevelopment())
             {
@@ -60,6 +62,12 @@ namespace HelseId.Core.BFF.Sample.Client
             services.AddScoped<ICurrentUser, CurrentHttpUser>();
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
+            var hidConfigSection = _configuration.GetSection("HelseId");
+            var hidOptions = hidConfigSection.Get<HelseIdAuthOptions>();
+            services.AddOptions<HelseIdAuthOptions>()
+                .Bind(hidConfigSection)
+                .ValidateDataAnnotations();
 
             var apiScope = _configuration["ApiScope"];
 
@@ -83,20 +91,20 @@ namespace HelseId.Core.BFF.Sample.Client
                 })
                 .AddOpenIdConnect("HelseID", options =>
                 {
-                    var hidConfig = _configuration.GetSection("HelseId");
-                    var acrValues = hidConfig["AcrValues"];
+                    var acrValues = hidOptions.AcrValues;
                     var hasAcrValues = !string.IsNullOrWhiteSpace(acrValues);
 
-                    options.Authority = hidConfig["Authority"];
+                    options.Authority = hidOptions.Authority;
                     options.RequireHttpsMetadata = true;
-                    options.ClientId = hidConfig["ClientId"];
-                    options.ClientSecret = hidConfig["ClientSecret"];
-                    options.ResponseType = "code";
-                    options.TokenValidationParameters.ValidAudience = hidConfig["ClientId"];
+                    options.ClientId = hidOptions.ClientId;
+                    options.ResponseType = OidcConstants.ResponseTypes.Code;
+                    options.TokenValidationParameters.ValidAudience = hidOptions.ClientId;
+                    options.CallbackPath = "/signin-oidc";
+                    options.SignedOutCallbackPath = "/signout-callback-oidc";
 
                     options.AccessDeniedPath = "/Forbidden";
 
-                    var scopes = hidConfig["Scopes"].Split(' ');
+                    var scopes = hidOptions.Scopes.Split(' ');
                     options.Scope.Clear();
                     foreach (var scope in scopes)
                     {
@@ -124,25 +132,28 @@ namespace HelseId.Core.BFF.Sample.Client
 
                         return Task.CompletedTask;
                     };
-                })
-                .AddAutomaticTokenManagement(options =>
-                {
-                    options.RefreshBeforeExpiration = TimeSpan.FromMinutes(2);
-                    options.RevokeRefreshTokenOnSignout = true;
-                    options.Scheme = "HelseID";
 
-                    options.CookieEvents.OnRedirectToAccessDenied = ctx =>
+                    // Use client assertion instead of client secret for initial token retrieval
+                    options.Events.OnAuthorizationCodeReceived = context =>
                     {
-                        // API requests should get a 403 status instead of being redirected to access denied page
-                        if (ctx.Request.Path.StartsWithSegments("/api"))
-                        {
-                            ctx.Response.Headers["Location"] = ctx.RedirectUri;
-                            ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
-                        }
+                        var clientAssertion = ClientAssertionBuilder.GetClientAssertion(hidOptions.ClientId, hidOptions.ClientJwk, hidOptions.Authority);
+
+                        var tokenEndpointRequest = context.TokenEndpointRequest!;
+                        tokenEndpointRequest.ClientAssertionType = clientAssertion.Type;
+                        tokenEndpointRequest.ClientAssertion = clientAssertion.Value;
 
                         return Task.CompletedTask;
                     };
                 });
+
+            // Automatic refresh of access token
+            services.AddOpenIdConnectAccessTokenManagement(options =>
+            {
+                options.RefreshBeforeExpiration = TimeSpan.FromSeconds(10);
+            });
+
+            // Use client assertion for automatic refresh of tokens
+            services.AddTransient<IClientAssertionService, ClientAssertionService>();
 
             var authenticatedHidUserPolicy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
