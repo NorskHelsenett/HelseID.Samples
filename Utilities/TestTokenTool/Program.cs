@@ -62,8 +62,6 @@ public class Program
             SignJwtWithInvalidSigningKey =      options.signJwtWithInvalidSigningKey,
             SetInvalidIssuer =                  options.setInvalidIssuer,
             SetInvalidAudience =                options.setInvalidAudience,
-            SetExpirationTimeAsExpired =        options.setExpirationTimeAsExpired,
-            ExpirationTimeInSeconds =           options.expirationTimeInSeconds,
             // User parameters
             SetPidPseudonym =                   options.setPidPseudonym,
             SetSubject =                        options.setSubject,
@@ -76,6 +74,12 @@ public class Program
             UserClaimsParametersGeneration =    options.userClaimsCreation.ToParametersGeneration(),
             CreateTillitsrammeverkClaims =      options.createTillitsrammeverkClaims,
             CreateDPoPTokenWithDPoPProof =      options.createDPoPTokenWithDPoPProof,
+            ExpirationParameters = new ExpirationParameters() 
+            {
+                SetExpirationTimeAsExpired =    options.setExpirationTimeAsExpired,
+                ExpirationTimeInSeconds =       options.expirationTimeInSeconds,
+                ExpirationTimeInDays =          options.expirationTimeInDays == 0 ? Int32.MinValue : options.expirationTimeInDays,
+            },
             HeaderParameters = new HeaderParameters()
             {
                 Typ = options.typHeader.GetEmptyStringIfNotSet(), 

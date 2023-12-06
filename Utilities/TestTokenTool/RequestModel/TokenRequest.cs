@@ -15,8 +15,6 @@ public class TokenRequest
 
     public bool SignJwtWithInvalidSigningKey { get; set; } 
 
-    public bool SetExpirationTimeAsExpired { get; set; }
-
     public bool SetInvalidIssuer { get; set; }
     
     public bool SetInvalidAudience { get; set; }
@@ -31,7 +29,7 @@ public class TokenRequest
     
     public bool SetSubject { get; set; }
 
-    public int ExpirationTimeInSeconds { get; set; } = Int32.MinValue;
+    public ExpirationParameters ExpirationParameters { get; set; } = new();
 
     public HeaderParameters HeaderParameters { get; set; } = new();
     

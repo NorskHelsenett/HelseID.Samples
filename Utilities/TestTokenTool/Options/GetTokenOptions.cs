@@ -27,8 +27,10 @@ public class GetTokenOptions : IArgumentModel
     public bool setInvalidAudience { get; set; } = false;
     [Named(Description = "The returned token will contain an expired 'nbf', 'iat', and 'exp' claims")]
     public bool setExpirationTimeAsExpired { get; set; } = false;
-    [Named(Description = "The returned token will contain an 'exp' claim matching the set expiration time")]
+    [Named(Description = "The returned token will contain an 'exp' claim matching the set expiration time in seconds")]
     public int expirationTimeInSeconds { get; set; } = 600;
+    [Named(Description = "The returned token will contain an 'exp' claim matching the set expiration time (days) in seconds")]
+    public int expirationTimeInDays { get; set; } = 0;
     // -----------------------------------------
     // Header parameters
     [Named(Description = "The returned token will contain a 'typ' header matching the injected value. Accepted values are 'jwt' and 'at+jwt'")]
