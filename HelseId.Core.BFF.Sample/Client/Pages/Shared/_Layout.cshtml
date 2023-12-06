@@ -14,7 +14,7 @@
 </main>
 
 <footer>
-    @if (User.Identity.IsAuthenticated)
+    @if (User!.Identity!.IsAuthenticated)
     {
         <div class="page-content">
             <a href="/Account/Logout">Logg ut</a>

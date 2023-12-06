@@ -1,10 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 
@@ -30,12 +30,10 @@ namespace HelseId.Core.BFF.Sample.Client.Services
     public class ApiClient : IApiClient
     {
         private readonly HttpClient _httpClient;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ApiClient(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
+        public ApiClient(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<HttpResponseMessage> Get(
@@ -44,7 +42,6 @@ namespace HelseId.Core.BFF.Sample.Client.Services
             CancellationToken cancellationToken = default
         )
         {
-            await PrepareRequest(accessToken);
             var response = await _httpClient.GetAsync(path, cancellationToken);
             return response;
         }
@@ -54,8 +51,8 @@ namespace HelseId.Core.BFF.Sample.Client.Services
             var response = await Get(path, accessToken, cancellationToken);
             response.EnsureSuccessStatusCode();
 
-            var contentStream = await response.Content.ReadAsStreamAsync();
-            return await JsonSerializer.DeserializeAsync<T>(contentStream, cancellationToken: cancellationToken);
+            var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+            return (await JsonSerializer.DeserializeAsync<T>(contentStream, cancellationToken: cancellationToken))!;
         }
 
         public async Task<HttpResponseMessage> Forward(
@@ -63,9 +60,13 @@ namespace HelseId.Core.BFF.Sample.Client.Services
             CancellationToken cancellationToken = default
         )
         {
-            await PrepareRequest();
+            HttpContent content;
+            using (var memoryStream = new MemoryStream())
+            {
+                await request.Body.CopyToAsync(memoryStream, cancellationToken: cancellationToken);
+                content = new ByteArrayContent(memoryStream.ToArray());
+            }
 
-            var content = new StreamContent(request.Body);
             if (request.ContentType != null)
             {
                 content.Headers.ContentType = MediaTypeHeaderValue.Parse(request.ContentType);
@@ -90,18 +91,6 @@ namespace HelseId.Core.BFF.Sample.Client.Services
             };
             var response = await _httpClient.SendAsync(requestMsg, cancellationToken);
             return response;
-        }
-
-        private async Task PrepareRequest(string? accessToken = null)
-        {
-            if (accessToken == null)
-            {
-                // TODO: Somehow set access token in constructor? (cannot because of async)
-                var httpContext = _httpContextAccessor.HttpContext;
-                accessToken = await httpContext.GetTokenAsync("access_token");
-            }
-
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         }
     }
 }
