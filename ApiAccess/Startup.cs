@@ -16,6 +16,7 @@ using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Interfaces.TokenExpiration;
 using HelseId.Samples.Common.Interfaces.TokenRequests;
 using HelseId.Samples.Common.JwtTokens;
+using HelseId.Samples.Common.Models;
 using HelseId.Samples.Common.PayloadClaimsCreators;
 using HelseId.Samples.Common.TokenExpiration;
 using HelseId.Samples.Common.TokenRequests;
@@ -39,7 +40,7 @@ public class Startup
     {
         _settings = settings;
     }
-    
+
     public WebApplication BuildWebApplication()
     {
         var builder = WebApplication.CreateBuilder();
@@ -72,12 +73,12 @@ public class Startup
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
     }
 
-    private void ConfigureServices(IServiceCollection services) 
+    private void ConfigureServices(IServiceCollection services)
     {
         // Add services to the container.
         services.AddControllersWithViews();
 
-        // Create a settings instance. These can be injected into other objects, for instance the HomeController 
+        // Create a settings instance. These can be injected into other objects, for instance the HomeController
         services.AddSingleton(_settings);
         // We need the HelseIdConfiguration instance as a service as well:
         services.AddSingleton(_settings.HelseIdConfiguration);
@@ -99,10 +100,32 @@ public class Startup
             // We add this object as an instance of IPayloadClaimsCreatorForClientAssertion
             services.AddSingleton<IPayloadClaimsCreatorForRequestObjects>(compositePayloadClaimsCreator);
         }
+        // TODO: FOO the resource indicator also uses an resource object
+        else if (_settings.ClientType == ClientType.ApiAccessWithResourceIndicators)
+        {
+            // We need payload claims for the token request, both the "default" type and for the child organization number:
+            var compositePayloadClaimsCreator = new CompositePayloadClaimsCreator(new List<IPayloadClaimsCreator>
+            {
+                new RequestObjectPayloadClaimsCreator(dateTimeService),
+                new PayloadClaimsCreatorWithChildOrgNumber()
+            });
+            // We add this object as an instance of IPayloadClaimsCreatorForClientAssertion
+            services.AddSingleton<IPayloadClaimsCreatorForRequestObjects>(compositePayloadClaimsCreator);
+        }
         else
         {
+            // TODO: FOO
+
+            var compositePayloadClaimsCreator = new CompositePayloadClaimsCreator(new List<IPayloadClaimsCreator>
+            {
+                new RequestObjectPayloadClaimsCreator(dateTimeService),
+                new PayloadClaimsCreatorWithChildOrgNumber()
+            });
+            // We add this object as an instance of IPayloadClaimsCreatorForClientAssertion
+            services.AddSingleton<IPayloadClaimsCreatorForRequestObjects>(compositePayloadClaimsCreator);
+
             // No request object is needed, so we inject a null object for payload claims creation instead
-            services.AddSingleton<IPayloadClaimsCreatorForRequestObjects>(new NullPayloadClaimsCreatorForRequestObjects());
+            //services.AddSingleton<IPayloadClaimsCreatorForRequestObjects>(new NullPayloadClaimsCreatorForRequestObjects());
         }
 
         var clientAssertionPayloadClaimsCreator = new ClientAssertionPayloadClaimsCreator(dateTimeService);
@@ -126,12 +149,31 @@ public class Startup
             });
             services.AddSingleton<IPayloadClaimsCreatorForClientAssertion>(compositePayloadClaimsCreator);
         }
+        else if (_settings.ClientType == ClientType.ApiAccessWithResourceIndicators)
+        {
+            // TODO: FOO the resource indicator sets a child org
+            var compositePayloadClaimsCreator = new CompositePayloadClaimsCreator(new List<IPayloadClaimsCreator>
+            {
+                clientAssertionPayloadClaimsCreator,
+                new PayloadClaimsCreatorWithChildOrgNumber(),
+            });
+            services.AddSingleton<IPayloadClaimsCreatorForClientAssertion>(compositePayloadClaimsCreator);
+        }
         else
         {
+            // TODO: FOO the default request sets a child org
+            /*
+            var compositePayloadClaimsCreator = new CompositePayloadClaimsCreator(new List<IPayloadClaimsCreator>
+            {
+                clientAssertionPayloadClaimsCreator,
+                new PayloadClaimsCreatorWithChildOrgNumber(),
+            });
+            services.AddSingleton<IPayloadClaimsCreatorForClientAssertion>(compositePayloadClaimsCreator);
+*/
             // We only need the "default" token request payload claim creator:
             services.AddSingleton<IPayloadClaimsCreatorForClientAssertion>(clientAssertionPayloadClaimsCreator);
         }
-        
+
         // Builder for client assertions payloads
         services.AddTransient<IJwtPayloadCreator, JwtPayloadCreator>();
         // Builder for JWT tokens used for client assertions
@@ -147,7 +189,7 @@ public class Startup
         services.AddTransient<ITokenRequestBuilder, TokenRequestBuilder>();
         // Used for creating a simple view model
         services.AddTransient<IViewModelCreator, ViewModelCreator>();
-        
+
         // Updates the stored access token(s) by means of the refresh token grant
         if (_settings.ClientType == ClientType.ApiAccessForMultiTenantClient)
         {
@@ -172,7 +214,7 @@ public class Startup
         // Add the authentication options initializers:
         services.AddTransient<IConfigureOptions<AuthenticationOptions>, AuthenticationOptionsInitializer>();
         services.AddTransient<IConfigureNamedOptions<OpenIdConnectOptions>, OpenIdConnectOptionsInitializer>();
-        
+
         // Set authentication options (these will call the AuthenticationOptionsInitializer and OpenIdConnectOptionsInitializer instances)
         services.AddAuthentication()
             .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
@@ -197,7 +239,7 @@ public class Startup
         {
             config.AddPolicy(SecurityLevelClaimPolicy, securityLevelClaimPolicy);
         });
-        
+
         // We need to replace the OpenIdConnectHandler with our own when DPoP is required
         if (_settings.UseDPoP)
         {
@@ -205,7 +247,7 @@ public class Startup
         }
     }
 
-    private WebApplication Configure(WebApplication webApplication) 
+    private WebApplication Configure(WebApplication webApplication)
     {
         // Configure the HTTP request pipeline.
         if (!webApplication.Environment.IsDevelopment())
@@ -219,7 +261,7 @@ public class Startup
         webApplication.UseStaticFiles();
         webApplication.UseRouting();
         // Registers the authentication middleware:
-        webApplication.UseAuthentication(); 
+        webApplication.UseAuthentication();
         webApplication.UseAuthorization();
         webApplication.MapControllerRoute(
             name: "default",

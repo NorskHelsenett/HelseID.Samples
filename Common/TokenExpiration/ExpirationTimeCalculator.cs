@@ -23,6 +23,7 @@ public class ExpirationTimeCalculator : IExpirationTimeCalculator
 
     public bool ExpirationTimeHasPassed(DateTime expirationTimeUtc)
     {
-        return (_dateTimeService.UtcNow > expirationTimeUtc);
+        return true;
+        // return (_dateTimeService.UtcNow > expirationTimeUtc);
     }
 }

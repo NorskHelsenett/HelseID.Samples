@@ -74,7 +74,9 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
 
         // Uses information from the user info endpoint
         // Comment these lines out if you don't need information about HPR authorization:
-        openIdConnectOptions.GetClaimsFromUserInfoEndpoint = true;
+        // TODO: FOO:
+        //openIdConnectOptions.GetClaimsFromUserInfoEndpoint = true;
+        openIdConnectOptions.GetClaimsFromUserInfoEndpoint = false;
         openIdConnectOptions.ClaimActions.MapCustomJson("helseid://claims/hpr/hpr_details",jsonElement =>
         {
             return jsonElement.TryGetProperty("helseid://claims/hpr/hpr_details", out var claimContent) ?
@@ -92,7 +94,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         // We use POST as the authentication method; the default method is GET
         openIdConnectOptions.AuthenticationMethod = OpenIdConnectRedirectBehavior.FormPost;
     }
-    
+
     private void SetUpScopes(OpenIdConnectOptions openIdConnectOptions)
     {
         openIdConnectOptions.Scope.Clear();
@@ -129,6 +131,11 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             authCodeReceivedContext.TokenEndpointRequest!.ClientAssertionType = clientAssertion.Type;
             // Asserts the client by using the generated Jwt (the value from the type)
             authCodeReceivedContext.TokenEndpointRequest.ClientAssertion = clientAssertion.Value;
+
+            // TODO: FOO use resource indicator on first call
+            //authCodeReceivedContext.TokenEndpointRequest.Resource = "nhn:helseid-public-sample-api-2";
+            // authCodeReceivedContext.TokenEndpointRequest.Scope = "openid profile nhn:helseid-public-sample-api-2";
+
 
             return Task.CompletedTask;
         };
@@ -174,12 +181,12 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             // Invoked before redirecting to the identity provider to authenticate. This can be used to
             // set a ProtocolMessage.State that will be persisted through the authentication process.
             // The ProtocolMessage can also be used to add or customize parameters sent to the identity provider.
-            
+
             // For certain features, we need to establish a custom request message for creating
-            // request objects or resource indicators.  The implementation of the former ('resource')
+            // request objects or resource indicators.  The implementation of the latter ('resource')
             // is not in conformance with the specification (https://www.rfc-editor.org/rfc/rfc8707), and
             // the (optional) 'request' parameter (https://openid.net/specs/openid-connect-core-1_0.html#JWTRequests)
-            // is not currently implemented
+            // is not currently implemented in the library
             if (redirectContext.ProtocolMessage.RequestType == OpenIdConnectRequestType.Authentication)
             {
                 var customOpenIdConnectMessageParameters =
@@ -187,7 +194,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
                     {
                         RequestObject = CreateRequestObject(),
                         ResourceIndicators = _settings.HelseIdConfiguration.ResourceIndicators,
-                    }; 
+                    };
 
                 // We need a custom class for creating the message to the authorization endpoint:
                 var customProtocolMessage = new CustomOpenIdConnectMessage(
@@ -224,7 +231,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
 
             // Here, you might want to inform the user about a failed authentication
             return Task.CompletedTask;
-        }; 
+        };
     }
 
     // Created a request object if the client type requires it.
@@ -242,7 +249,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         {
             ChildOrganizationNumber = ConfigurationValues.ApiAccessWithRequestObjectChildOrganizationNumber
         };
-        // We create a signing token (as used in a client assertion), and use this as a request object: 
+        // We create a signing token (as used in a client assertion), and use this as a request object:
         return _signingTokenCreator.CreateSigningToken(_payloadClaimsCreatorForRequestObjects, payloadClaimParameters);
     }
 
@@ -343,6 +350,18 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             // This sets the contextual claim type for the call to HelseID:
             result.ContextualClaimType = ConfigurationValues.TestContextClaim;
         }
+
+        // TODO: FOO use organization for resource indicators
+        if (_settings.ClientType == ClientType.ApiAccessWithResourceIndicators)
+        {
+            // This value will typically be assigned to a logged on user:
+            result.ChildOrganizationNumber = ConfigurationValues.ApiAccessWithRequestObjectChildOrganizationNumber;
+
+            //result.ChildOrganizationNumber = "999977775";
+        }
+
+        // TODO: FOO always child org nos
+        result.ChildOrganizationNumber = ConfigurationValues.ApiAccessWithRequestObjectChildOrganizationNumber;
 
         return result;
     }

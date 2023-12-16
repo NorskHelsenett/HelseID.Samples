@@ -92,12 +92,12 @@ public class AccessTokenUpdater : IAccessTokenUpdater
         {
             tokenResponse = await GetRefreshTokenResponseFromHelseId(httpClient, userSessionData, apiIndicators, tokenResponse.DPoPNonce);
         }
-        
+
         if (tokenResponse.IsError)
         {
             throw new TokenResponseErrorException(tokenResponse.Error ?? "No token response error found");
         }
-        
+
         if (tokenResponse.AccessToken == null)
         {
             throw new TokenResponseErrorException("No access token response found");
@@ -112,18 +112,21 @@ public class AccessTokenUpdater : IAccessTokenUpdater
         {
             throw new TokenResponseErrorException("No refresh token response found");
         }
-        
+
         return await UpdateUserSessionData(userSessionData, apiIndicators, tokenResponse);
     }
-    
+
     private async Task<TokenResponse> GetRefreshTokenResponseFromHelseId(
         HttpClient httpClient,
         UserSessionData userSessionData,
-        ApiIndicators apiIndicators, 
+        ApiIndicators apiIndicators,
         string? dPoPNonce = null)
     {
         var tokenRequestParameters = CreateRefreshTokenRequestParameters(userSessionData, apiIndicators);
-        
+
+        // TODO: FOO use organization number for refresh token
+        tokenRequestParameters.PayloadClaimParameters.ChildOrganizationNumber = "999977777";
+
         // If the value for refreshToken is null, we expect this method to fail
         var request = await _tokenRequestBuilder.CreateRefreshTokenRequest(_payloadClaimsCreatorForClientAssertion, tokenRequestParameters!, dPoPNonce);
 

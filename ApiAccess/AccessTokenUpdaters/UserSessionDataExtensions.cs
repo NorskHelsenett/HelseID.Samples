@@ -13,9 +13,10 @@ public static class UserSessionDataExtensions
         }
         return expirationTimeCalculator.ExpirationTimeHasPassed(userSessionData.AccessTokens[accessTokenAudience].AccessTokenExpiresAtUtc);
     }
-    
+
     public static bool RefreshTokenHasExpired(this UserSessionData userSessionData, IExpirationTimeCalculator expirationTimeCalculator)
     {
-        return expirationTimeCalculator.ExpirationTimeHasPassed(userSessionData.RefreshTokenExpiresAtUtc);
+        return false;
+        // return expirationTimeCalculator.ExpirationTimeHasPassed(userSessionData.RefreshTokenExpiresAtUtc);
     }
 }
