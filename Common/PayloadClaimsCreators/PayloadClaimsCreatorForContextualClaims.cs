@@ -16,22 +16,22 @@ public class PayloadClaimsCreatorForContextualClaims : IPayloadClaimsCreator
             {
               authorization = new
               {
-                code = "AA",
+                code = "1",
                 system = "urn:oid:2.16.578.1.12.4.1.1.9060",
               },
               legal_entity = new
               {
-                id = "111222333",
+                id = "810483822",
                 system = "urn:oid:2.16.578.1.12.4.1.4.101"
               },
               point_of_care = new
               {
-                id = "111222333",
+                id = "810483822",
                 system = "urn:oid:2.16.578.1.12.4.1.4.101",
               },
               department = new
               {
-                id = "111222333",
+                id = "1001",
                 system = "urn:oid:2.16.578.1.12.4.1.4.102",
               },
             },
