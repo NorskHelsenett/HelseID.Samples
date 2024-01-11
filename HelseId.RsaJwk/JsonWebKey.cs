@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace HelseId.RsaJwk;
+﻿namespace HelseId.RsaJwk;
 
 internal class JsonWebKey
 {
@@ -20,13 +18,3 @@ internal class JsonWebKey
     public string Use { get; set; }
     public string Alg { get; set; }
 }
-
-// Source generation is only required because PublishTrimmed is enabled on project
-[JsonSerializable(typeof(JsonWebKey))]
-[JsonSourceGenerationOptions(
-    WriteIndented = false,
-    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-    IgnoreReadOnlyProperties = true,
-    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase
-)]
-internal partial class SourceGenerationContext : JsonSerializerContext {}

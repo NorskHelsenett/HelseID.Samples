@@ -6,7 +6,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text.Json;
 using JsonWebKey = HelseId.RsaJwk.JsonWebKey;
-
+using JsonWebKeySet = HelseId.RsaJwk.JsonWebKeySet;
 
 new Parser(with =>
     {
@@ -33,11 +33,13 @@ static int GenerateKey(Options options)
 
     var jwkFileName = "jwk.json";
     var publicJwkFileName = "jwk_pub.json";
+    var jwksFileName = "jwks.json";
 
     if (prefix != null)
     {
         jwkFileName = $"{prefix}_{jwkFileName}";
         publicJwkFileName = $"{prefix}_{publicJwkFileName}";
+        jwksFileName = $"{prefix}_{jwksFileName}";
     }
 
     JsonWebKey privateJwk, publicJwk;
@@ -56,8 +58,17 @@ static int GenerateKey(Options options)
 
     File.WriteAllText(jwkFileName, JsonSerializer.Serialize(privateJwk, SourceGenerationContext.Default.JsonWebKey));
     Console.WriteLine($"Wrote JWK to {jwkFileName}");
+
     File.WriteAllText(publicJwkFileName, JsonSerializer.Serialize(publicJwk, SourceGenerationContext.Default.JsonWebKey));
     Console.WriteLine($"Wrote public JWK to {publicJwkFileName}");
+
+    var jwks = new JsonWebKeySet
+    {
+        Keys = [publicJwk]
+    };
+
+    File.WriteAllText(jwksFileName, JsonSerializer.Serialize(jwks, SourceGenerationContext.Default.JsonWebKeySet));
+    Console.WriteLine($"Wrote JWKS to {jwksFileName}");
 
     return 0;
 }
