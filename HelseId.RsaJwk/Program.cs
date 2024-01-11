@@ -29,18 +29,6 @@ static int GenerateKey(Options options)
     }
 
     var keyType = options.KeyType;
-    var prefix = options.Prefix;
-
-    var jwkFileName = "jwk.json";
-    var publicJwkFileName = "jwk_pub.json";
-    var jwksFileName = "jwks.json";
-
-    if (prefix != null)
-    {
-        jwkFileName = $"{prefix}_{jwkFileName}";
-        publicJwkFileName = $"{prefix}_{publicJwkFileName}";
-        jwksFileName = $"{prefix}_{jwksFileName}";
-    }
 
     JsonWebKey privateJwk, publicJwk;
     switch (keyType)
@@ -56,19 +44,7 @@ static int GenerateKey(Options options)
             return 1;
     }
 
-    File.WriteAllText(jwkFileName, JsonSerializer.Serialize(privateJwk, SourceGenerationContext.Default.JsonWebKey));
-    Console.WriteLine($"Wrote JWK to {jwkFileName}");
-
-    File.WriteAllText(publicJwkFileName, JsonSerializer.Serialize(publicJwk, SourceGenerationContext.Default.JsonWebKey));
-    Console.WriteLine($"Wrote public JWK to {publicJwkFileName}");
-
-    var jwks = new JsonWebKeySet
-    {
-        Keys = [publicJwk]
-    };
-
-    File.WriteAllText(jwksFileName, JsonSerializer.Serialize(jwks, SourceGenerationContext.Default.JsonWebKeySet));
-    Console.WriteLine($"Wrote JWKS to {jwksFileName}");
+    WriteKeyPair(privateJwk, publicJwk, options);
 
     return 0;
 }
@@ -147,4 +123,36 @@ static (JsonWebKey privateJwk, JsonWebKey publicJwk) GenerateEcdsaKey(Options op
     };
 
     return (privateJwk, publicJwk);
+}
+
+static void WriteKeyPair(JsonWebKey privateJwk, JsonWebKey publicJwk, Options options)
+{
+    var jwkFileName = "jwk.json";
+    var publicJwkFileName = "jwk_pub.json";
+    var jwksFileName = "jwks.json";
+
+    var prefix = options.Prefix;
+    if (prefix != null)
+    {
+        jwkFileName = $"{prefix}_{jwkFileName}";
+        publicJwkFileName = $"{prefix}_{publicJwkFileName}";
+        jwksFileName = $"{prefix}_{jwksFileName}";
+    }
+
+    File.WriteAllText(jwkFileName, JsonSerializer.Serialize(privateJwk, SourceGenerationContext.Default.JsonWebKey));
+    Console.WriteLine($"Wrote JWK to {jwkFileName}");
+
+    File.WriteAllText(publicJwkFileName, JsonSerializer.Serialize(publicJwk, SourceGenerationContext.Default.JsonWebKey));
+    Console.WriteLine($"Wrote public JWK to {publicJwkFileName}");
+
+    if (options.Jwks)
+    {
+        var jwks = new JsonWebKeySet
+        {
+            Keys = [publicJwk]
+        };
+
+        File.WriteAllText(jwksFileName, JsonSerializer.Serialize(jwks, SourceGenerationContext.Default.JsonWebKeySet));
+        Console.WriteLine($"Wrote JWKS to {jwksFileName}");
+    }
 }
