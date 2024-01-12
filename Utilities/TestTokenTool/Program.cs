@@ -1,4 +1,4 @@
-﻿using CommandDotNet;
+using CommandDotNet;
 using CommandDotNet.Help;
 using Microsoft.Extensions.Configuration;
 using TestTokenTool.ApiCalls;
@@ -15,7 +15,7 @@ namespace TestTokenTool;
 public class Program
 {
     private static IConfigurationBuilder? _builder;
-    
+
     static async Task Main(string[] args)
     {
         _builder = new ConfigurationBuilder()
@@ -46,16 +46,16 @@ public class Program
         await appRunner.RunAsync(args);
     }
 
-    [Command("getToken", Description = "Get a token from the test token service")] 
+    [Command("getToken", Description = "Get a token from the test token service")]
     public async Task GetToken(GetTokenOptions options)
     {
-        
+
         if (!File.Exists(FileConstants.JwkFileName))
         {
             Console.WriteLine("Ooops! The private key for usage with HelseID is missing. [Read the README.md file for how to create this key and use its public equivalent in HelseID Selvbetjening.]");
             return;
         }
-        
+
         var tokenRequest = new TokenRequest
         {
             // Invalid output from TTT
@@ -74,7 +74,7 @@ public class Program
             UserClaimsParametersGeneration =    options.userClaimsCreation.ToParametersGeneration(),
             CreateTillitsrammeverkClaims =      options.createTillitsrammeverkClaims,
             CreateDPoPTokenWithDPoPProof =      options.createDPoPTokenWithDPoPProof,
-            ExpirationParameters = new ExpirationParameters() 
+            ExpirationParameters = new ExpirationParameters()
             {
                 SetExpirationTimeAsExpired =    options.setExpirationTimeAsExpired,
                 ExpirationTimeInSeconds =       options.expirationTimeInSeconds,
@@ -82,7 +82,7 @@ public class Program
             },
             HeaderParameters = new HeaderParameters()
             {
-                Typ = options.typHeader.GetEmptyStringIfNotSet(), 
+                Typ = options.typHeader.GetEmptyStringIfNotSet(),
             },
             GeneralClaimsParameters = new GeneralParameters
             {
@@ -113,21 +113,25 @@ public class Program
             TillitsrammeverkClaimsParameters = new TillitsrammeverkClaimsParameters
             {
                 PractitionerAuthorizationCode = options.practitionerAuthorizationCode,
-                PractitionerAuthorizationText = options.practitionerAuthorizationText, 
+                PractitionerAuthorizationText = options.practitionerAuthorizationText,
                 PractitionerLegalEntityId = options.practitionerLegalEntityId,
                 PractitionerLegalEntityName = options.practitionerLegalEntityName,
                 PractitionerPointOfCareId = options.practitionerPointOfCareId,
                 PractitionerPointOfCareName = options.practitionerPointOfCareName,
                 PractitionerDepartmentId  = options.practitionerDepartmentId,
                 PractitionerDepartmentName = options.practitionerDepartmentName,
-                
+
                 CareRelationshipHealthcareServiceCode = options.careRelationshipHealthcareServiceCode,
                 CareRelationshipHealthcareServiceText = options.careRelationshipHealthcareServiceText,
                 CareRelationshipPurposeOfUseCode = options.careRelationshipPurposeOfUseCode,
                 CareRelationshipPurposeOfUseText = options.careRelationshipPurposeOfUseText,
                 CareRelationshipPurposeOfUseDetailsCode = options.careRelationshipPurposeOfUseDetailsCode,
-                CareRelationshipPurposeOfUseDetailsText = options.careRelationshipPurposeOfUseDetailsText, 
+                CareRelationshipPurposeOfUseDetailsText = options.careRelationshipPurposeOfUseDetailsText,
                 CareRelationshipTracingRefId = options.careRelationshipTracingRefId,
+                PatientsPointOfCareId = options.patientsPointOfCareId,
+                PatientsPointOfCareName = options.patientsPointOfCareName,
+                PatientsDepartmentId = options.patientsDepartmentId,
+                PatientsDepartmentName = options.patientsDepartmentName,
             },
             DPoPProofParameters = new DPoPProofParameters
             {
@@ -150,7 +154,7 @@ public class Program
         };
         TokenPrinter.WriteResponse(tokenResponse, parameters);
         IApiCaller apiCaller = new ApiCaller();
-        await apiCaller.CallApi(tokenResponse, parameters);        
+        await apiCaller.CallApi(tokenResponse, parameters);
     }
 
     [Command("createKeys", Description = "Create a new public/private key pair for authentication with HelseID")]

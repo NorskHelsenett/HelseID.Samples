@@ -2,9 +2,9 @@ namespace TestTokenTool.RequestModel;
 
 public class TillitsrammeverkClaimsParameters
 {
-    public string PractitionerAuthorizationCode { get; set; } = string.Empty;    
-    public string PractitionerAuthorizationText { get; set; } = string.Empty; 
-    
+    public string PractitionerAuthorizationCode { get; set; } = string.Empty;
+    public string PractitionerAuthorizationText { get; set; } = string.Empty;
+
     public string PractitionerLegalEntityId { get; set; } = string.Empty;
     public string PractitionerLegalEntityName { get; set; } = string.Empty;
 
@@ -16,7 +16,7 @@ public class TillitsrammeverkClaimsParameters
 
     public string CareRelationshipHealthcareServiceCode { get; set; } = string.Empty;
     public string CareRelationshipHealthcareServiceText { get; set; } = string.Empty;
-    
+
     public string CareRelationshipPurposeOfUseCode { get; set; } = string.Empty;
     public string CareRelationshipPurposeOfUseText { get; set; } = string.Empty;
 
@@ -24,4 +24,10 @@ public class TillitsrammeverkClaimsParameters
     public string CareRelationshipPurposeOfUseDetailsText { get; set; } = string.Empty;
 
     public string CareRelationshipTracingRefId { get; set; } = string.Empty;
+
+    public string PatientsPointOfCareId { get; set; } = string.Empty;
+    public string PatientsPointOfCareName { get; set; } = string.Empty;
+
+    public string PatientsDepartmentId { get; set; } = string.Empty;
+    public string PatientsDepartmentName { get; set; } = string.Empty;
 }
