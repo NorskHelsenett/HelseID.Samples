@@ -123,6 +123,14 @@ public class GetTokenOptions : IArgumentModel
     public string careRelationshipPurposeOfUseDetailsText { get; set; } = string.Empty;
     [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
     public string careRelationshipTracingRefId { get; set; } = string.Empty;
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
+    public string patientsPointOfCareId { get; set; } = string.Empty;
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
+    public string patientsPointOfCareName { get; set; } = string.Empty;
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
+    public string patientsDepartmentId { get; set; } = string.Empty;
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
+    public string patientsDepartmentName { get; set; } = string.Empty;
     // -----------------------------------------
     // Usage of parameters
     [Named(Description = "Instructs how common claims are created")]

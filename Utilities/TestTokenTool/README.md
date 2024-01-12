@@ -75,7 +75,7 @@ For å få en liste over alle parametrene, kan du bruke kommandoen
 `dotnet run getToken -- --help`
 
 
-For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen):
+For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen) med DPoP:
 `dotnet run getToken --createDPoPTokenWithDPoPProof --htuClaimValue https://localhost:5081/machine-clients/dpop-greetings --htmClaimValue GET --callApi
 `
 
@@ -255,7 +255,18 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen):
 
   --careRelationshipTracingRefId             <TEXT>                        []
   Parameter for use in 'tillitsrammeverk' claims
+  
+  --patientsPointOfCareId                    <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
 
+  --patientsPointOfCareName                  <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --patientsDepartmentId                     <TEXT>                        []
+    Parameter for use in 'tillitsrammeverk' claims
+
+  --patientsDepartmentName                   <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
 ```
 ### Brukerparametre: for å justere claim og bevis for DPoP
 ```
