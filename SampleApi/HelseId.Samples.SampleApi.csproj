@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IdentityModel" Version="6.1.0" />
+    <PackageReference Include="IdentityModel" Version="7.0.0-preview.2" />
     <PackageReference Include="IdentityModel.AspNetCore.OAuth2Introspection" Version="6.2.0" />
     <PackageReference Include="IdentityModel.OidcClient" Version="5.2.1" />
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
