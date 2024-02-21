@@ -35,27 +35,22 @@ public class Program
             aliases: new [] {"--use-multi-tenant", "-mt"},
             description: "If set, the application will use a client set up for multi-tenancy, i.e. it makes use of an organization number that is connected to the client.",
             getDefaultValue: () => false);
-        
-        var useContextualClaimsOption = new Option<bool>(
-            aliases: new [] {"--use-contextual-claims", "-cc"},
-            description: "If set, the application will use submit a contextual claim to HelseID, which will in turn be returned to the sample API.",
-            getDefaultValue: () => false);
-        
+
         var useDPoPOption = new Option<bool>(
             aliases: new [] {"--use-dpop", "-dp"},
             description: "If set, the application will use the demonstrating proof-of-possesion mechanism for sender-constraining the token sent to the example API.",
             getDefaultValue: () => false);
-        
+
         var rootCommand = new RootCommand("An authorization code flow usage sample")
         {
-            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, useContextualClaimsOption, useDPoPOption
+            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, useDPoPOption
         };
 
-        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useContextualClaims, useDPoP) =>
+        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useDPoP) =>
         {
-            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useContextualClaims, useDPoP);
+            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useDPoP);
             new Startup(settings).BuildWebApplication().Run();
-        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, useContextualClaimsOption, useDPoPOption);
+        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, useDPoPOption);
 
         await rootCommand.InvokeAsync(args);
     }
@@ -66,10 +61,9 @@ public class Program
         bool useRequestObjects,
         bool useResourceIndicators,
         bool useMultiTenant,
-        bool useContextualClaims,
         bool useDPoP)
     {
-        var clientType = GetClientType(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useContextualClaims);
+        var clientType = GetClientType(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant);
 
         return new Settings
         {
@@ -88,8 +82,7 @@ public class Program
         bool useTokenExchange,
         bool useRequestObjects,
         bool useResourceIndicators,
-        bool useMultiTenant,
-        bool useContextualClaims)
+        bool useMultiTenant)
     {
         if (userLoginOnly)
         {
@@ -114,11 +107,6 @@ public class Program
         if (useMultiTenant)
         {
             return ClientType.ApiAccessForMultiTenantClient;
-        }
-
-        if (useContextualClaims)
-        {
-            return ClientType.ApiAccessWithContextualClaims;
         }
 
         return ClientType.ApiAccess;
@@ -167,7 +155,6 @@ public class Program
             ClientType.ApiAccessWithResourceIndicators => HelseIdSamplesConfiguration.ResourceIndicatorsClient,
             ClientType.UserLoginOnly => HelseIdSamplesConfiguration.UserAuthenticationClient,
             ClientType.ApiAccessForMultiTenantClient => HelseIdSamplesConfiguration.ApiAccessForMultiTenantClient,
-            ClientType.ApiAccessWithContextualClaims => HelseIdSamplesConfiguration.ApiAccessWithContextualClaimsClient,
             _ => HelseIdSamplesConfiguration.ApiAccess
         };
         result.UseDPoP = useDPoP;

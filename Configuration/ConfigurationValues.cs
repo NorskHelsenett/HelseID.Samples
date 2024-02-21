@@ -31,9 +31,6 @@ public static class ConfigurationValues
     // The scope that is needed for access to the clientinfo_endpoint on HelseID (https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/492044292/Client+Info+Endpoint):
     private const string ClientInfoScope = "helseid://scopes/client/info";
 
-    // The claim that is needed for use of contextual claims:
-    public const string TestContextClaim = "helseid://claims/external/test-context";
-
     // HelseID security level claim
     public const string HelseIdSecurityLevelClaim = "helseid://claims/identity/security_level";
 
@@ -107,7 +104,6 @@ public static class ConfigurationValues
     public static readonly SecurityKey ClientCredentialsWithChildOrgNumberSamplePrivateKeyJwk = CommonRsaKey;
     public static readonly SecurityKey ApiAccessSampleRsaPrivateKeyJwk = CommonRsaKey;
     public static readonly SecurityKey ApiAccessSampleForMultiTenantPrivateKeyJwk = CommonRsaKey;
-    public static readonly SecurityKey ApiAccessSampleForContextualClaimsPrivateKeyJwk = CommonRsaKey;
     public static readonly SecurityKey TokenExchangeSubjectRsaPrivateKeyJwk = CommonRsaKey;
     public static readonly SecurityKey TokenExchangeActorRsaPrivateKeyJwk = CommonRsaKey;
     public static readonly SecurityKey ApiAccessWithRequestObjectSampleRsaPrivateKeyJwk = CommonRsaKey;
@@ -127,7 +123,6 @@ public static class ConfigurationValues
     public const string ClientCredentialsWithChildOrgNumberSampleClientId = "helseid-sample-client-credentials-with-underenhet";
     public const string ApiAccessSampleClientId = "helseid-sample-api-access";
     public const string ApiAccessSampleClientIdForMultiTenantApp = "helseid-sample-api-access-for-multitenant-app";
-    public const string ApiAccessSampleClientIdForContextualClaims = "helseid-sample-api-access-for-contextual-claims";
     public const string TokenExchangeSubjectClientId = "helseid-sample-token-exchange-subject-client";
     public const string TokenExchangeActorClientId = "helseid-sample-token-exchange-actor-client";
     public const string ApiAccessSampleClientIdWithRequestObject = "helseid-sample-request-objects-console";

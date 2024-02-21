@@ -6,7 +6,6 @@ using HelseId.Samples.Common.Interfaces.TokenRequests;
 using HelseId.Samples.Common.Models;
 using IdentityModel;
 using IdentityModel.Client;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -28,8 +27,7 @@ public class OpenIdConnectHandlerForDPoP : OpenIdConnectHandler
         IOptionsMonitor<OpenIdConnectOptions> options,
         ILoggerFactory logger,
         HtmlEncoder htmlEncoder,
-        UrlEncoder encoder,
-        ISystemClock clock) : base(options, logger, htmlEncoder, encoder, clock)
+        UrlEncoder encoder) : base(options, logger, htmlEncoder, encoder)
     {
         _dPoPProofCreator = dPoPProofCreator;
         _endpointsDiscoverer = endpointsDiscoverer;
@@ -44,11 +42,11 @@ public class OpenIdConnectHandlerForDPoP : OpenIdConnectHandler
         // This nonce can then be used in a second call to the Resource Server
 
         Logger.LogDebug("Creating first call for getting a DPoP token.");
-        
+
         var authorizationCodeTokenRequestParameters = new AuthorizationCodeTokenRequestParameters(
             tokenEndpointRequest.Parameters["code"],
             tokenEndpointRequest.Parameters["code_verifier"],
-            tokenEndpointRequest.Parameters["redirect_uri"], 
+            tokenEndpointRequest.Parameters["redirect_uri"],
             new List<string>());
 
         var authCodeRequest = await _tokenRequestBuilder.CreateAuthorizationCodeTokenRequest(_payloadClaimsCreator, authorizationCodeTokenRequestParameters, null);
@@ -58,14 +56,14 @@ public class OpenIdConnectHandlerForDPoP : OpenIdConnectHandler
         {
             throw new OpenIdConnectProtocolException("Expected a DPoP nonce to be returned from the authorization server.");
         }
-        
+
         var tokenEndpoint = await _endpointsDiscoverer.GetTokenEndpointFromHelseId();
         // We got the nonce from HelseID; use it to get a DPoP proof
         var dPoPProof = _dPoPProofCreator.CreateDPoPProof(tokenEndpoint, "POST", tokenResponse.DPoPNonce);
         // Remove any existing DPoP proof and set the new DPoP proof:
         Backchannel.DefaultRequestHeaders.Remove(OidcConstants.HttpHeaders.DPoP);
         Backchannel.DefaultRequestHeaders.Add(OidcConstants.HttpHeaders.DPoP, dPoPProof);
-        
+
         var result = await base.RedeemAuthorizationCodeAsync(tokenEndpointRequest);
         // Remove the residual DPoP header:
         Backchannel.DefaultRequestHeaders.Remove(OidcConstants.HttpHeaders.DPoP);

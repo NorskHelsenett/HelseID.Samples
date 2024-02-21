@@ -52,36 +52,29 @@ public class HelseIdSamplesConfiguration : HelseIdConfiguration
         new(
             ConfigurationValues.ApiAccessSampleRsaPrivateKeyJwk,
             ConfigurationValues.ApiAccessSampleClientId,
-            ConfigurationValues.ApiAccessSampleScope);            
+            ConfigurationValues.ApiAccessSampleScope);
 
     // The configuration for the ApiAccess project with request objects (accessing the sample API)
     public static HelseIdSamplesConfiguration ApiAccessWithRequestObject =>
         new(
             ConfigurationValues.ApiAccessWithRequestObjectSampleRsaPrivateKeyJwk,
             ConfigurationValues.ApiAccessSampleClientIdWithRequestObject,
-            ConfigurationValues.ApiAccessWithRequestObjectSampleScope); 
-            
+            ConfigurationValues.ApiAccessWithRequestObjectSampleScope);
+
     // Configuration for the ApiAccess project with multi-tenancy
     public static HelseIdSamplesConfiguration ApiAccessForMultiTenantClient =>
         new(
             ConfigurationValues.ApiAccessSampleForMultiTenantPrivateKeyJwk,
             ConfigurationValues.ApiAccessSampleClientIdForMultiTenantApp,
             ConfigurationValues.ApiAccessSampleScopeForMultiTenantApp);
-    
-    // Configuration for the ApiAccess project with use of contextual claims
-    public static HelseIdSamplesConfiguration ApiAccessWithContextualClaimsClient =>
-        new(
-            ConfigurationValues.ApiAccessSampleForContextualClaimsPrivateKeyJwk,
-            ConfigurationValues.ApiAccessSampleClientIdForContextualClaims,
-            ConfigurationValues.ApiAccessSampleScope);
-    
+
     // The configuration for the ApiAccess project (accessing the token exchange client)
     public static HelseIdSamplesConfiguration ApiAccessWithTokenExchange =>
         new(
             ConfigurationValues.TokenExchangeSubjectRsaPrivateKeyJwk,
             ConfigurationValues.TokenExchangeSubjectClientId,
-            ConfigurationValues.TokenExchangeSubjectClientScope);            
-    
+            ConfigurationValues.TokenExchangeSubjectClientScope);
+
     // The configuration for the the ApiAccess project with resource indicators
     // We add the audiences for the two APIs that this project will use as resource indicators
     public static HelseIdSamplesConfiguration ResourceIndicatorsClient =>

@@ -93,12 +93,6 @@ In addition to start the [Sample API project](../SampleAPI/README.md), you will 
 dotnet run --use-multi-tenant
 ```
 
-### Use of contextual claims
-The use of *contextual claims* allows a client to send a structured claim as client assertion to HelseID. This claim will then be attached to the returned access token. In order to sample this functionality, use the extra option
-```
-dotnet run --use-contextual-claims
-```
-
 #### To use DPoP (Demonstrating Proof-of-Possession) tokens against the sample API:
 ```
 dotnet run --use-dpop

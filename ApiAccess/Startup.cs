@@ -39,7 +39,7 @@ public class Startup
     {
         _settings = settings;
     }
-    
+
     public WebApplication BuildWebApplication()
     {
         var builder = WebApplication.CreateBuilder();
@@ -72,12 +72,12 @@ public class Startup
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
     }
 
-    private void ConfigureServices(IServiceCollection services) 
+    private void ConfigureServices(IServiceCollection services)
     {
         // Add services to the container.
         services.AddControllersWithViews();
 
-        // Create a settings instance. These can be injected into other objects, for instance the HomeController 
+        // Create a settings instance. These can be injected into other objects, for instance the HomeController
         services.AddSingleton(_settings);
         // We need the HelseIdConfiguration instance as a service as well:
         services.AddSingleton(_settings.HelseIdConfiguration);
@@ -117,21 +117,12 @@ public class Startup
             // We add this object as an instance of IPayloadClaimsCreatorForClientAssertion
             services.AddSingleton<IPayloadClaimsCreatorForClientAssertion>(compositePayloadClaimsCreator);
         }
-        else if (_settings.ClientType == ClientType.ApiAccessWithContextualClaims)
-        {
-            var compositePayloadClaimsCreator = new CompositePayloadClaimsCreator(new List<IPayloadClaimsCreator>
-            {
-                clientAssertionPayloadClaimsCreator,
-                new PayloadClaimsCreatorForContextualClaims(),
-            });
-            services.AddSingleton<IPayloadClaimsCreatorForClientAssertion>(compositePayloadClaimsCreator);
-        }
         else
         {
             // We only need the "default" token request payload claim creator:
             services.AddSingleton<IPayloadClaimsCreatorForClientAssertion>(clientAssertionPayloadClaimsCreator);
         }
-        
+
         // Builder for client assertions payloads
         services.AddTransient<IJwtPayloadCreator, JwtPayloadCreator>();
         // Builder for JWT tokens used for client assertions
@@ -147,15 +138,11 @@ public class Startup
         services.AddTransient<ITokenRequestBuilder, TokenRequestBuilder>();
         // Used for creating a simple view model
         services.AddTransient<IViewModelCreator, ViewModelCreator>();
-        
+
         // Updates the stored access token(s) by means of the refresh token grant
         if (_settings.ClientType == ClientType.ApiAccessForMultiTenantClient)
         {
             services.AddTransient<IAccessTokenUpdater, AccessTokenUpdaterForMultiTenantRequests>();
-        }
-        else if (_settings.ClientType == ClientType.ApiAccessWithContextualClaims)
-        {
-            services.AddTransient<IAccessTokenUpdater, AccessTokenUpdaterForContextualClaims>();
         }
         else
         {
@@ -172,7 +159,7 @@ public class Startup
         // Add the authentication options initializers:
         services.AddTransient<IConfigureOptions<AuthenticationOptions>, AuthenticationOptionsInitializer>();
         services.AddTransient<IConfigureNamedOptions<OpenIdConnectOptions>, OpenIdConnectOptionsInitializer>();
-        
+
         // Set authentication options (these will call the AuthenticationOptionsInitializer and OpenIdConnectOptionsInitializer instances)
         services.AddAuthentication()
             .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
@@ -197,7 +184,7 @@ public class Startup
         {
             config.AddPolicy(SecurityLevelClaimPolicy, securityLevelClaimPolicy);
         });
-        
+
         // We need to replace the OpenIdConnectHandler with our own when DPoP is required
         if (_settings.UseDPoP)
         {
@@ -205,7 +192,7 @@ public class Startup
         }
     }
 
-    private WebApplication Configure(WebApplication webApplication) 
+    private WebApplication Configure(WebApplication webApplication)
     {
         // Configure the HTTP request pipeline.
         if (!webApplication.Environment.IsDevelopment())
@@ -219,7 +206,7 @@ public class Startup
         webApplication.UseStaticFiles();
         webApplication.UseRouting();
         // Registers the authentication middleware:
-        webApplication.UseAuthentication(); 
+        webApplication.UseAuthentication();
         webApplication.UseAuthorization();
         webApplication.MapControllerRoute(
             name: "default",

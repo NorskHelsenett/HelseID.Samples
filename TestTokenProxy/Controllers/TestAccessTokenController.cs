@@ -3,7 +3,6 @@ using System.Text;
 using System.Text.Json;
 using HelseID.Samples.Configuration;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using TestTokenProxy.Models;
 
