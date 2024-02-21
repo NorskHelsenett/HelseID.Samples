@@ -12,7 +12,7 @@ The localhost port for this API is configured in the file `ConfigurationValues.c
 
 ### Requirements
 
-The [.NET 7 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) is required to build the program.
+The [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) is required to build the program.
 
 #### To run the sample, enter the following on the command line inside this folder:
 ```

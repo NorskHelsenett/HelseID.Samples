@@ -189,19 +189,30 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             // is not currently implemented
             if (redirectContext.ProtocolMessage.RequestType == OpenIdConnectRequestType.Authentication)
             {
+                /*
+                The metadata endpoint https://helseid-sts.test.nhn.no/connect/availableidps list the available IDPs
+                in the test environment. If you want to redirect the user to a specific IDP, you can specify this value.
+                */
+
+                // redirectContext.ProtocolMessage.AcrValues = "idp:testidpnew-oidc";
+
+                /*
+                See https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/5571426/Use+of+ID-porten for more examples:
+                If you want to authenticate the user on behalf of a specific organization, you can add this parameter:
+                */
+
+                redirectContext.ProtocolMessage.Parameters.Add("on_behalf_of", "912159523");
 
                 // Construct the state parameter and add it to the protocol message
                 // so that we include it in the pushed authorization request
-//                SetStateParameterForParRequest(redirectContext);
-
                 redirectContext.Properties.Items.Add(OpenIdConnectDefaults.RedirectUriForCodePropertiesKey, redirectContext.ProtocolMessage.RedirectUri);
                 redirectContext.ProtocolMessage.State = redirectContext.Options.StateDataFormat.Protect(redirectContext.Properties);
-
 
                 var pushedAuthorizationResponse = await PushAuthorizationParameters(redirectContext);
 
                 // Remove all the parameters from the protocol message, and replace with what we got from the PAR response
                 redirectContext.ProtocolMessage.Parameters.Clear();
+
                 // Then, set client id and request uri as parameters
                 redirectContext.ProtocolMessage.ClientId = _settings.HelseIdConfiguration.ClientId;
                 redirectContext.ProtocolMessage.RequestUri = pushedAuthorizationResponse.RequestUri;
@@ -249,26 +260,35 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         var discoveryDocumentResponse = await _discoveryDocumentGetter.GetDiscoveryDocument();
 
         var clientAssertion = _clientAssertionsBuilder.BuildClientAssertion(_payloadClaimsCreatorForClientAssertion, CreatePayloadClaimParameters());
-        var par = new PushedAuthorizationRequest
+        try
         {
-            Address = discoveryDocumentResponse.PushedAuthorizationRequestEndpoint,
-            ClientCredentialStyle = ClientCredentialStyle.PostBody,
-            ClientId = _settings.HelseIdConfiguration.ClientId,
-            ClientAssertion = clientAssertion,
-            Parameters = new Parameters(context.ProtocolMessage.Parameters.Where(p => p.Key != "client_id")),
-            //AcrValues = "idp:idporten-oidc",
-        };
+            var requestObject = CreateRequestObject();
+            var par = new PushedAuthorizationRequest
+            {
+                Address = discoveryDocumentResponse.PushedAuthorizationRequestEndpoint,
+                ClientCredentialStyle = ClientCredentialStyle.PostBody,
+                ClientId = _settings.HelseIdConfiguration.ClientId,
+                ClientAssertion = clientAssertion,
+                Parameters = new Parameters(context.ProtocolMessage.Parameters.Where(p => p.Key != "client_id")),
+                //AcrValues = "idp:idporten-oidc",
+                Request = requestObject,
+            };
 
-        using var httpClient = new HttpClient();
+            using var httpClient = new HttpClient();
 
-        var response = await httpClient.PushAuthorizationAsync(par);
+            var response = await httpClient.PushAuthorizationAsync(par);
 
-        if (response.IsError)
-        {
-            throw new Exception("PAR failure", response.Exception);
+            if (response.IsError)
+            {
+                throw new Exception("PAR failure", response.Exception);
+            }
+
+            return response;
         }
-
-        return response;
+        catch (Exception fff)
+        {
+            throw fff;
+        }
     }
 
     private void RedirectToAuthorizeEndpoint(RedirectContext context)

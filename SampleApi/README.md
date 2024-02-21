@@ -35,7 +35,7 @@ See [../TestTokenProxy/README.md](TestTokenProxy/README.md) for more information
 
 ### Requirements
 
-The [.NET 7 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) is required to build the program.
+The [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) is required to build the program.
 
 ### Default mode 
 
