@@ -28,7 +28,7 @@ public class Startup
     {
         _settings = settings;
     }
-    
+
     public WebApplication BuildWebApplication()
     {
         var webApplicationBuilder = WebApplication.CreateBuilder();
@@ -48,7 +48,8 @@ public class Startup
     {
         webApplicationBuilder.Services.AddSingleton(_settings);
         var configuration = HelseIdSamplesConfiguration.TokenExchangeClient;
-        configuration.UseDPoP = _settings.UseDPoP;
+        // TODO: REMOVE
+        configuration.NoUseOfDPoP = !_settings.UseDPoP;
         webApplicationBuilder.Services.AddSingleton<HelseIdConfiguration>(configuration);
         webApplicationBuilder.Services.AddSingleton<IDateTimeService, DateTimeService>();
         webApplicationBuilder.Services.AddSingleton<IDiscoveryDocumentGetter>(new DiscoveryDocumentGetter(ConfigurationValues.StsUrl));
@@ -67,7 +68,7 @@ public class Startup
 
         // The controller also needs an API consumer:
         webApplicationBuilder.Services.AddSingleton<IApiConsumer, ApiConsumer>();
-        
+
         webApplicationBuilder.Services.AddMvc(option => option.EnableEndpointRouting = false);
         webApplicationBuilder.Services.AddControllers();
         webApplicationBuilder.Services.AddEndpointsApiExplorer();
@@ -92,14 +93,14 @@ public class Startup
             });
 
         webApplicationBuilder.Services.AddAuthorization(options =>
-        {   
+        {
             // Add a policy for verifying scopes and claims for a logged on user for the token exchange endpoint
             options.AddPolicy(
                 TokenExchangePolicy,
                 policy => policy.RequireClaim("scope", _settings.TokenExchangeApiScope)
                     .RequireClaim("helseid://claims/identity/pid")
                     .RequireClaim("helseid://claims/identity/security_level", "4"));
-        });        
+        });
     }
 
     private void SetUpKestrel(WebApplicationBuilder webApplicationBuilder)

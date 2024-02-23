@@ -15,6 +15,6 @@ public class Settings
     public string ApiAudience2 { get; init; } = string.Empty;
 
     public HelseIdConfiguration HelseIdConfiguration { get; init; } = null!;
-    
-    public bool UseDPoP { get; init; }
+
+    public bool NoUseOfDPoP { get; init; }
 }

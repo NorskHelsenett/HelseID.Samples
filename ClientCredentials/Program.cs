@@ -25,26 +25,26 @@ static class Program
             description: "If set, the application will use the access token to access the client info endpoint on the HelseID service.",
             getDefaultValue: () => false);
 
-        var useDPoPOption = new Option<bool>(
-            aliases: new [] {"--use-dpop", "-dp"},
-            description: "If set, the application will use the demonstrating proof-of-possesion mechanism for sender-constraining the token sent to the example API.",
+        var noUseOfDPoPOption = new Option<bool>(
+            aliases: new [] {"--no-use-of-dpop", "-nd"},
+            description: "If set, the application will use a bearer token in the call to the API.",
             getDefaultValue: () => false);
 
         var rootCommand = new RootCommand("A client credentials usage sample")
         {
-            useChildOrgNumberOption, useClientInfoEndpointOption, useMultiTenantPattern, useDPoPOption
+            useChildOrgNumberOption, useClientInfoEndpointOption, useMultiTenantPattern, noUseOfDPoPOption
         };
 
-        rootCommand.SetHandler(async (useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue, useMultiTenantPatternOptionValue, useDPoPOptionValue) =>
+        rootCommand.SetHandler(async (useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue, useMultiTenantPatternOptionValue, noUseOfDPoPOptionValue) =>
         {
             var clientConfigurator = new ClientConfigurator();
-            var client = clientConfigurator.ConfigureClient(useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue, useMultiTenantPatternOptionValue, useDPoPOptionValue);
+            var client = clientConfigurator.ConfigureClient(useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue, useMultiTenantPatternOptionValue, noUseOfDPoPOptionValue);
             var repeatCall = true;
             while (repeatCall)
             {
                 repeatCall = await CallApiWithToken(client);
             }
-        }, useChildOrgNumberOption, useClientInfoEndpointOption, useMultiTenantPattern, useDPoPOption);
+        }, useChildOrgNumberOption, useClientInfoEndpointOption, useMultiTenantPattern, noUseOfDPoPOption);
 
         await rootCommand.InvokeAsync(args);
     }

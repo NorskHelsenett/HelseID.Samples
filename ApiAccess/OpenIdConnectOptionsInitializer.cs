@@ -255,7 +255,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
 
         if (response.IsError)
         {
-            throw new Exception("PAR failure", response.Exception);
+            throw new Exception($"PAR failure: {response.Json.ToString()}");
         }
 
         return response;

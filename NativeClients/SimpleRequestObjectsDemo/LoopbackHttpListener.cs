@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
-namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall;
+namespace HelseId.Samples.SimpleRequestObjectsDemo;
 
 // This class functions as a makeshift web host, getting the redirect response from the browser.
 // If the status code is 200, the query string containing the authorization code is set on the

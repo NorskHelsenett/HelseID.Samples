@@ -128,7 +128,14 @@ public class Startup
         // Builder for JWT tokens used for client assertions
         services.AddSingleton<ISigningTokenCreator, SigningTokenCreator>();
         // Builder for DPoP proofs
-        services.AddSingleton<IDPoPProofCreator, DPoPProofCreator>();
+        if (_settings.NoUseOfDPoP)
+        {
+            services.AddSingleton<IDPoPProofCreator, NullDPoPProofCreator>();
+        }
+        else
+        {
+            services.AddSingleton<IDPoPProofCreator, DPoPProofCreator>();
+        }
         // Builder for client assertions
         services.AddTransient<IClientAssertionsBuilder, ClientAssertionsBuilder>();
         // Finds the relevant endpoints on the HelseID server
@@ -186,7 +193,7 @@ public class Startup
         });
 
         // We need to replace the OpenIdConnectHandler with our own when DPoP is required
-        if (_settings.UseDPoP)
+        if (_settings.NoUseOfDPoP == false)
         {
             services.Replace(ServiceDescriptor.Transient<OpenIdConnectHandler, OpenIdConnectHandlerForDPoP>());
         }
@@ -200,6 +207,7 @@ public class Startup
             webApplication.UseExceptionHandler("/Home/Error");
             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             webApplication.UseHsts();
+            webApplication.UseDeveloperExceptionPage();
         }
 
         webApplication.UseHttpsRedirection();

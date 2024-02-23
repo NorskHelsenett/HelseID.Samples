@@ -8,4 +8,5 @@ public enum ClientType
     ApiAccessWithTokenExchange,
     ApiAccessWithResourceIndicators,
     ApiAccessForMultiTenantClient,
+    ApiAccessWithoutDPoP,
 }

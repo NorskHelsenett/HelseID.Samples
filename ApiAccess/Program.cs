@@ -36,21 +36,21 @@ public class Program
             description: "If set, the application will use a client set up for multi-tenancy, i.e. it makes use of an organization number that is connected to the client.",
             getDefaultValue: () => false);
 
-        var useDPoPOption = new Option<bool>(
-            aliases: new [] {"--use-dpop", "-dp"},
-            description: "If set, the application will use the demonstrating proof-of-possesion mechanism for sender-constraining the token sent to the example API.",
+        var noUseOfDPoPOption = new Option<bool>(
+            aliases: new [] {"--no-use-of-dpop", "-nd"},
+            description: "If set, the application will use a bearer token in the call to the API.",
             getDefaultValue: () => false);
 
         var rootCommand = new RootCommand("An authorization code flow usage sample")
         {
-            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, useDPoPOption
+            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, noUseOfDPoPOption
         };
 
-        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useDPoP) =>
+        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, noUseOfDPoP) =>
         {
-            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useDPoP);
+            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, noUseOfDPoP);
             new Startup(settings).BuildWebApplication().Run();
-        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, useDPoPOption);
+        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, noUseOfDPoPOption);
 
         await rootCommand.InvokeAsync(args);
     }
@@ -61,7 +61,7 @@ public class Program
         bool useRequestObjects,
         bool useResourceIndicators,
         bool useMultiTenant,
-        bool useDPoP)
+        bool noUseOfDPoP)
     {
         var clientType = GetClientType(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant);
 
@@ -72,8 +72,8 @@ public class Program
             ApiUrl2 = GetApiUrl2(clientType),
             ApiAudience1 = GetApiAudience1(clientType),
             ApiAudience2 = GetApiAudience2(clientType),
-            HelseIdConfiguration = SetSamplesConfiguration(clientType, useDPoP),
-            UseDPoP = useDPoP,
+            HelseIdConfiguration = SetSamplesConfiguration(clientType, noUseOfDPoP),
+            NoUseOfDPoP = noUseOfDPoP,
         };
     }
 
@@ -118,7 +118,8 @@ public class Program
         {
             ClientType.ApiAccessWithTokenExchange => ConfigurationValues.SampleApiUrlForTokenExchange,
             ClientType.ApiAccessWithResourceIndicators => ConfigurationValues.SampleApiUrlForResourceIndicators1,
-            _ => ConfigurationValues.SampleApiUrl
+            ClientType.ApiAccessWithoutDPoP => ConfigurationValues.SampleApiUrlWithoutDPoP,
+            _ => ConfigurationValues.SampleApiUrl,
         };
     }
 
@@ -146,7 +147,7 @@ public class Program
             string.Empty;
     }
 
-    private static HelseIdConfiguration SetSamplesConfiguration(ClientType clientType, bool useDPoP)
+    private static HelseIdConfiguration SetSamplesConfiguration(ClientType clientType, bool noUseOfDPoP)
     {
         var result = clientType switch
         {
@@ -157,7 +158,7 @@ public class Program
             ClientType.ApiAccessForMultiTenantClient => HelseIdSamplesConfiguration.ApiAccessForMultiTenantClient,
             _ => HelseIdSamplesConfiguration.ApiAccess
         };
-        result.UseDPoP = useDPoP;
+        result.NoUseOfDPoP = noUseOfDPoP;
         return result;
     }
 }

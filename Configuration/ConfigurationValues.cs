@@ -61,7 +61,8 @@ public static class ConfigurationValues
 
     public const string TestTokenProxyResource = "test-token";
 
-    public static readonly string SampleApiUrl = $"https://localhost:{SampleApiPort}/{AuthCodeClientResource}";
+    public static readonly string SampleApiUrl = $"https://localhost:{SampleApiPort}/{AuthCodeClientResourceForDPoP}";
+    public static readonly string SampleApiUrlWithoutDPoP = $"https://localhost:{SampleApiPort}/{AuthCodeClientResource}";
     public static readonly string SampleApiUrlForTokenExchange = $"https://localhost:{SampleApiForTokenExchangePort}/{TokenExchangeResource}";
     public static readonly string SampleApiUrlForResourceIndicators1 = $"https://localhost:{SampleApiForResourceIndicators1Port}/{ResourceIndicatorsResource1}";
     public static readonly string SampleApiUrlForResourceIndicators2 = $"https://localhost:{SampleApiForResourceIndicators2Port}/{ResourceIndicatorsResource2}";
@@ -77,7 +78,7 @@ public static class ConfigurationValues
 
     // If used, the child organization number (underenhet) must match a number in the client's whitelist as it's held by HelseID:
     public const string ClientCredentialsWithChildOrganizationNumber = "999977776";
-    public const string ApiAccessWithRequestObjectChildOrganizationNumber = "999977776";
+    public const string ApiAccessWithRequestObjectChildOrganizationNumber = "999977775";
 
     public const string GranfjelldalKommuneOrganizationNumber = "999977774";
     public const string GranfjelldalKommuneOrganizationName = "Granfjelldal kommune";

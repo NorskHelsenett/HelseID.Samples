@@ -1,252 +1,273 @@
-using IdentityModel;
-using IdentityModel.Client;
-using IdentityModel.OidcClient;
-using Microsoft.AspNetCore.Http;
-using Microsoft.IdentityModel.JsonWebTokens;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices;
+using IdentityModel;
+using IdentityModel.Client;
+using IdentityModel.OidcClient;
+using IdentityModel.OidcClient.Browser;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 
-namespace HelseId.RequestObjectsDemo
+namespace HelseId.Samples.SimpleRequestObjectsDemo;
+
+class Program
 {
-    class Program
+    //
+    // The values below should normally be configurable
+    //
+
+    // In a production environment you would use your own private key stored somewhere safe (a vault, a certificate store, a secure database or similar).
+    private const string JwkPrivateKey = """{"d":"wUJFbzCvRwDlDyVyCmLmXQy0Xod81R5Cwk8U1vW2cJg1E88dQurAkgGAYcISUJKGW1haCVn-WZqmJm2WXLTjNHvGIH-sZapWqINVuwrl1FF_hQ-Cf2hRCyV8P-eU0tn_GH0gCRS2_ER5AbtDw26JfkHy9Y3ZRrL9EXjH_ZEd-7fNM_g_UelGe1a0xBLrCf80HkZaO-U10MV-iu88kqsUFb3RdIsbykGgrYVHmr87Y6K1DLYzJESQU3z_rJmubSELE6-HWw_gf1zb-FXhb1M3i1fbFlB0muom_BnbyOvOFRhGV5ngi8tyRBaz9BMbtyWLEEJzLorjz7C4iKfelefjjaUh-BinhpZ35j_Ki0aY5rwXjcyxQiciUHdfDcntzu815Rq5vu2lcL7VHz4mIp-X7Er4PfKqlrIgBp52SVJpWI1JEL8c7vA2ABGM9hqqY_Akh6YJmdMwNUpqE_Madr_cI2X3R9D0AxeGYrhwwYx41izST9X8dPrJ9X9w2UGlOCweHBi3Ok8gGIYvZzbi6cmXMkzo5J0-qCTQYDS2Lb6h4YKEVN7TQpp3PjXOfeZrc4AW8pHVjnirMoI7GGioGDMMEMA2n60I2qMmX-nyb5K5OsbWPDqMKZLBdTk5mfNfQvQy6cF5BR25QjxFGvXH0ThWjFaUWCgSBa0O3azzkcG1-b0","dp":"Y9CvDg6yfbZGyE-ycLasng1NLT1_cfiYkMLXa4c9TN2L7Ta1R4sBc4vX4IvZ_kSD3ubHD4q3vKSGxEawD7x-3odyrkamLZPHmkvafrkIZPZWcNqGTZAwqCpHxmodJsJIOkPWI_xn2uD2yU9aAaZEoxTqA7Oac-kLdDPjLKsvCRJcilQyD4kvodoK0n4YKINJM-taLIgsxwA7ZkH2GBlV49ZCvKLRZGERhEiunxncx4LNKUd5CBbKCBTZse8EpdhFxbzRgUxOQZujXaVOzdZB_IUkfDPFsN5Fjf6rYQmbyp1W7rUlqJQ5sqRgZngjrCMUdKCzMhVN7X34IMzUDv8ppQ","dq":"zcQhwDxvPDIPUMbIyyWw5G-tnMueZS8KlSmSTzUaLC9QDOU9RbSK6SbNSP-zahG13IJwtAJ9TqYlmj9AbVpdrXtctdcZkUn_wX5P-Qz6J_w-0xODjM_YB3ma_qYsh4yYoEm4lgS0JZN2F7fnc1rOXpzBjm-jsJyRbulD1K908dy6ui9kuO4FfoWpXwX7Jixqfz55koIm1umSVjwI6otz7NOLd8gZcapeBFPrCZnCMIVrGBU0DDVAolEF2GMps4a3259VYPYPkDDs7lwSY8Jk1jFUmdkqwXLwaDzlgnpJJI2boHMOxt1QAuMdToLphah5R3HNLh1NTrLQn0Uehiazhw","e":"AQAB","kty":"RSA","n":"4e76k7QF01kw3hhdHyc3iyUn6c465yrLD9KV7m4gNIc3Tm66Iq3P72xq9w5abAXJG9GJUkbhtTG5isFmXLCU4MOlU5T2a7iBqx2dmao72LSsQ7WZQVtIv5JvWYAXpd4rlgTaJfO3Unv9Tn8v5wWgL9ZbplVmR_GWMY5l-7i44PWwLwGZge_KUVGQmKtx7XXsnezG4JfEAPJbO9zfD4CH6AGtRdcAn2r-2-jqk_-uU1BVoWwDdrCJ_DKOyYNDUfkRneTATY5RDdH5flNd-19XW31L1q3dTMqHbcMzFMfiqwyBYX5kFJrDT-W7poIex7jhZfA5by8K1tfwJqdYRGH4Qp5QtBTs76iuANNBUz3tO0vmV8bYez2AWegvRqrZGHPsMPtA5pCjXw1rueJdH5WqpCHrBsnNkOHNVcd8yHLPmXRokwi3cSanOuquLOI5Qh-pqeuTTJAv8QQ3X5aQRnHmZoyVuOP9Qqq05MGRPp6W-7Vdbi6mslDP-FwUnkHb2C-XenxHesqfcbqBOELa-PD6Fj_usVKPcL9HR_J4IK38XFFOT669_Xhpyaq6iRtvlmj1n_fQNvRcGpZIfIAFgf64cIwLAz2vimj5ywXneyDIRv5Wge8VyhfsAe9S01x0dNq-aR16clayKDn48e6fETeTWJJaPK7lvi1-Oc-tlaA7Pfk","p":"8fDDtrup_sHpmpnAQ6arzA6S2zG23OlRwsrPQu1bByDJSAB6Y0RQDIxQB06NjNCyyoetpiUlblgpcLQpy-R9xAgdvw-gcxNYW4hxkQdbnSP0U9vv8V3tGtxN8szjBEsNz0vhs0Gc4Wz01IYGVY6OJhOg3qshAFrjZie49MsIRw_w0dJA6UAXbx19fvoFtKDSyp-w2FnFQHMnzwsoJULiCPB6R77XJZLx3gyQN4ad-s63E7f89055JNIO8rt-cigkL_ilQh-x9m-oX_nBWb_N4gjVdnyoH2Vjlq2os2l209URLPl4bq6AMCfe7SAnuyLA9U_aTiLOF2eAlbgznmUWjw","q":"7xAWBXurm-Qv60KwKF2dqkGbCyNTrQv1Ep8L2ArTVeTMcQb54dQiwLZb-NDaiRIAyBXOsrkWEyh8tru5fvicn-EdAnajGTxEwwKktaUA-ufDw8vy4HOfATXGuA0DFt1L6nZ_n9lFYxd09iEUj0GwvaRM21A7nbOz3Qf6JThCaP8JOK3doOYsr7fufD8E9gcE7CiTcbbpm8BOa6-h2fY3tENCOV76a9_G2RfPOrvIu-tgVPU_2K-r8vSWQobXhGELOYc0XAipUxEAPxGLOq3T-OTQk2SvPnom2mEG_-5V1PG1sxH0WGf53XpUjjsUW1Zj9bidmuhLPqbMBf-ZhbLm9w","qi":"3h-0vyBkKf0WsPhCiIWXm8yPU-J_qgM4JjkrBzwWOU6CpnQyIdoSfStXhas7ehoODnb7sAQ2PEh4RBls2kJrXmzqC_0wsUEFdnfSERsf8eb8Sgu1NF5JgqRU9UBe9-4bvLZAcFpBG_PJyMg8QhCEuqFbjrjNjg9r3EVfeRHyjl7dPEGF5RwIUiGbkyLmXmcqf0L4GhuvqGdd56krht_kvwI-lppMB4OoZDgwfOH0fcKuHJUyc0RyfZ-iS9YZTQI-1AO2gA-RsjCjvtZB2QBdhvqPp2OujkYlcGXukSBtoBsU3elGBqFPRqlPsDMN8dj0bw_xjNxue7fKh9a68CPedA","kid":"B2C61A07EE0661237D19BEE1E0A1463C"}""";
+
+    // This client_id is only to be used for this particular sample. Your application will use it's own client_id.
+    private const string ClientId = "f7cd1256-0526-4b5a-b4c3-f054c984ace8";
+
+    // The client is configured in the HelseID test environment, so we will point to that
+    private const string StsUrl = "https://helseid-sts.test.nhn.no";
+
+    // An API which requires a logged in user
+    // You can find the source code for this API at https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.SampleAPI
+    private const string ApiUrl = "https://localhost:5081/user-login-clients/greetings";
+
+    private const int LocalhostPort = 8080;
+
+    // In a test environment, the port does not need to be pre-registered in HelseID Selvbetjening;
+    // this means that you can allocate any available port when launching the application:
+    private static readonly string RedirectUrl = $"http://localhost:{LocalhostPort.ToString()}/callback";
+
+    // This is the scope of the API you want to call (get an access token for)
+    private const string ApiScopes = "nhn:helseid-public-samplecode/authorization-code";
+
+    // These scopes indicate that you want an ID-token ("openid"), and what information about the user you want the ID-token to contain
+    private const string IdentityScopes = "openid profile offline_access helseid://scopes/identity/pid helseid://scopes/identity/security_level";
+
+    static async Task Main(string[] args)
     {
-
-        static async Task Main(string[] args)
+        try
         {
-            const string jwkPrivateKey = "{'d':'wUJFbzCvRwDlDyVyCmLmXQy0Xod81R5Cwk8U1vW2cJg1E88dQurAkgGAYcISUJKGW1haCVn-WZqmJm2WXLTjNHvGIH-sZapWqINVuwrl1FF_hQ-Cf2hRCyV8P-eU0tn_GH0gCRS2_ER5AbtDw26JfkHy9Y3ZRrL9EXjH_ZEd-7fNM_g_UelGe1a0xBLrCf80HkZaO-U10MV-iu88kqsUFb3RdIsbykGgrYVHmr87Y6K1DLYzJESQU3z_rJmubSELE6-HWw_gf1zb-FXhb1M3i1fbFlB0muom_BnbyOvOFRhGV5ngi8tyRBaz9BMbtyWLEEJzLorjz7C4iKfelefjjaUh-BinhpZ35j_Ki0aY5rwXjcyxQiciUHdfDcntzu815Rq5vu2lcL7VHz4mIp-X7Er4PfKqlrIgBp52SVJpWI1JEL8c7vA2ABGM9hqqY_Akh6YJmdMwNUpqE_Madr_cI2X3R9D0AxeGYrhwwYx41izST9X8dPrJ9X9w2UGlOCweHBi3Ok8gGIYvZzbi6cmXMkzo5J0-qCTQYDS2Lb6h4YKEVN7TQpp3PjXOfeZrc4AW8pHVjnirMoI7GGioGDMMEMA2n60I2qMmX-nyb5K5OsbWPDqMKZLBdTk5mfNfQvQy6cF5BR25QjxFGvXH0ThWjFaUWCgSBa0O3azzkcG1-b0','dp':'Y9CvDg6yfbZGyE-ycLasng1NLT1_cfiYkMLXa4c9TN2L7Ta1R4sBc4vX4IvZ_kSD3ubHD4q3vKSGxEawD7x-3odyrkamLZPHmkvafrkIZPZWcNqGTZAwqCpHxmodJsJIOkPWI_xn2uD2yU9aAaZEoxTqA7Oac-kLdDPjLKsvCRJcilQyD4kvodoK0n4YKINJM-taLIgsxwA7ZkH2GBlV49ZCvKLRZGERhEiunxncx4LNKUd5CBbKCBTZse8EpdhFxbzRgUxOQZujXaVOzdZB_IUkfDPFsN5Fjf6rYQmbyp1W7rUlqJQ5sqRgZngjrCMUdKCzMhVN7X34IMzUDv8ppQ','dq':'zcQhwDxvPDIPUMbIyyWw5G-tnMueZS8KlSmSTzUaLC9QDOU9RbSK6SbNSP-zahG13IJwtAJ9TqYlmj9AbVpdrXtctdcZkUn_wX5P-Qz6J_w-0xODjM_YB3ma_qYsh4yYoEm4lgS0JZN2F7fnc1rOXpzBjm-jsJyRbulD1K908dy6ui9kuO4FfoWpXwX7Jixqfz55koIm1umSVjwI6otz7NOLd8gZcapeBFPrCZnCMIVrGBU0DDVAolEF2GMps4a3259VYPYPkDDs7lwSY8Jk1jFUmdkqwXLwaDzlgnpJJI2boHMOxt1QAuMdToLphah5R3HNLh1NTrLQn0Uehiazhw','e':'AQAB','kty':'RSA','n':'4e76k7QF01kw3hhdHyc3iyUn6c465yrLD9KV7m4gNIc3Tm66Iq3P72xq9w5abAXJG9GJUkbhtTG5isFmXLCU4MOlU5T2a7iBqx2dmao72LSsQ7WZQVtIv5JvWYAXpd4rlgTaJfO3Unv9Tn8v5wWgL9ZbplVmR_GWMY5l-7i44PWwLwGZge_KUVGQmKtx7XXsnezG4JfEAPJbO9zfD4CH6AGtRdcAn2r-2-jqk_-uU1BVoWwDdrCJ_DKOyYNDUfkRneTATY5RDdH5flNd-19XW31L1q3dTMqHbcMzFMfiqwyBYX5kFJrDT-W7poIex7jhZfA5by8K1tfwJqdYRGH4Qp5QtBTs76iuANNBUz3tO0vmV8bYez2AWegvRqrZGHPsMPtA5pCjXw1rueJdH5WqpCHrBsnNkOHNVcd8yHLPmXRokwi3cSanOuquLOI5Qh-pqeuTTJAv8QQ3X5aQRnHmZoyVuOP9Qqq05MGRPp6W-7Vdbi6mslDP-FwUnkHb2C-XenxHesqfcbqBOELa-PD6Fj_usVKPcL9HR_J4IK38XFFOT669_Xhpyaq6iRtvlmj1n_fQNvRcGpZIfIAFgf64cIwLAz2vimj5ywXneyDIRv5Wge8VyhfsAe9S01x0dNq-aR16clayKDn48e6fETeTWJJaPK7lvi1-Oc-tlaA7Pfk','p':'8fDDtrup_sHpmpnAQ6arzA6S2zG23OlRwsrPQu1bByDJSAB6Y0RQDIxQB06NjNCyyoetpiUlblgpcLQpy-R9xAgdvw-gcxNYW4hxkQdbnSP0U9vv8V3tGtxN8szjBEsNz0vhs0Gc4Wz01IYGVY6OJhOg3qshAFrjZie49MsIRw_w0dJA6UAXbx19fvoFtKDSyp-w2FnFQHMnzwsoJULiCPB6R77XJZLx3gyQN4ad-s63E7f89055JNIO8rt-cigkL_ilQh-x9m-oX_nBWb_N4gjVdnyoH2Vjlq2os2l209URLPl4bq6AMCfe7SAnuyLA9U_aTiLOF2eAlbgznmUWjw','q':'7xAWBXurm-Qv60KwKF2dqkGbCyNTrQv1Ep8L2ArTVeTMcQb54dQiwLZb-NDaiRIAyBXOsrkWEyh8tru5fvicn-EdAnajGTxEwwKktaUA-ufDw8vy4HOfATXGuA0DFt1L6nZ_n9lFYxd09iEUj0GwvaRM21A7nbOz3Qf6JThCaP8JOK3doOYsr7fufD8E9gcE7CiTcbbpm8BOa6-h2fY3tENCOV76a9_G2RfPOrvIu-tgVPU_2K-r8vSWQobXhGELOYc0XAipUxEAPxGLOq3T-OTQk2SvPnom2mEG_-5V1PG1sxH0WGf53XpUjjsUW1Zj9bidmuhLPqbMBf-ZhbLm9w','qi':'3h-0vyBkKf0WsPhCiIWXm8yPU-J_qgM4JjkrBzwWOU6CpnQyIdoSfStXhas7ehoODnb7sAQ2PEh4RBls2kJrXmzqC_0wsUEFdnfSERsf8eb8Sgu1NF5JgqRU9UBe9-4bvLZAcFpBG_PJyMg8QhCEuqFbjrjNjg9r3EVfeRHyjl7dPEGF5RwIUiGbkyLmXmcqf0L4GhuvqGdd56krht_kvwI-lppMB4OoZDgwfOH0fcKuHJUyc0RyfZ-iS9YZTQI-1AO2gA-RsjCjvtZB2QBdhvqPp2OujkYlcGXukSBtoBsU3elGBqFPRqlPsDMN8dj0bw_xjNxue7fKh9a68CPedA','kid':'B2C61A07EE0661237D19BEE1E0A1463C'}";
-            
-            try
+            using var httpClient = new HttpClient();
+
+            // Download the HelseID metadata from https://helseid-sts.test.nhn.no/.well-known/openid-configuration to determine endpoints and public keys used by HelseID:
+            var disco = await httpClient.GetDiscoveryDocumentAsync(StsUrl);
+
+            // Setup a client assertion - this will authenticate the client (this application)
+            var clientAssertionPayload = GetClientAssertionPayload(disco);
+
+            var options = new OidcClientOptions
             {
-                // NOTE: In a production environment you would use your own private key stored somewhere safe (a vault, a certificate store, a secure database or similar).
-                // Corresponding public key is: {'e':'AQAB','kty':'RSA','n':'4e76k7QF01kw3hhdHyc3iyUn6c465yrLD9KV7m4gNIc3Tm66Iq3P72xq9w5abAXJG9GJUkbhtTG5isFmXLCU4MOlU5T2a7iBqx2dmao72LSsQ7WZQVtIv5JvWYAXpd4rlgTaJfO3Unv9Tn8v5wWgL9ZbplVmR_GWMY5l-7i44PWwLwGZge_KUVGQmKtx7XXsnezG4JfEAPJbO9zfD4CH6AGtRdcAn2r-2-jqk_-uU1BVoWwDdrCJ_DKOyYNDUfkRneTATY5RDdH5flNd-19XW31L1q3dTMqHbcMzFMfiqwyBYX5kFJrDT-W7poIex7jhZfA5by8K1tfwJqdYRGH4Qp5QtBTs76iuANNBUz3tO0vmV8bYez2AWegvRqrZGHPsMPtA5pCjXw1rueJdH5WqpCHrBsnNkOHNVcd8yHLPmXRokwi3cSanOuquLOI5Qh-pqeuTTJAv8QQ3X5aQRnHmZoyVuOP9Qqq05MGRPp6W-7Vdbi6mslDP-FwUnkHb2C-XenxHesqfcbqBOELa-PD6Fj_usVKPcL9HR_J4IK38XFFOT669_Xhpyaq6iRtvlmj1n_fQNvRcGpZIfIAFgf64cIwLAz2vimj5ywXneyDIRv5Wge8VyhfsAe9S01x0dNq-aR16clayKDn48e6fETeTWJJaPK7lvi1-Oc-tlaA7Pfk','kid':'B2C61A07EE0661237D19BEE1E0A1463C'}
+                Authority = StsUrl,
+                ClientId = ClientId,
+                RedirectUri = RedirectUrl,
+                ClientAssertion = clientAssertionPayload,
+                LoadProfile = false,
+            };
 
-                // These values should go into a configuration file
-                const string clientId = "f7cd1256-0526-4b5a-b4c3-f054c984ace8";
-                const string localhost = "http://localhost:8090";
-                const string redirectUrl = "/callback";
-                const string startPage = "/start";
-                const string stsUrl = "https://helseid-sts.test.nhn.no";
+            // Setup the oidc client for authentication against HelseID
+            var oidcClient = new OidcClient(options);
 
+            // The authorizeState object contains the state the needs to be held between starting the authorize request and the response
+            var authorizeState = await oidcClient.PrepareLoginAsync();
 
-                var disco = await new HttpClient().GetDiscoveryDocumentAsync(stsUrl);
-                if (disco.IsError)
-                {
-                    throw new Exception(disco.Error);
-                }
+            var pushedAuthorizationResponse = await GetPushedAuthorizationResponse(
+                httpClient,
+                clientAssertionPayload,
+                authorizeState,
+                disco);
 
-                // Setup the oidc client for authentication against HelseID
-                var oidcClient = new OidcClient(new OidcClientOptions
-                {
-                    Authority = stsUrl,
-                    LoadProfile = false,
-                    RedirectUri = localhost + redirectUrl,
-                    Scope = "openid profile offline_access nhn:helseid-public-samplecode/authorization-code",
-                    ClientId = clientId,
-                    Policy = new Policy { ValidateTokenIssuerName = true },
-                    ClientAssertion = GetClientAssertionPayload(clientId, disco, jwkPrivateKey)
-                });
-
-                // Build the request object - this will authenticate the user and validate the child organization
-                var requestObject = GetRequestObjectsPayload(clientId, stsUrl, jwkPrivateKey);
-
-                // Authenticate with HelseID using the request object via the system browser
-                var state = await oidcClient.PrepareLoginAsync(requestObject);
-                var response = await AuthorizeWithRequestObjects(localhost, redirectUrl, startPage, state);
-
-                // Setup a client assertion - this will authenticate the organization
-                // This request is done from the client to the server without using
-                // a web browser
-                var loginResult = await oidcClient.ProcessResponseAsync(response, state);
-
-                if (loginResult.IsError)
-                {
-                    throw new Exception(loginResult.Error);
-                }
-
-                var token = new JsonWebTokenHandler().ReadJsonWebToken(loginResult.IdentityToken);
-
-
-                // The access token can now be used when calling an api
-                // It contains the user id, the security level, the organization number
-                // and the child organization
-                // Copy the access token and paste it at https://jwt.ms to decode it
-                Console.WriteLine("ID Token:");
-                Console.WriteLine(loginResult.IdentityToken);
-                Console.WriteLine();
-                Console.WriteLine("Access token:");
-                Console.WriteLine(loginResult.AccessToken);
-
-                var rt = await new HttpClient().RequestRefreshTokenAsync(new RefreshTokenRequest
-                {
-                    RefreshToken = loginResult.RefreshToken,
-                    Address = disco.TokenEndpoint,
-                    ClientAssertion = GetClientAssertionPayload(clientId, disco, jwkPrivateKey)                    
-                });
-
-                Console.WriteLine();
-                Console.WriteLine("New Access Token after using Refresh Token:");
-                Console.WriteLine(rt.AccessToken);
+            if (pushedAuthorizationResponse.IsError)
+            {
+                throw new Exception($"{pushedAuthorizationResponse.Error}: JSON: {pushedAuthorizationResponse.Json}");
             }
-            catch (Exception ex)
+
+            var startUrl = $"{disco.AuthorizeEndpoint}?client_id={ClientId}&request_uri={pushedAuthorizationResponse.RequestUri}";
+
+            var browserOptions = new BrowserOptions(startUrl, RedirectUrl);
+
+            // Create a redirect URI using an available port on the loopback address.
+            var browser = new SystemBrowser(port: LocalhostPort);
+
+            var browserResult = await browser.InvokeAsync(browserOptions, default);
+
+            // If the result type is success, the browser result should contain the authorization code.
+            // We can now call the /token endpoint with the authorization code in order to get tokens:
+            var loginResult = await oidcClient.ProcessResponseAsync(browserResult.Response, authorizeState);
+
+            if (loginResult.IsError)
             {
-                Console.Error.WriteLine("Error:");
-                Console.Error.WriteLine(ex.ToString());
+                throw new Exception($"{loginResult.Error}: Description: {loginResult.ErrorDescription}");
             }
-        }
 
-        private static async Task<string> AuthorizeWithRequestObjects(string localhost, string redirectUrl, string startPage, AuthorizeState state)
-        {
-            // Build a HTML form that does a POST of the data from the url
-            // This is a workaround since the url may be too long to pass to the browser directly
-            var startPageHtml = UrlToHtmlForm.Parse(state.StartUrl);
+            // The access token can now be used when calling an api
+            // It contains the user id, the security level, the organization number
+            // and the child organization
+            // Copy the access token and paste it at https://jwt.ms to decode it
 
-            // Setup a temporary http server that listens to the given redirect uri and to 
-            // the given start page. At the start page we can publish the html that we
-            // generated from the StartUrl and at the redirect uri we can retrieve the 
-            // authorization code and return it to the application
-            var listener = new ContainedHttpServer(localhost, redirectUrl,
-                new Dictionary<string, Action<HttpContext>> {
-                    { startPage, async ctx => await ctx.Response.WriteAsync(startPageHtml) }
-                });
+            Console.WriteLine($"Identity token from login: {loginResult.IdentityToken}");
+            Console.WriteLine($"Access token from login: {loginResult.AccessToken}");
 
-            RunBrowser(localhost + startPage);
-
-            return await listener.WaitForCallbackAsync();
-        }
-
-        private static Parameters GetRequestObjectsPayload(string clientId, string stsUrl, string jwkPrivateKey)
-        {
-
-
-            var requestObject = BuildRequestObject(clientId, stsUrl, jwkPrivateKey);
-            var dict = new Dictionary<string, string>
-                {
-                   { "request", requestObject }
-                };
-
-            return new Parameters(dict);
-        }
-
-        private static void RunBrowser(string url)
-        {
-            try
+            var rt = await httpClient.RequestRefreshTokenAsync(new RefreshTokenRequest
             {
-                Process.Start(url);
+                RefreshToken = loginResult.RefreshToken,
+                Address = disco.TokenEndpoint,
+                ClientAssertion = GetClientAssertionPayload(disco)
+            });
+
+            Console.WriteLine();
+            Console.WriteLine("New Access Token after using Refresh Token:");
+            Console.WriteLine(rt.AccessToken);
+        }
+        catch (Exception ex)
+        {
+            await Console.Error.WriteLineAsync("Error:");
+            await Console.Error.WriteLineAsync(ex.ToString());
+        }
+    }
+
+    private static async Task<PushedAuthorizationResponse> GetPushedAuthorizationResponse(
+        HttpClient httpClient,
+        ClientAssertion clientAssertionPayload,
+        AuthorizeState authorizeState,
+        DiscoveryDocumentResponse disco)
+    {
+        var pushedAuthorizationRequest = new PushedAuthorizationRequest
+        {
+            Address = disco.PushedAuthorizationRequestEndpoint,
+            Parameters = GetParametersForPushedAuthorizationRequest(
+                clientAssertionPayload,
+                authorizeState,
+                disco),
+        };
+
+        // Calls the /par endpoint in order to get a request URI for the /authorize endpoint
+        return await httpClient.PushAuthorizationAsync(pushedAuthorizationRequest);
+    }
+
+    // This is necessary in order to please the IdentityModel library:
+    private static Parameters GetParametersForPushedAuthorizationRequest(
+        ClientAssertion clientAssertionPayload,
+        AuthorizeState authorizeState,
+        DiscoveryDocumentResponse disco)
+    {
+        // Sets the pushed authorization request parameters:
+        var challengeBytes = SHA256.HashData(Encoding.UTF8.GetBytes(authorizeState.CodeVerifier));
+        var codeChallenge = WebEncoders.Base64UrlEncode(challengeBytes);
+        var requestObject = BuildRequestObject(disco);
+
+        var dictionary = new Dictionary<string, string>
+        {
+            { "client_id", ClientId },
+            { "client_assertion", clientAssertionPayload.Value },
+            { "client_assertion_type", clientAssertionPayload.Type },
+            { "request", requestObject },
+            { "scope", ApiScopes + " " + IdentityScopes },
+            { "redirect_uri", RedirectUrl},
+            { "response_type", OidcConstants.ResponseTypes.Code },
+            { "code_challenge", codeChallenge },
+            { "code_challenge_method", OidcConstants.CodeChallengeMethods.Sha256 },
+            { "state", authorizeState.State },
+        };
+        return new Parameters(dictionary);
+    }
+
+    private static string BuildRequestObject(DiscoveryDocumentResponse disco)
+    {
+        // Builds a request object containing the authorization details claim with the following structure:
+        // (This type of structure indicates a multi-tenant client)
+        //        "authorization_details":{
+        //            "type":"helseid_authorization",
+        //            "practitioner_role":{
+        //                "organization":{
+        //                    "identifier": {
+        //                        "system":"urn:oid:1.0.652301",
+        //                        "type":"ENH",
+        //                        "value":"NO:ORGNR:[parent organization number]:[child organization number]"
+        //                    }
+        //                }
+        //            }
+        //        }
+
+
+        var orgNumberDetails = new Dictionary<string, string>
+        {
+            {"system", "urn:oid:1.0.6523"},
+            {"type", "ENH"},
+            {
+                // The client configuration in HelseID contains a delegation from the supplier of this system to the
+                // requested organization number. If this delegation is not set, the request will be invalidated.
+                "value", "NO:ORGNR:994598759:123456789"
             }
-            catch
-            {
-                // https://brockallen.com/2016/09/24/process-start-for-urls-on-net-core/
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    url = url.Replace("&", "^&");
-                    Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                {
-                    Process.Start("xdg-open", url);
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                {
-                    Process.Start("open", url);
-                }
-                else
-                {
-                    throw new Exception("Unrecognized operating system");
-                }
-            }
-        }
+        };
 
-        private static string BuildRequestObject(string clientId, string audience, string jwkPrivateKey)
+        var identifier = new Dictionary<string, object>
         {
-            // Builds a request object containing the authorization details claim with
-            // the following structure:
-            //        "authorization_details":{
-            //            "type":"helseid_authorization",
-            //            "practitioner_role":{
-            //                "organization":{
-            //                    "identifier": {
-            //                        "system":"urn:oid:2.16.578.1.12.4.1.2.101",
-            //                        "type":"ENH",
-            //                        "value":"[orgnummer]"
-            //                    }
-            //                }
-            //            }
-            //        }
+            {"identifier", orgNumberDetails}
+        };
 
-            var orgNumberDetails = new Dictionary<string, string>
-            {
-                { "system", "urn:oid:1.0.6523" },
-                { "type", "ENH" },
-                { "value", "NO:ORGNR:994598759:123456789" } // Client configuration in HelseID contains a orgnumber whitelist with this number
-            };
-
-            var identifier = new Dictionary<string, object>
-            {
-                { "identifier", orgNumberDetails }
-            };
-
-            var organization = new Dictionary<string, object>
-            {
-                { "organization", identifier }
-            };
-
-            var authorizationDetails = new Dictionary<string, object>
-            {
-                { "type", "helseid_authorization" }, 
-                { "practitioner_role", organization }
-            };
-
-            var serialized = JsonConvert.SerializeObject(authorizationDetails);
-
-            var claims = new List<Claim>
-            {
-                new Claim("authorization_details", serialized, "json")
-            };
-
-            var requestObject = BuildHelseIdJwt(clientId, audience, claims, jwkPrivateKey);
-            return requestObject;
-        }
-
-        private static ClientAssertion GetClientAssertionPayload(string clientId, DiscoveryDocumentResponse disco, string jwkPrivateKey)
+        var organization = new Dictionary<string, object>
         {
-            var claims = new List<Claim>
-            {
-                new Claim(JwtClaimTypes.Subject, clientId),
-                new Claim(JwtClaimTypes.IssuedAt, DateTimeOffset.Now.ToUnixTimeSeconds().ToString()),
-                new Claim(JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N")),
-            };
+            {"organization", identifier}
+        };
 
-            var clientAssertionString = BuildHelseIdJwt(clientId, disco.Issuer, claims, jwkPrivateKey);
-            return new ClientAssertion
-            {
-                Type = OidcConstants.ClientAssertionTypes.JwtBearer,
-                Value = clientAssertionString
-            };
-
-        }
-
-        private static string BuildHelseIdJwt(string clientId, string issuer, List<Claim> extraClaims, string jwkPrivateKey)
+        var authorizationDetails = new Dictionary<string, object>
         {
+            {"type", "helseid_authorization"},
+            {"practitioner_role", organization}
+        };
 
+        var serialized = JsonConvert.SerializeObject(authorizationDetails);
 
-            var credentials = new JwtSecurityToken(clientId, issuer, extraClaims, DateTime.UtcNow, DateTime.UtcNow.AddSeconds(60), GetSecurityKey(jwkPrivateKey));
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            return tokenHandler.WriteToken(credentials);
-        }
-
-        private static SigningCredentials GetSecurityKey(string jwkPrivateKey)
+        var claims = new List<Claim>
         {
-            var jwk =  new JsonWebKey(jwkPrivateKey);
-            return new SigningCredentials(jwk, SecurityAlgorithms.RsaSha256);
-        }
+            new Claim("authorization_details", serialized, "json"),
+            new Claim(JwtClaimTypes.Subject, ClientId),
+            new Claim(JwtClaimTypes.IssuedAt, DateTimeOffset.Now.ToUnixTimeSeconds().ToString()),
+            new Claim(JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N")),
+        };
+
+        return BuildHelseIdJwt(disco, claims);
+    }
+
+    private static ClientAssertion GetClientAssertionPayload(DiscoveryDocumentResponse disco)
+    {
+        var clientAssertion = BuildClientAssertion(disco);
+
+        return new ClientAssertion
+        {
+            Type = OidcConstants.ClientAssertionTypes.JwtBearer,
+            Value = clientAssertion,
+        };
+    }
+
+    private static string BuildClientAssertion(DiscoveryDocumentResponse disco)
+    {
+        var claims = new List<Claim>
+        {
+            new Claim(JwtClaimTypes.Subject, ClientId),
+            new Claim(JwtClaimTypes.IssuedAt, DateTimeOffset.Now.ToUnixTimeSeconds().ToString()),
+            new Claim(JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N")),
+        };
+
+        return BuildHelseIdJwt(disco, claims);
+    }
+
+    private static string BuildHelseIdJwt(DiscoveryDocumentResponse disco, List<Claim> extraClaims)
+    {
+        var credentials = new JwtSecurityToken(ClientId, disco.Issuer, extraClaims, DateTime.UtcNow,
+            DateTime.UtcNow.AddSeconds(60), GetClientAssertionSigningCredentials());
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        return tokenHandler.WriteToken(credentials);
+    }
+
+    private static SigningCredentials GetClientAssertionSigningCredentials()
+    {
+        var securityKey = new JsonWebKey(JwkPrivateKey);
+        return new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256);
     }
 }

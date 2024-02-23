@@ -21,19 +21,19 @@ public class HelseIdConfiguration
             ResourceIndicators = resourceIndicators;
         }
     }
-    
-    // The private key MUST be properly secured inside the client. 
+
+    // The private key MUST be properly secured inside the client.
     // TODO: guidelines
     public SecurityKey PrivateKeyJwk  { get; }
 
     public string ClientId { get; }
-    
+
     public string Scope { get;  }
 
     public string StsUrl { get; }
 
     // These are used for clients that are using resource indicators against the authorization and token endpoints:
     public List<string> ResourceIndicators { get; } = new();
-    
-    public bool UseDPoP { get; set; }
+
+    public bool NoUseOfDPoP { get; set; }
 }

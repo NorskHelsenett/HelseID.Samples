@@ -22,7 +22,7 @@ public class Machine2MachineClient
     private readonly IPayloadClaimsCreatorForClientAssertion _payloadClaimsCreatorForClientAssertion;
     // Can be used for debugging purposes:
     private IClientInfoRetriever _clientInfoRetriever;
-    
+
     public Machine2MachineClient(
         IApiConsumer apiConsumer,
         ITokenRequestBuilder tokenRequestBuilder,
@@ -83,7 +83,7 @@ public class Machine2MachineClient
             await WriteErrorToConsole(tokenResponse);
             throw new Exception();
         }
-        
+
         WriteAccessTokenFromTokenResult(tokenResponse);
 
         return tokenResponse;
@@ -93,15 +93,15 @@ public class Machine2MachineClient
     {
         // The request to HelseID is created:
         var request = await _tokenRequestBuilder.CreateClientCredentialsTokenRequest(_payloadClaimsCreatorForClientAssertion, _tokenRequestParameters, null);
-        
+
         var tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(request);
 
-        if (_configuration.UseDPoP && tokenResponse.IsError && tokenResponse.Error == "use_dpop_nonce" && !string.IsNullOrEmpty(tokenResponse.DPoPNonce))
+        if (!_configuration.NoUseOfDPoP && tokenResponse.IsError && tokenResponse.Error == "use_dpop_nonce" && !string.IsNullOrEmpty(tokenResponse.DPoPNonce))
         {
             request = await _tokenRequestBuilder.CreateClientCredentialsTokenRequest(_payloadClaimsCreatorForClientAssertion, _tokenRequestParameters, tokenResponse.DPoPNonce);
             tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(request);
         }
-        
+
         return tokenResponse;
     }
 
@@ -123,11 +123,11 @@ public class Machine2MachineClient
         {
             Console.WriteLine("Using the access token to call the sample API");
             ApiResponse? response;
-            if (_configuration.UseDPoP)
+            if (_configuration.NoUseOfDPoP)
             {
-                response = await _apiConsumer.CallApiWithDPoPToken(httpClient, ConfigurationValues.SampleApiUrlForM2MWithDPoP, accessToken);
-            } else {
                 response = await _apiConsumer.CallApiWithBearerToken(httpClient, ConfigurationValues.SampleApiUrlForM2M, accessToken);
+            } else {
+                response = await _apiConsumer.CallApiWithDPoPToken(httpClient, ConfigurationValues.SampleApiUrlForM2MWithDPoP, accessToken);
             }
             var notPresent = "<not present>";
             var supplierOrganization = OrganizationStore.GetOrganization(response?.SupplierOrganizationNumber);

@@ -22,7 +22,7 @@ public class TokenExchangeController : ControllerBase
     private readonly IApiConsumer _apiConsumer;
     private readonly IDPoPProofCreator _dPoPProofCreator;
     private readonly HelseIdConfiguration _configuration;
-    
+
     public TokenExchangeController(
         ITokenRequestBuilder tokenRequestBuilder,
         IPayloadClaimsCreatorForClientAssertion payloadClaimsCreatorForClientAssertion,
@@ -37,17 +37,17 @@ public class TokenExchangeController : ControllerBase
         _configuration = configuration;
     }
 
-    private string ApiUrl => _configuration.UseDPoP
-        ? ConfigurationValues.SampleApiUrlForM2MWithDPoP
-        : ConfigurationValues.SampleApiUrlForM2M;
-    
+    private string ApiUrl => _configuration.NoUseOfDPoP
+        ? ConfigurationValues.SampleApiUrlForM2M
+        : ConfigurationValues.SampleApiUrlForM2MWithDPoP;
+
     [HttpGet]
     [Route(ConfigurationValues.TokenExchangeResource)]
     public async Task<ActionResult<ApiResponse?>> Get()
     {
         return await CallApiWithTokenExchange();
     }
-    
+
     //TODO: Cache actor access token (or at least show how to)
     private async Task<ApiResponse?> CallApiWithTokenExchange()
     {
@@ -57,24 +57,24 @@ public class TokenExchangeController : ControllerBase
         var subjectAccessToken = await HttpContext.GetTokenAsync("access_token");
 
         // 2: use token exchange to get an actor access token
-        var actorAccessToken = await ExchangeTheSubjectTokenForAnActorAccessToken(httpClient, subjectAccessToken!); 
+        var actorAccessToken = await ExchangeTheSubjectTokenForAnActorAccessToken(httpClient, subjectAccessToken!);
 
         // 3: consume the API
         return await CallApi(httpClient, actorAccessToken);
     }
-    
+
     private async Task<ApiResponse?> CallApi(HttpClient httpClient, string actorAccessToken)
     {
         try
         {
             Console.WriteLine("Using the (exchanged) access token to call the sample API");
-            if (_configuration.UseDPoP)
+            if (_configuration.NoUseOfDPoP)
             {
-                return await _apiConsumer.CallApiWithDPoPToken(httpClient, ApiUrl, actorAccessToken);
+                return await _apiConsumer.CallApiWithBearerToken(httpClient, ApiUrl, actorAccessToken);
             }
             else
             {
-                return await _apiConsumer.CallApiWithBearerToken(httpClient, ApiUrl, actorAccessToken);
+                return await _apiConsumer.CallApiWithDPoPToken(httpClient, ApiUrl, actorAccessToken);
             }
         }
         catch (HttpRequestException e)
@@ -87,10 +87,10 @@ public class TokenExchangeController : ControllerBase
 
     private async Task<string> ExchangeTheSubjectTokenForAnActorAccessToken(HttpClient httpClient, string subjectToken)
     {
-        string? dPoPNonce = null;
-        if (_configuration.UseDPoP)
+        var dPoPNonce = await GetDPoPNonce(httpClient, subjectToken);;
+        if (_configuration.NoUseOfDPoP)
         {
-            dPoPNonce = await GetDPoPNonce(httpClient, subjectToken);
+            dPoPNonce = null;
         }
         // The request to HelseID is created:
         var request = await _tokenRequestBuilder.CreateTokenExchangeTokenRequest(
