@@ -110,7 +110,7 @@ Issuer.discover(STS_URL).then(oidcIssuer => {
 
   passport.use(
     PASSPORT_OIDC_STRATEGY,
-    new Strategy({ client, passReqToCallback: true }, (req, tokenSet, userinfo, done) => {
+    new Strategy({ client, passReqToCallback: true }, (request, tokenSet, userinfo, done) => {
       // Uncomment to debug result:
     /*  
       console.log('-----------------------------');
@@ -118,8 +118,8 @@ Issuer.discover(STS_URL).then(oidcIssuer => {
       console.log('userinfo', userinfo);
       console.log('-----------------------------');
       */
-      req.session.tokenSet = tokenSet;
-      req.session.userinfo = userinfo;
+      request.session.tokenSet = tokenSet;
+      request.session.userinfo = userinfo;
       const user = tokenSet.claims();
       user['id_token'] = tokenSet['id_token'];
       return done(null, user);
@@ -136,10 +136,10 @@ Issuer.discover(STS_URL).then(oidcIssuer => {
   // ------------------------------------------------------------
   // Index page
   // ------------------------------------------------------------
-  app.get('/', (req, res) => {
-    res.send(`
+  app.get('/', (request, response) => {
+    response.send(`
         <h1>Welcome</h1>
-        <p> This sample demonstrates how a client can access an API that requires authentication. <br> 
+        <p> This sample demonstrates how a client can access an API that requires authentication.<br> 
         <a href='${LOGIN_PATH}'>Log in</a> and use <strong>Test IDP</strong> to authenticate the user. The logged in user can then call the API and access data. </p>
         `);
   });
@@ -147,15 +147,15 @@ Issuer.discover(STS_URL).then(oidcIssuer => {
   // ------------------------------------------------------------
   // The user was redirected after logout
   // ------------------------------------------------------------
-  app.get(OIDC_POST_LOGOUT_REDIRECT_PATH, (req, res) => {
-    return res.redirect('/');
+  app.get(OIDC_POST_LOGOUT_REDIRECT_PATH, (request, response) => {
+    return response.redirect('/');
   });
 
   // ------------------------------------------------------------
   // The user was logged on at a wrong security level
   // ------------------------------------------------------------
-  app.get(LOGIN_IN_AT_WRONG_SECURITY_LEVEL, (req, res) => {
-    res.send(`
+  app.get(LOGIN_IN_AT_WRONG_SECURITY_LEVEL, (request, response) => {
+    response.send(`
         <h3>Access denied</h3>
         <p>You were logged on, but the security level was not accepted.</p>
         <p>Please <a href='${LOGOUT_PATH}'>log out</a> and try to log in log in with another identity provider!</p>
@@ -165,40 +165,40 @@ Issuer.discover(STS_URL).then(oidcIssuer => {
   // ------------------------------------------------------------
   // Starting the passport authenticate function
   // ------------------------------------------------------------
-  app.get(LOGIN_PATH, (req, res, next)  => {
+  app.get(LOGIN_PATH, (request, response, next)  => {
     next();
   }, passport.authenticate(PASSPORT_OIDC_STRATEGY, {scope: CLIENT_SCOPE}));
 
   // ------------------------------------------------------------
   // The user has been redirected from HelseID:
   // ------------------------------------------------------------
-  app.get(OIDC_REDIRECT_PATH, (req, res, next) => {
+  app.get(OIDC_REDIRECT_PATH, (request, response, next) => {
     passport.authenticate(PASSPORT_OIDC_STRATEGY, { successRedirect: LOGGED_IN_USER_PATH, failureRedirect: LOGIN_FAILURE_PATH })
-    (req, res, next)
+    (request, response, next)
   });
 
   // ------------------------------------------------------------
   // The user has been authenticated:
   // ------------------------------------------------------------
-  app.get(LOGGED_IN_USER_PATH, (req, res) => {
+  app.get(LOGGED_IN_USER_PATH, (request, response) => {
 
-    if (req.session.passport == undefined || req.session.passport.user == undefined) {
-      return res.redirect('/');
+    if (request.session.passport == undefined || request.session.passport.user == undefined) {
+      return response.redirect('/');
     }
 
-    const user = req.session.passport.user;
+    const user = request.session.passport.user;
     // the user info is stored as a TokenSet:
 
     if (user['helseid://claims/identity/security_level'] !== '4') {
       // The security level is not at the required value
-      return res.redirect(LOGIN_IN_AT_WRONG_SECURITY_LEVEL);
+      return response.redirect(LOGIN_IN_AT_WRONG_SECURITY_LEVEL);
     }
 
     const userInfo = JSON.stringify({
       user
     }, null, 1);
 
-    res.send(`
+    response.send(`
         <h1>Success</h1>
         <p>The user was logged in</p>
         <p>${userInfo}</p> 
@@ -209,28 +209,28 @@ Issuer.discover(STS_URL).then(oidcIssuer => {
   // ------------------------------------------------------------
   // Logs out the user from HelseID:
   // ------------------------------------------------------------
-  app.get(LOGOUT_PATH, (req, res) => {
-    //const ession = req.sessionStore.get(req.session.id);
+  app.get(LOGOUT_PATH, (request, response) => {
+    //const ession = request.sessionStore.get(request.session.id);
     // We need the ID token in order to indicate to HelseID what our session is
-    const user = req.session.passport.user;
-    res.redirect(client.endSessionUrl({id_token_hint: user['id_token'] }));
+    const user = request.session.passport.user;
+    response.redirect(client.endSessionUrl({id_token_hint: user['id_token'] }));
   });
 
   // ------------------------------------------------------------
   // This gets redirected from HelseID post logout:
   // ------------------------------------------------------------
-  app.get(OIDC_POST_LOGOUT_REDIRECT_URI, (req, res) => {
+  app.get(OIDC_POST_LOGOUT_REDIRECT_URI, (request, response) => {
     // clears the persisted user from the local storage
-    req.logout();
+    request.logout();
     // redirects the user to a public route
-    res.redirect('/');
+    response.redirect('/');
   });
 
   // ------------------------------------------------------------
   // Login error:
   // ------------------------------------------------------------
-  app.get(LOGIN_FAILURE_PATH, (req, res) => {
-    res.send(`
+  app.get(LOGIN_FAILURE_PATH, (request, response) => {
+    response.send(`
         <h1>Error</h1>
         <p>The login failed</p>
         `);
