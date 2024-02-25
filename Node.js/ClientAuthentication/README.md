@@ -8,12 +8,12 @@ The purpose of this example is to demonstrate how user login can be acheived wit
 When you start the sample with npm start on the command line, you'll need to connect a web browser to the address that shows up in the console:
 
 ```
-Now listening on: http://localhost:5040
+Now listening on: https://localhost:5040
 ```
 
-the default is http://localhost:5040, but you can change the port number in the `index.js` file. 
+the default is https://localhost:5040, but you can change the port number in the `index.js` file. 
 
-Click "Login", and use the "Test IDP". Then log in as a well known test person. You should be redirected back to the application at https://localhost:5151.
+Click "Login", and use the "Test IDP". Then log in as a well known test person. You should be redirected back to the application at https://localhost:5040.
 
 ### Requirements
 Node.js is required to build the program.
