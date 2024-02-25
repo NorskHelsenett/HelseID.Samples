@@ -27,8 +27,10 @@ public class GetTokenOptions : IArgumentModel
     public bool setInvalidAudience { get; set; } = false;
     [Named(Description = "The returned token will contain an expired 'nbf', 'iat', and 'exp' claims")]
     public bool setExpirationTimeAsExpired { get; set; } = false;
-    [Named(Description = "The returned token will contain an 'exp' claim matching the set expiration time")]
+    [Named(Description = "The returned token will contain an 'exp' claim matching the set expiration time in seconds")]
     public int expirationTimeInSeconds { get; set; } = 600;
+    [Named(Description = "The returned token will contain an 'exp' claim matching the set expiration time (days) in seconds")]
+    public int expirationTimeInDays { get; set; } = 0;
     // -----------------------------------------
     // Header parameters
     [Named(Description = "The returned token will contain a 'typ' header matching the injected value. Accepted values are 'jwt' and 'at+jwt'")]
@@ -92,43 +94,51 @@ public class GetTokenOptions : IArgumentModel
     // -----------------------------------------
     // Tillitsrammeverk parameters
     [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
-    public string legalEntityId { get; set; } = string.Empty;
-    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
-    public string legalEntityName { get; set; } = string.Empty;
-    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
-    public string pointOfCareId { get; set; } = string.Empty;
-    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
-    public string pointOfCareName { get; set; } = string.Empty;
-    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
     public string practitionerAuthorizationCode { get; set; } = string.Empty;
     [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
     public string practitionerAuthorizationText { get; set; } = string.Empty;
-    [Named(Description = "Parameter for use in 'dokumentdeling' claims")]
-    public string careRelationshipDepartmentId { get; set; } = string.Empty;
-    [Named(Description = "Parameter for use in 'dokumentdeling' claims")]
-    public string careRelationshipDepartmentName { get; set; } = string.Empty;
-    [Named(Description = "Parameter for use in 'dokumentdeling' claims")]
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
+    public string practitionerLegalEntityId { get; set; } = string.Empty;
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
+    public string practitionerLegalEntityName { get; set; } = string.Empty;
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
+    public string practitionerPointOfCareId { get; set; } = string.Empty;
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
+    public string practitionerPointOfCareName { get; set; } = string.Empty;
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
+    public string practitionerDepartmentId { get; set; } = string.Empty;
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
+    public string practitionerDepartmentName { get; set; } = string.Empty;
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
     public string careRelationshipHealthcareServiceCode { get; set; } = string.Empty;
-    [Named(Description = "Parameter for use in 'dokumentdeling' claims")]
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
     public string careRelationshipHealthcareServiceText { get; set; } = string.Empty;
-    [Named(Description = "Parameter for use in 'dokumentdeling' claims")]
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
     public string careRelationshipPurposeOfUseCode { get; set; } = string.Empty;
-    [Named(Description = "Parameter for use in 'dokumentdeling' claims")]
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
     public string careRelationshipPurposeOfUseText { get; set; } = string.Empty;
-    [Named(Description = "Parameter for use in 'dokumentdeling' claims")]
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
     public string careRelationshipPurposeOfUseDetailsCode { get; set; } = string.Empty;
-    [Named(Description = "Parameter for use in 'dokumentdeling' claims")]
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
     public string careRelationshipPurposeOfUseDetailsText { get; set; } = string.Empty;
-    [Named(Description = "Parameter for use in 'dokumentdeling' claims")]
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
     public string careRelationshipTracingRefId { get; set; } = string.Empty;
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
+    public string patientsPointOfCareId { get; set; } = string.Empty;
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
+    public string patientsPointOfCareName { get; set; } = string.Empty;
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
+    public string patientsDepartmentId { get; set; } = string.Empty;
+    [Named(Description = "Parameter for use in 'tillitsrammeverk' claims")]
+    public string patientsDepartmentName { get; set; } = string.Empty;
     // -----------------------------------------
     // Usage of parameters
     [Named(Description = "Instructs how common claims are created")]
     public ClaimGeneration generalClaimsCreation { get; set; } = ClaimGeneration.DefaultWithParameterValues;
     [Named(Description = "Instructs how user claims are created")]
     public ClaimGeneration userClaimsCreation { get; set; } = ClaimGeneration.DefaultWithParameterValues;
-    [Named(Description = "Create claims for dokumentdeling")]
-    public bool createDokumentdelingClaims { get; set; } = false;
+    [Named(Description = "Create claims for tillitsrammeverk")]
+    public bool createTillitsrammeverkClaims { get; set; } = false;
     // DPoP parameters
     [Named(Description = "This will create a DPoP proof and a corresponding 'cnf' claim in the returned token")]
     public bool createDPoPTokenWithDPoPProof { get; set; } = false;

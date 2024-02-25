@@ -10,7 +10,10 @@ namespace HelseId.Core.BFF.Sample.Api
     {
         public static void Main(string[] args)
         {
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? Environments.Production;
+            var environment =
+                Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+                ?? Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
+                ?? Environments.Production;
 
             var configurationBuilder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: true)
@@ -26,12 +29,13 @@ namespace HelseId.Core.BFF.Sample.Api
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseSerilog()
                 .ConfigureWebHostDefaults(
                     webBuilder =>
                     {
                         webBuilder
-                            .UseStartup<Startup>()
-                            .UseSerilog();
+                            .ConfigureKestrel(c => c.AddServerHeader = false)
+                            .UseStartup<Startup>();
                     }
                 );
     }

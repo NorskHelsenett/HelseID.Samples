@@ -29,13 +29,13 @@ public class TestAccessTokenController : ControllerBase
     {
         _configuration = configuration;
     }
-    
+
     [AllowAnonymous]
     [HttpPost]
-    [Route("test-token")]
+    [Route(ConfigurationValues.TestTokenProxyResource)]
     public async Task<ActionResult<TestTokenResult>> TestToken([FromBody] TestTokenParameters testTokenParameters)
     {
-        // This method calls the HelseID Test Token Service (TTT) and returns a token per the input parameters 
+        // This method calls the HelseID Test Token Service (TTT) and returns a token per the input parameters
         var tokenCreationParameter = GetTokenCreationParameter(testTokenParameters);
 
         if (tokenCreationParameter == TokenCreationParameter.None)
@@ -91,6 +91,7 @@ public class TestAccessTokenController : ControllerBase
             case "/" + ConfigurationValues.ResourceIndicatorsResource2:
                 return TokenCreationParameter.CreateTokenWithUser;
             case "/" + ConfigurationValues.SampleApiMachineClientResourceForDPoP:
+            case "/" + ConfigurationValues.AuthCodeClientResourceForDPoP:
                 return TokenCreationParameter.CreateTokenWithDPoP;
             default:
                 return TokenCreationParameter.None;
@@ -108,7 +109,7 @@ public class TestAccessTokenController : ControllerBase
                 // Client Credentials token:
                 bodyObject.generalClaimsParameters = new
                 {
-                    scope = new List<string> {"nhn:helseid-public-samplecode/client-credentials"},
+                    scope = new List<string> {ConfigurationValues.ClientCredentialsScopeForSampleApi},
                 };
                 break;
             case TokenCreationParameter.CreateTokenWithUser:
@@ -116,19 +117,20 @@ public class TestAccessTokenController : ControllerBase
                 bodyObject.userClaimsParametersGeneration = 1; // 1: GenerateOnlyDefault
                 bodyObject.generalClaimsParameters = new
                 {
-                    scope = new List<string> {"nhn:helseid-public-samplecode/authorization-code"},
+                    scope = new List<string> {ConfigurationValues.AuthorizationCodeScopeForSampleApi},
                 };
                 break;
             case TokenCreationParameter.CreateTokenWithDPoP:
                 // Client credentials token w/DPoP:
                 bodyObject.generalClaimsParameters = new
                 {
-                    scope = new List<string> {"nhn:helseid-public-samplecode/client-credentials"},
+                    scope = new List<string> {ConfigurationValues.ClientCredentialsScopeForSampleApi},
                 };
+                // This sets up the DPoP proof:
                 bodyObject.createDPoPTokenWithDPoPProof = true;
                 bodyObject.dPoPProofParameters = new
                 {
-                    htuClaimValue = "https://localhost:5081/machine-clients/dpop-greetings",
+                    htuClaimValue = ConfigurationValues.SampleApiUrlForM2MWithDPoP,
                     htmClaimValue = "GET",
                 };
                 break;
@@ -136,7 +138,7 @@ public class TestAccessTokenController : ControllerBase
 
         return JsonSerializer.Serialize(bodyObject);
     }
-    
+
     private HttpClient CreateHttpClient()
     {
         var httpClient = new HttpClient();

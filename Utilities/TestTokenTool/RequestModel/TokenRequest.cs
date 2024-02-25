@@ -11,11 +11,9 @@ public class TokenRequest
 
     public bool CreateDPoPTokenWithDPoPProof { get; set; }
     
-    public bool CreateDokumentdelingClaims { get; set; }
+    public bool CreateTillitsrammeverkClaims { get; set; }
 
     public bool SignJwtWithInvalidSigningKey { get; set; } 
-
-    public bool SetExpirationTimeAsExpired { get; set; }
 
     public bool SetInvalidIssuer { get; set; }
     
@@ -31,7 +29,7 @@ public class TokenRequest
     
     public bool SetSubject { get; set; }
 
-    public int ExpirationTimeInSeconds { get; set; } = Int32.MinValue;
+    public ExpirationParameters ExpirationParameters { get; set; } = new();
 
     public HeaderParameters HeaderParameters { get; set; } = new();
     
@@ -40,8 +38,6 @@ public class TokenRequest
     public UserClaimsParameters UserClaimsParameters { get; set; } = new ();
 
     public TillitsrammeverkClaimsParameters TillitsrammeverkClaimsParameters { get; set; } = new();
-
-    public DokumentdelingClaimsParameters DokumentdelingClaimsParameters { get; set; } = new();
     
     public DPoPProofParameters DPoPProofParameters { get; set; } = new();
 }

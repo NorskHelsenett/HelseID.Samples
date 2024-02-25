@@ -31,7 +31,7 @@ options.UseRequestInterceptor($"(req) => {{ return setBearerTokenInRequest(req, 
 The function `setBearerTokenInrequest` described above is contained in the file `./wwwroot/swagger/extend-swagger.js`, and this function 
 calls the Test Token proxy server.
 
-See [../TestTokenProxy/README.md](TestTokenProxy/README.md) for more information about the call to the test token server.
+See [TestTokenProxy README](https://github.com/NorskHelsenett/HelseID.Samples/blob/master/TestTokenProxy/README.md) for more information about the call to the test token server.
 
 ### Requirements
 
