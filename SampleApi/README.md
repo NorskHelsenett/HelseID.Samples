@@ -24,9 +24,9 @@ functionality, you must also run the `TestTokenProxy` project, which sets up the
 
 The Swagger UI is set up in the `Startup` class, and an interceptor for its use of the Test Token proxy server is configured with the code
 ```
-options.UseRequestInterceptor($"(req) => {{ return setBearerTokenInRequest(req, testTokenProxyEndpointAddress); }} ");
+options.UseRequestInterceptor($"(req) => {{ return setDPoPTokenInRequest(req, testTokenProxyEndpointAddress); }} ");
 ```
-The function `setBearerTokenInrequest` described above is contained in the file `./wwwroot/swagger/extend-swagger.js`, and this function 
+The function `setDPoPTokenInRequest` described above is contained in the file `./wwwroot/swagger/extend-swagger.js`, and this function 
 calls the Test Token proxy server.
 
 See [../TestTokenProxy/README.md](TestTokenProxy/README.md) for more information about the call to the test token server.

@@ -20,7 +20,6 @@ public class TestAccessTokenController : ControllerBase
         None = 0,
         CreateTokenForClientCredentials = 1,
         CreateTokenWithUser = 2,
-        CreateTokenWithDPoP = 3,
     }
 
     private readonly IConfiguration _configuration;
@@ -39,16 +38,16 @@ public class TestAccessTokenController : ControllerBase
 
         if (tokenCreationParameter == TokenCreationParameter.None)
         {
-            return new JsonResult("");
+            return new BadRequestResult();
         }
 
-        var body = CreateBody(tokenCreationParameter);
+        var body = CreateBodyForUseAgainstTestTokenService(tokenCreationParameter, testTokenParameters.Uri);
         using var httpClient = CreateHttpClient();
-        var httpResponse = await httpClient
-            .PostAsync(_configuration[TestTokenServiceEndpointConfig],
+        var httpResponse = await httpClient.PostAsync(
+                _configuration[TestTokenServiceEndpointConfig],
                 new StringContent(body, Encoding.UTF8, "application/json"));
 
-        TokenResponse? tokenResponse = null;
+        TokenResponse? tokenResponse;
         try
         {
             tokenResponse = await httpResponse.Content.ReadFromJsonAsync<TokenResponse>();
@@ -66,13 +65,9 @@ public class TestAccessTokenController : ControllerBase
 
         var result = new TestTokenResult
         {
-            AccessToken = tokenResponse!.SuccessResponse.AccessTokenJwt
+            AccessToken = tokenResponse!.SuccessResponse.AccessTokenJwt,
+            DPoPProof = tokenResponse!.SuccessResponse.DPoPProof!,
         };
-
-        if (tokenCreationParameter == TokenCreationParameter.CreateTokenWithDPoP)
-        {
-            result.DPoPProof = tokenResponse!.SuccessResponse.DPoPProof!;
-        }
 
         return new JsonResult(result);
     }
@@ -85,19 +80,26 @@ public class TestAccessTokenController : ControllerBase
         {
             case "/" + ConfigurationValues.ResourceIndicatorsResource1:
             case "/" + ConfigurationValues.ResourceIndicatorsResource2:
+            case "/" + ConfigurationValues.AuthCodeClientResource:
                 return TokenCreationParameter.CreateTokenWithUser;
             case "/" + ConfigurationValues.SampleApiMachineClientResource:
-            case "/" + ConfigurationValues.AuthCodeClientResource:
-                return TokenCreationParameter.CreateTokenWithDPoP;
+                return TokenCreationParameter.CreateTokenForClientCredentials;
             default:
                 return TokenCreationParameter.None;
         }
     }
 
-    private static dynamic CreateBody(TokenCreationParameter parameter)
+    private static dynamic CreateBodyForUseAgainstTestTokenService(TokenCreationParameter parameter, string uri)
     {
         dynamic bodyObject = new ExpandoObject();
         bodyObject.generalClaimsParametersGeneration = 2; // 2: GenerateOnlyFromNonEmptyParameterValues
+        // This sets up the DPoP proof:
+        bodyObject.createDPoPTokenWithDPoPProof = true;
+        bodyObject.dPoPProofParameters = new
+        {
+            htuClaimValue = uri,
+            htmClaimValue = "GET",
+        };
 
         switch (parameter)
         {
@@ -114,20 +116,6 @@ public class TestAccessTokenController : ControllerBase
                 bodyObject.generalClaimsParameters = new
                 {
                     scope = new List<string> {ConfigurationValues.AuthorizationCodeScopeForSampleApi},
-                };
-                break;
-            case TokenCreationParameter.CreateTokenWithDPoP:
-                // Client credentials token w/DPoP:
-                bodyObject.generalClaimsParameters = new
-                {
-                    scope = new List<string> {ConfigurationValues.ClientCredentialsScopeForSampleApi},
-                };
-                // This sets up the DPoP proof:
-                bodyObject.createDPoPTokenWithDPoPProof = true;
-                bodyObject.dPoPProofParameters = new
-                {
-                    htuClaimValue = ConfigurationValues.SampleApiUrlForM2M,
-                    htmClaimValue = "GET",
                 };
                 break;
         }

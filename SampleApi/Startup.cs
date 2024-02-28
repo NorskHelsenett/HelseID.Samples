@@ -164,8 +164,8 @@ public  class Startup
         webApplication.UseSwaggerUI(options =>
         {
             var testTokenProxyEndpointAddress = ConfigurationValues.TestTokenProxyUrl;
-            // This is needed in order to get the access token from the test token service proxy:
-            options.UseRequestInterceptor($"(req) => {{ return setBearerTokenInRequest(req, '{testTokenProxyEndpointAddress}'); }} ");
+            // This injection of JavaScript code is needed in order to get the access token from the test token service proxy:
+            options.UseRequestInterceptor($"(req) => {{ return setDPoPTokenInRequest(req, '{testTokenProxyEndpointAddress}'); }} ");
             options.InjectJavascript("extend-swagger.js");
         });
 
