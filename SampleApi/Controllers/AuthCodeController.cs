@@ -22,21 +22,21 @@ public class AuthCodeController: ControllerBase
     {
         return CreateResult("Sample API");
     }
-    
+    /*
     [HttpGet]
     [Route(ConfigurationValues.ResourceIndicatorsResource1)]
     public ActionResult<ApiResponse> GetForIndicator1()
     {
         return CreateResult("Sample API (indicator 1)");
     }
-    
+
     [HttpGet]
     [Route(ConfigurationValues.ResourceIndicatorsResource2)]
     public ActionResult<ApiResponse> GetForIndicator2()
     {
         return CreateResult("Sample API (indicator 2)");
     }
-
+*/
     private ActionResult<ApiResponse> CreateResult(string apiName)
     {
         // The claims of the logged in user:

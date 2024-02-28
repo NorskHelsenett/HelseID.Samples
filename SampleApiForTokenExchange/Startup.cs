@@ -146,7 +146,7 @@ public class Startup
                             tokenValidatedContext.Fail(validationResult.ErrorDescription!);
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         tokenValidatedContext.Fail("Invalid token!");
                     }
