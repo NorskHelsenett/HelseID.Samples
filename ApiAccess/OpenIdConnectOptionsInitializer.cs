@@ -387,14 +387,6 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             // This value will typically be assigned to a logged on user:
             result.ChildOrganizationNumber = ConfigurationValues.ApiAccessWithRequestObjectChildOrganizationNumber;
         }
-
-        if (_settings.ClientType == ClientType.ApiAccessForMultiTenantClient)
-        {
-            // This instructs the payload claim creator for multi-tenancy to not create an 'authorization_details' claim
-            // (it is not validated with the code grant).
-            result.IsAuthCodeRequest = true;
-        }
-
         return result;
     }
 }

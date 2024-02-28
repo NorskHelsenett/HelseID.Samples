@@ -21,17 +21,12 @@ public class PayloadClaimsCreatorForMultiTenantClient : IPayloadClaimsCreator {
         PayloadClaimParameters payloadClaimParameters,
         HelseIdConfiguration configuration)
     {
-        if (payloadClaimParameters.IsAuthCodeRequest)
+        if (string.IsNullOrEmpty(payloadClaimParameters.ParentOrganizationNumber))
         {
             return new List<PayloadClaim>();
         }
 
-        if (string.IsNullOrEmpty(payloadClaimParameters.ParentOrganizationNumber))
-        {
-            throw new Exception("Need payload claim parameters with a parent organization number");
-        }
-        
-        // When the client is of the multitenancy type, it will require a parent organization number claim.
+        // When the client is of the multi-tenancy type, it will require a parent organization number claim.
         // In this case, HelseID will require an authorization details claim with the following structure:
         //
         //  "authorization_details":{
@@ -46,28 +41,34 @@ public class PayloadClaimsCreatorForMultiTenantClient : IPayloadClaimsCreator {
         //          }
         //      }
         //  }
-        // 
+        //
         // We use anonymous types to insert the structured claim into the payload:
 
-        var authorizationDetails = new
+        var orgNumberDetails = new Dictionary<string, string>
         {
-            type = "helseid_authorization",
-            practitioner_role = new
-            {
-                organization = new
-                {
-                    identifier = new
-                    {
-                        system =  "urn:oid:1.0.6523",
-                        type = "ENH",
-                        value = $"NO:ORGNR:{GetOrganizationNumberValue(payloadClaimParameters)}"
-                    }
-                }
-            }
+            { "system", "urn:oid:1.0.6523" },
+            { "type", "ENH" },
+            { "value", $"NO:ORGNR:{GetOrganizationNumberValue(payloadClaimParameters)}" }
+        };
+
+        var identifier = new Dictionary<string, object>
+        {
+            { "identifier", orgNumberDetails }
+        };
+
+        var organization = new Dictionary<string, object>
+        {
+            { "organization", identifier }
+        };
+
+        var authorizationDetails = new Dictionary<string, object>
+        {
+            { "type", "helseid_authorization" },
+            { "practitioner_role", organization }
         };
 
         return new List<PayloadClaim> {
-            new PayloadClaim("authorization_details", authorizationDetails),
+            new("authorization_details", authorizationDetails),
         };
     }
 

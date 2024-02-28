@@ -20,7 +20,7 @@ public class AccessTokenUpdaterForMultiTenantRequests : AccessTokenUpdater
         IUserSessionDataStore userSessionDataStore,
         IExpirationTimeCalculator expirationTimeCalculator,
         IUserSessionGetter userSessionGetter) : base(tokenRequestBuilder, payloadClaimsCreatorForClientAssertion, userSessionDataStore, expirationTimeCalculator, userSessionGetter) { }
-    
+
     protected override RefreshTokenRequestParameters CreateRefreshTokenRequestParameters(
         UserSessionData userSessionData,
         ApiIndicators apiIndicators)
@@ -28,7 +28,6 @@ public class AccessTokenUpdaterForMultiTenantRequests : AccessTokenUpdater
         var result = base.CreateRefreshTokenRequestParameters(userSessionData, apiIndicators);
         result.PayloadClaimParameters = new PayloadClaimParameters
         {
-            IsAuthCodeRequest = false,
             ParentOrganizationNumber = userSessionData.SelectedOrganization.OrgNoParent,
             ChildOrganizationNumber = GetChildOrganizationNumber(userSessionData),
         };
