@@ -17,7 +17,7 @@ public class DPoPClientCredentialsController : ControllerBase
     }
 
     [HttpGet]
-    [Route(ConfigurationValues.SampleApiMachineClientResourceForDPoP)]
+    [Route(ConfigurationValues.SampleApiMachineClientResource)]
     public ActionResult<ApiResponse> GetGreetings()
     {
         // Get the claims of the current principal (a system user, not a personal user)

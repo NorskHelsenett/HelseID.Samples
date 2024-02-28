@@ -297,7 +297,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         // This value is set as a static value from configuration here:
         var payloadClaimParameters = new PayloadClaimParameters
         {
-            ChildOrganizationNumber = ConfigurationValues.ApiAccessWithRequestObjectChildOrganizationNumber
+            ChildOrganizationNumber = ConfigurationValues.GranfjelldalKommuneChildOrganizationNumber1
         };
         // We create a signing token (as used in a client assertion), and use this as a request object:
         return _signingTokenCreator.CreateSigningToken(_payloadClaimsCreatorForRequestObjects, payloadClaimParameters);
@@ -385,7 +385,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         if (_settings.ClientType == ClientType.ApiAccessWithRequestObject)
         {
             // This value will typically be assigned to a logged on user:
-            result.ChildOrganizationNumber = ConfigurationValues.ApiAccessWithRequestObjectChildOrganizationNumber;
+            result.ChildOrganizationNumber = ConfigurationValues.GranfjelldalKommuneChildOrganizationNumber1;
         }
         return result;
     }

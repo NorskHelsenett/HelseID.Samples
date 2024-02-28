@@ -128,14 +128,7 @@ public class Startup
         // Builder for JWT tokens used for client assertions
         services.AddSingleton<ISigningTokenCreator, SigningTokenCreator>();
         // Builder for DPoP proofs
-        if (_settings.NoUseOfDPoP)
-        {
-            services.AddSingleton<IDPoPProofCreator, NullDPoPProofCreator>();
-        }
-        else
-        {
-            services.AddSingleton<IDPoPProofCreator, DPoPProofCreator>();
-        }
+        services.AddSingleton<IDPoPProofCreator, DPoPProofCreator>();
         // Builder for client assertions
         services.AddTransient<IClientAssertionsBuilder, ClientAssertionsBuilder>();
         // Finds the relevant endpoints on the HelseID server
@@ -192,11 +185,8 @@ public class Startup
             config.AddPolicy(SecurityLevelClaimPolicy, securityLevelClaimPolicy);
         });
 
-        // We need to replace the OpenIdConnectHandler with our own when DPoP is required
-        if (_settings.NoUseOfDPoP == false)
-        {
-            services.Replace(ServiceDescriptor.Transient<OpenIdConnectHandler, OpenIdConnectHandlerForDPoP>());
-        }
+        // We need to replace the OpenIdConnectHandler with our own as DPoP is required
+        services.Replace(ServiceDescriptor.Transient<OpenIdConnectHandler, OpenIdConnectHandlerForDPoP>());
     }
 
     private WebApplication Configure(WebApplication webApplication)

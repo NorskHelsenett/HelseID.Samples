@@ -63,11 +63,6 @@ dotnet run --use-multi-tenant-pattern
 dotnet run --use-client-info-endpoint
 ```
 
-#### To use DPoP (Demonstrating Proof-of-Possession) tokens against the sample API:
-```
-dotnet run --use-dpop
-```
-
 #### To list all options
 ```
 dotnet run -- --help

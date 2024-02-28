@@ -7,7 +7,6 @@ public static class ConfigurationValues
 {
     // The URL for HelseID
     public const string StsUrl = "https://helseid-sts.test.nhn.no";
-//    public const string StsUrl = "https://localhost:44366"; // "https://helseid-sts.test.nhn.no";
 
     // Audience and scopes for using the 'regular' sample API:
     public const string SampleApiNameAudience = "nhn:helseid-public-samplecode";
@@ -54,15 +53,13 @@ public static class ConfigurationValues
 
     // URLS and resource parameters (url fragments) for the use of the sample APIs for the API access project
     public const string AuthCodeClientResource = "user-login-clients/greetings";
-    public const string AuthCodeClientResourceForDPoP = "user-login-clients/dpop-greetings";
     public const string TokenExchangeResource = "token-exchange-clients/greetings";
     public const string ResourceIndicatorsResource1 = "resource-indicator-client-1/greetings";
     public const string ResourceIndicatorsResource2 = "resource-indicator-client-2/greetings";
 
     public const string TestTokenProxyResource = "test-token";
 
-    public static readonly string SampleApiUrl = $"https://localhost:{SampleApiPort}/{AuthCodeClientResourceForDPoP}";
-    public static readonly string SampleApiUrlWithoutDPoP = $"https://localhost:{SampleApiPort}/{AuthCodeClientResource}";
+    public static readonly string SampleApiUrl = $"https://localhost:{SampleApiPort}/{AuthCodeClientResource}";
     public static readonly string SampleApiUrlForTokenExchange = $"https://localhost:{SampleApiForTokenExchangePort}/{TokenExchangeResource}";
     public static readonly string SampleApiUrlForResourceIndicators1 = $"https://localhost:{SampleApiForResourceIndicators1Port}/{ResourceIndicatorsResource1}";
     public static readonly string SampleApiUrlForResourceIndicators2 = $"https://localhost:{SampleApiForResourceIndicators2Port}/{ResourceIndicatorsResource2}";
@@ -71,17 +68,17 @@ public static class ConfigurationValues
 
     // URLS and resource parameter (url fragment) for the use of the sample API for the client credentials project
     public const string SampleApiMachineClientResource = "machine-clients/greetings";
-    public const string SampleApiMachineClientResourceForDPoP = "machine-clients/dpop-greetings";
 
     public static readonly string SampleApiUrlForM2M = $"https://localhost:{SampleApiPort}/{SampleApiMachineClientResource}";
-    public static readonly string SampleApiUrlForM2MWithDPoP = $"https://localhost:{SampleApiPort}/{SampleApiMachineClientResourceForDPoP}";
 
     // If used, the child organization number (underenhet) must match a number in the client's whitelist as it's held by HelseID:
-    public const string ClientCredentialsWithChildOrganizationNumber = "999977776";
-    public const string ApiAccessWithRequestObjectChildOrganizationNumber = "999977775";
-
     public const string GranfjelldalKommuneOrganizationNumber = "999977774";
     public const string GranfjelldalKommuneOrganizationName = "Granfjelldal kommune";
+    public const string GranfjelldalKommuneChildOrganizationNumber1 = "999977776";
+    public const string GranfjelldalKommuneChildOrganizationName1 = "Granfjelldal kommune bo- og omsorgssenter";
+    public const string GranfjelldalKommuneChildOrganizationNumber2 = "999977775";
+    public const string GranfjelldalKommuneChildOrganizationName2 = "Granfjelldal kommune legekontor";
+
     public const string SupplierOrganizationNumber = "313745392";
     public const string SupplierOrganizationName = "Acme EPJ";
     public const string HansensLegekontorOrganizationNumber = "313325016";

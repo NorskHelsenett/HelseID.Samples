@@ -26,12 +26,11 @@ public class ClientConfigurator
     public Machine2MachineClient ConfigureClient(
         bool useChildOrganizationNumberOptionValue,
         bool useClientInfoEndpointOptionValue,
-        bool useMultiTenantPatternOptionValue,
-        bool noUseOfDPoP)
+        bool useMultiTenantPatternOptionValue)
     {
         var discoveryDocumentGetter = new DiscoveryDocumentGetter(ConfigurationValues.StsUrl);
         var endpointDiscoverer = new HelseIdEndpointsDiscoverer(discoveryDocumentGetter);
-        var configuration = SetUpHelseIdConfiguration(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue, noUseOfDPoP);
+        var configuration = SetUpHelseIdConfiguration(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue);
         var tokenRequestBuilder = CreateTokenRequestBuilder(configuration, endpointDiscoverer);
         var clientInfoRetriever = SetUpClientInfoRetriever(useClientInfoEndpointOptionValue, endpointDiscoverer);
         var tokenRequestParameters = SetUpTokenRequestParameters(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue);
@@ -77,7 +76,7 @@ public class ClientConfigurator
             new NullClientInfoRetriever();
     }
 
-    private  HelseIdConfiguration SetUpHelseIdConfiguration(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue, bool noUseOfDPoP)
+    private  HelseIdConfiguration SetUpHelseIdConfiguration(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue)
     {
         var result = HelseIdSamplesConfiguration.ClientCredentialsClient;
 
@@ -92,7 +91,6 @@ public class ClientConfigurator
             result = HelseIdSamplesConfiguration.ClientCredentialsWithChildOrgNumberClient;
         }
 
-        result.NoUseOfDPoP = noUseOfDPoP;
         return result;
     }
 
@@ -135,7 +133,7 @@ public class ClientConfigurator
         {
             result.PayloadClaimParameters = new PayloadClaimParameters()
             {
-                ChildOrganizationNumber = ConfigurationValues.ClientCredentialsWithChildOrganizationNumber,
+                ChildOrganizationNumber = ConfigurationValues.GranfjelldalKommuneChildOrganizationNumber2,
             };
         }
         if (useMultiTenantPatternOptionValue)

@@ -19,7 +19,3 @@ The [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) is requ
 dotnet run
 ```
 
-#### To use DPoP (Demonstrating Proof-of-Possession) exchanged tokens against the sample API:
-```
-dotnet run --use-dpop
-```

@@ -11,7 +11,7 @@ If you want to use HelseID not only to log on as a user, but also to connect to 
 
 ### Architecture
 
-The client application is based on [ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/?view=aspnetcore-6.0). You can find relevant code in:
+The client application is based on [ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/?view=aspnetcore-8.0). You can find relevant code in:
 * The `Startup` class: this is the initial configuration of the project
 * The `OpenIdConnectOptionsInitializer` class sets up the OpenID Connect user login, using IClientAssertionsBuilder from the `Common` project
 * The `IUserSessionDataStore` interface abstracts the persisting of user tokens
@@ -91,11 +91,6 @@ In addition to start the [Sample API project](../SampleAPI/README.md), you will 
 
 ```
 dotnet run --use-multi-tenant
-```
-
-#### To use DPoP (Demonstrating Proof-of-Possession) tokens against the sample API:
-```
-dotnet run --use-dpop
 ```
 
 ### To list all options:

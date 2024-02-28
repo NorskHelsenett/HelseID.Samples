@@ -14,7 +14,6 @@ public  class Startup
     private readonly Settings _settings;
 
     public const string DPoPTokenAuthenticationScheme = "dpop_token_authentication_scheme";
-    public const string BearerTokenAuthenticationScheme = "bearer_token_authentication_scheme";
     public const string AuthCodePolicy = "auth_code_policy";
     public const string ClientCredentialsPolicy = "client_credentials_policy";
 
@@ -54,24 +53,7 @@ public  class Startup
         webApplicationBuilder.Services.AddSingleton<DPoPProofValidator>();
 
         webApplicationBuilder.Services
-            .AddAuthentication(BearerTokenAuthenticationScheme)
-            // Adds the authentication scheme to be used for bearer tokens:
-            .AddJwtBearer(BearerTokenAuthenticationScheme, options =>
-            {
-                options.RequireHttpsMetadata = true;
-                options.Authority = _settings.Authority;
-                options.Audience = _settings.Audience;
-
-                // Validation parameters are in agreement with HelseIDs requirements:
-                // https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/284229708/Guidelines+for+using+JSON+Web+Tokens+JWTs
-                // The following parameters (and a few others) are all true by default, but set to true here for instructive purposes:
-                options.TokenValidationParameters.ValidateLifetime = true;
-                options.TokenValidationParameters.ValidateIssuer = true;
-                options.TokenValidationParameters.ValidateAudience = true;
-                options.TokenValidationParameters.RequireSignedTokens = true;
-                options.TokenValidationParameters.RequireExpirationTime = true;
-                options.TokenValidationParameters.RequireAudience = true;
-            })
+            .AddAuthentication(DPoPTokenAuthenticationScheme)
             // Adds the authentication scheme to be used for DPoP tokens:
             .AddJwtBearer(DPoPTokenAuthenticationScheme, options =>
             {

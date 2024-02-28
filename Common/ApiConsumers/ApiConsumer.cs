@@ -15,27 +15,18 @@ public class ApiConsumer : IApiConsumer
     {
         _idPoPProofCreator = idPoPProofCreator;
     }
-    
-    public async Task<ApiResponse?> CallApiWithBearerToken(HttpClient httpClient, string apiUrl, string accessToken)
-    {
-        // This extension from the IdentityModel library sets the token in the authorization header
-        // value for the request: "Authorization: Bearer {token}"
-        httpClient.SetBearerToken(accessToken);
-
-        return await CallApi(httpClient, apiUrl);
-    }
 
     public async Task<ApiResponse?> CallApiWithDPoPToken(HttpClient httpClient, string apiUrl, string accessToken)
     {
-        var dPopProof = _idPoPProofCreator.CreateDPoPProof(apiUrl, "GET", accessToken: accessToken); 
-        
+        var dPopProof = _idPoPProofCreator.CreateDPoPProof(apiUrl, "GET", accessToken: accessToken);
+
         var requestMessage = new HttpRequestMessage(HttpMethod.Get, apiUrl);
         requestMessage.SetDPoPToken(accessToken, dPopProof);
-        
+
         var response = await httpClient.SendAsync(requestMessage);
         response.EnsureSuccessStatusCode();
         var responseBody = await response.Content.ReadAsStringAsync();
-        
+
         return JsonSerializer.Deserialize<ApiResponse>(
             responseBody,
             new JsonSerializerOptions

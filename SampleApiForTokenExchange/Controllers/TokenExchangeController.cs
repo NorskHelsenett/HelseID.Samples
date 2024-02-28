@@ -37,9 +37,7 @@ public class TokenExchangeController : ControllerBase
         _configuration = configuration;
     }
 
-    private string ApiUrl => _configuration.NoUseOfDPoP
-        ? ConfigurationValues.SampleApiUrlForM2M
-        : ConfigurationValues.SampleApiUrlForM2MWithDPoP;
+    private string ApiUrl => ConfigurationValues.SampleApiUrlForM2M;
 
     [HttpGet]
     [Route(ConfigurationValues.TokenExchangeResource)]
@@ -68,14 +66,7 @@ public class TokenExchangeController : ControllerBase
         try
         {
             Console.WriteLine("Using the (exchanged) access token to call the sample API");
-            if (_configuration.NoUseOfDPoP)
-            {
-                return await _apiConsumer.CallApiWithBearerToken(httpClient, ApiUrl, actorAccessToken);
-            }
-            else
-            {
-                return await _apiConsumer.CallApiWithDPoPToken(httpClient, ApiUrl, actorAccessToken);
-            }
+            return await _apiConsumer.CallApiWithDPoPToken(httpClient, ApiUrl, actorAccessToken);
         }
         catch (HttpRequestException e)
         {
@@ -87,11 +78,7 @@ public class TokenExchangeController : ControllerBase
 
     private async Task<string> ExchangeTheSubjectTokenForAnActorAccessToken(HttpClient httpClient, string subjectToken)
     {
-        var dPoPNonce = await GetDPoPNonce(httpClient, subjectToken);;
-        if (_configuration.NoUseOfDPoP)
-        {
-            dPoPNonce = null;
-        }
+        var dPoPNonce = await CallTokenEndpointAndGetDPoPNonce(httpClient, subjectToken);;
         // The request to HelseID is created:
         var request = await _tokenRequestBuilder.CreateTokenExchangeTokenRequest(
             _payloadClaimsCreatorForClientAssertion,
@@ -112,7 +99,7 @@ public class TokenExchangeController : ControllerBase
         return tokenResponse.AccessToken;
     }
 
-    private async Task<string?> GetDPoPNonce(HttpClient httpClient, string subjectToken)
+    private async Task<string?> CallTokenEndpointAndGetDPoPNonce(HttpClient httpClient, string subjectToken)
     {
         var request = await _tokenRequestBuilder.CreateTokenExchangeTokenRequest(
             _payloadClaimsCreatorForClientAssertion,

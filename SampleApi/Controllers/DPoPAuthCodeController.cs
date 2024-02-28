@@ -17,7 +17,7 @@ public class DPoPAuthCodeController : ControllerBase
     }
 
     [HttpGet]
-    [Route(ConfigurationValues.AuthCodeClientResourceForDPoP)]
+    [Route(ConfigurationValues.AuthCodeClientResource)]
     public ActionResult<ApiResponse> GetGreetings()
     {
         return CreateResult("Sample API (with DPoP)");

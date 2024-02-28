@@ -83,14 +83,11 @@ public class TestAccessTokenController : ControllerBase
         var controllerName = new Uri(testTokenParameters.Uri);
         switch (controllerName.AbsolutePath)
         {
-            case "/" + ConfigurationValues.SampleApiMachineClientResource:
-                return TokenCreationParameter.CreateTokenForClientCredentials;
-            case "/" + ConfigurationValues.AuthCodeClientResource:
             case "/" + ConfigurationValues.ResourceIndicatorsResource1:
             case "/" + ConfigurationValues.ResourceIndicatorsResource2:
                 return TokenCreationParameter.CreateTokenWithUser;
-            case "/" + ConfigurationValues.SampleApiMachineClientResourceForDPoP:
-            case "/" + ConfigurationValues.AuthCodeClientResourceForDPoP:
+            case "/" + ConfigurationValues.SampleApiMachineClientResource:
+            case "/" + ConfigurationValues.AuthCodeClientResource:
                 return TokenCreationParameter.CreateTokenWithDPoP;
             default:
                 return TokenCreationParameter.None;
@@ -129,7 +126,7 @@ public class TestAccessTokenController : ControllerBase
                 bodyObject.createDPoPTokenWithDPoPProof = true;
                 bodyObject.dPoPProofParameters = new
                 {
-                    htuClaimValue = ConfigurationValues.SampleApiUrlForM2MWithDPoP,
+                    htuClaimValue = ConfigurationValues.SampleApiUrlForM2M,
                     htmClaimValue = "GET",
                 };
                 break;

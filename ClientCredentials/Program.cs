@@ -25,26 +25,21 @@ static class Program
             description: "If set, the application will use the access token to access the client info endpoint on the HelseID service.",
             getDefaultValue: () => false);
 
-        var noUseOfDPoPOption = new Option<bool>(
-            aliases: new [] {"--no-use-of-dpop", "-nd"},
-            description: "If set, the application will use a bearer token in the call to the API.",
-            getDefaultValue: () => false);
-
         var rootCommand = new RootCommand("A client credentials usage sample")
         {
-            useChildOrgNumberOption, useClientInfoEndpointOption, useMultiTenantPattern, noUseOfDPoPOption
+            useChildOrgNumberOption, useClientInfoEndpointOption, useMultiTenantPattern
         };
 
-        rootCommand.SetHandler(async (useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue, useMultiTenantPatternOptionValue, noUseOfDPoPOptionValue) =>
+        rootCommand.SetHandler(async (useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue, useMultiTenantPatternOptionValue) =>
         {
             var clientConfigurator = new ClientConfigurator();
-            var client = clientConfigurator.ConfigureClient(useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue, useMultiTenantPatternOptionValue, noUseOfDPoPOptionValue);
+            var client = clientConfigurator.ConfigureClient(useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue, useMultiTenantPatternOptionValue);
             var repeatCall = true;
             while (repeatCall)
             {
                 repeatCall = await CallApiWithToken(client);
             }
-        }, useChildOrgNumberOption, useClientInfoEndpointOption, useMultiTenantPattern, noUseOfDPoPOption);
+        }, useChildOrgNumberOption, useClientInfoEndpointOption, useMultiTenantPattern);
 
         await rootCommand.InvokeAsync(args);
     }

@@ -33,6 +33,4 @@ public class HelseIdConfiguration
 
     // These are used for clients that are using resource indicators against the authorization and token endpoints:
     public List<string> ResourceIndicators { get; } = new();
-
-    public bool NoUseOfDPoP { get; set; }
 }

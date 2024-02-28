@@ -6,7 +6,7 @@ using HelseID.Samples.Configuration;
 namespace HelseId.Samples.ApiAccess;
 
 // This file is used for bootstrapping the example. Nothing of real interest here.
-public class Program
+public static class Program
 {
     public static async Task Main(string[] args)
     {
@@ -36,21 +36,16 @@ public class Program
             description: "If set, the application will use a client set up for multi-tenancy, i.e. it makes use of an organization number that is connected to the client.",
             getDefaultValue: () => false);
 
-        var noUseOfDPoPOption = new Option<bool>(
-            aliases: new [] {"--no-use-of-dpop", "-nd"},
-            description: "If set, the application will use a bearer token in the call to the API.",
-            getDefaultValue: () => false);
-
         var rootCommand = new RootCommand("An authorization code flow usage sample")
         {
-            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, noUseOfDPoPOption
+            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption
         };
 
-        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, noUseOfDPoP) =>
+        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant) =>
         {
-            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, noUseOfDPoP);
+            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant);
             new Startup(settings).BuildWebApplication().Run();
-        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, noUseOfDPoPOption);
+        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption);
 
         await rootCommand.InvokeAsync(args);
     }
@@ -60,8 +55,7 @@ public class Program
         bool useTokenExchange,
         bool useRequestObjects,
         bool useResourceIndicators,
-        bool useMultiTenant,
-        bool noUseOfDPoP)
+        bool useMultiTenant)
     {
         var clientType = GetClientType(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant);
 
@@ -72,8 +66,7 @@ public class Program
             ApiUrl2 = GetApiUrl2(clientType),
             ApiAudience1 = GetApiAudience1(clientType),
             ApiAudience2 = GetApiAudience2(clientType),
-            HelseIdConfiguration = SetSamplesConfiguration(clientType, noUseOfDPoP),
-            NoUseOfDPoP = noUseOfDPoP,
+            HelseIdConfiguration = SetSamplesConfiguration(clientType),
         };
     }
 
@@ -118,7 +111,6 @@ public class Program
         {
             ClientType.ApiAccessWithTokenExchange => ConfigurationValues.SampleApiUrlForTokenExchange,
             ClientType.ApiAccessWithResourceIndicators => ConfigurationValues.SampleApiUrlForResourceIndicators1,
-            ClientType.ApiAccessWithoutDPoP => ConfigurationValues.SampleApiUrlWithoutDPoP,
             _ => ConfigurationValues.SampleApiUrl,
         };
     }
@@ -147,9 +139,9 @@ public class Program
             string.Empty;
     }
 
-    private static HelseIdConfiguration SetSamplesConfiguration(ClientType clientType, bool noUseOfDPoP)
+    private static HelseIdConfiguration SetSamplesConfiguration(ClientType clientType)
     {
-        var result = clientType switch
+        return clientType switch
         {
             ClientType.ApiAccessWithTokenExchange => HelseIdSamplesConfiguration.ApiAccessWithTokenExchange,
             ClientType.ApiAccessWithRequestObject => HelseIdSamplesConfiguration.ApiAccessWithRequestObject,
@@ -158,7 +150,5 @@ public class Program
             ClientType.ApiAccessForMultiTenantClient => HelseIdSamplesConfiguration.ApiAccessForMultiTenantClient,
             _ => HelseIdSamplesConfiguration.ApiAccess
         };
-        result.NoUseOfDPoP = noUseOfDPoP;
-        return result;
     }
 }
