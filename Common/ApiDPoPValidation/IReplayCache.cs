@@ -1,4 +1,4 @@
-namespace HelseId.SampleAPI.DPoPValidation;
+namespace HelseId.Samples.Common.ApiDPoPValidation;
 
 public interface IReplayCache
 {

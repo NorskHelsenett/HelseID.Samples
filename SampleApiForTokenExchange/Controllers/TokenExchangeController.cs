@@ -14,7 +14,7 @@ namespace HelseId.SampleApiForTokenExchange.Controllers;
 
 // Authentication is needed to access the API
 [ApiController]
-[Authorize(Policy=Startup.TokenExchangePolicy, AuthenticationSchemes = Startup.TokenAuthenticationScheme)]
+[Authorize(Policy=Startup.TokenExchangePolicy, AuthenticationSchemes = Startup.TokenAuthenticationSchemeWithDPoP)]
 public class TokenExchangeController : ControllerBase
 {
     private readonly ITokenRequestBuilder _tokenRequestBuilder;
@@ -48,7 +48,7 @@ public class TokenExchangeController : ControllerBase
         return await CallApiWithTokenExchange();
     }
 
-    //TODO: Cache actor access token (or at least show how to)
+    //TODO: Cache the actor access token
     private async Task<ApiResponse?> CallApiWithTokenExchange()
     {
         using var httpClient = new HttpClient();

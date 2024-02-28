@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using HelseId.SampleApi.Configuration;
 using HelseId.SampleAPI.Controllers;
-using HelseId.SampleAPI.DPoPValidation;
 using HelseId.SampleApi.Interfaces;
+using HelseId.Samples.Common.ApiDPoPValidation;
 using HelseID.Samples.Configuration;
 using IdentityModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -111,30 +111,37 @@ public  class Startup
 
                 options.Events.OnTokenValidated = async tokenValidatedContext =>
                 {
-                    // This functionality validates the DPoP proof
-                    // https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-16.html#name-checking-dpop-proofs
-
-                    // Get the DPoP proof:
-                    var request = tokenValidatedContext.HttpContext.Request;
-                    if (!request.GetDPoPProof(out var dPopProof))
+                    try
                     {
-                        tokenValidatedContext.Fail("Missing DPoP proof");
-                        return;
+                        // This functionality validates the DPoP proof
+                        // https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-16.html#name-checking-dpop-proofs
+
+                        // Get the DPoP proof:
+                        var request = tokenValidatedContext.HttpContext.Request;
+                        if (!request.GetDPoPProof(out var dPopProof))
+                        {
+                            tokenValidatedContext.Fail("Missing DPoP proof");
+                            return;
+                        }
+
+                        // Get the access token:
+                        request.GetDPoPAccessToken(out var accessToken);
+
+                        // Get the cnf claim from the access token:
+                        var cnfClaimValue = tokenValidatedContext.Principal!.FindFirstValue(JwtClaimTypes.Confirmation);
+
+                        var data = new DPoPProofValidationData(request, dPopProof!, accessToken!, cnfClaimValue);
+
+                        var dPopProofValidator = tokenValidatedContext.HttpContext.RequestServices.GetRequiredService<DPoPProofValidator>();
+                        var validationResult = await dPopProofValidator.Validate(data);
+                        if (validationResult.IsError)
+                        {
+                            tokenValidatedContext.Fail(validationResult.ErrorDescription!);
+                        }
                     }
-
-                    // Get the access token:
-                    request.GetDPoPAccessToken(out var accessToken);
-
-                    // Get the cnf claim from the access token:
-                    var cnfClaimValue = tokenValidatedContext.Principal!.FindFirstValue(JwtClaimTypes.Confirmation);
-
-                    var data = new DPoPProofValidationData(request, dPopProof!, accessToken!, cnfClaimValue);
-
-                    var dPopProofValidator = tokenValidatedContext.HttpContext.RequestServices.GetRequiredService<DPoPProofValidator>();
-                    var validationResult = await dPopProofValidator.Validate(data);
-                    if (validationResult.IsError)
+                    catch (Exception e)
                     {
-                        tokenValidatedContext.Fail(validationResult.ErrorDescription!);
+                        tokenValidatedContext.Fail("Invalid token!");
                     }
                 };
             });

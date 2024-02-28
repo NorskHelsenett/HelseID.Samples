@@ -1,9 +1,9 @@
-using System.Text.Json;
+using System.Linq;
 using IdentityModel;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace HelseId.SampleAPI.DPoPValidation;
+namespace HelseId.Samples.Common.ApiDPoPValidation;
 
 public class DPoPProofValidator
 {

@@ -1,9 +1,10 @@
 using System.Security.Cryptography;
 using System.Text;
 using IdentityModel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 
-namespace HelseId.SampleAPI.DPoPValidation;
+namespace HelseId.Samples.Common.ApiDPoPValidation;
 
 public class DPoPProofValidationData
 {

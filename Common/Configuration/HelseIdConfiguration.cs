@@ -23,7 +23,6 @@ public class HelseIdConfiguration
     }
 
     // The private key MUST be properly secured inside the client.
-    // TODO: guidelines
     public SecurityKey PrivateKeyJwk  { get; }
 
     public string ClientId { get; }

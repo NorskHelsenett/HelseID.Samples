@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace HelseId.SampleAPI.DPoPValidation;
+namespace HelseId.Samples.Common.ApiDPoPValidation;
 
 public class DummyReplayCache : IReplayCache
 {
