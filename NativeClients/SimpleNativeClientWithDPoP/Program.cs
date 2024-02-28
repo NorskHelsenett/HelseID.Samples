@@ -37,7 +37,7 @@ namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
 
         // An API that requires a logged in user
         // You can find README for this API in the SampleApi folder in this repository
-        private const string ApiUrl = "https://localhost:5081/user-login-clients/dpop-greetings";
+        private const string ApiUrl = "https://localhost:5081/user-login-clients/greetings";
 
         // The port do not need to be pre-registered in HelseID, which means that you can allocate an available port on your localhost when launching the application:
         private const int LocalhostPort = 8089;

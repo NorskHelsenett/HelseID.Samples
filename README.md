@@ -83,9 +83,9 @@ If you wish to use this sample, you will need to start both
 
 For use in "native clients", i.e. applications that does not run in a web client, we have created a set of simple examples for the use of a system browser for login against HelseID. These examples can be found in the `NativeClients`folder.
 
-### <a name="APIAccessResourceIndicators"></a> Simple API access with API login
+### <a name="SimpleNativeClientWithDPoP"></a> Simple API access with API login
 
-The sample demonstrates a simple user login. See [NativeClients/SimpleNativeClientWithUserLoginAndApiCall/README.md](NativeClients/SimpleNativeClientWithUserLoginAndApiCall/README.md) for more information.
+The sample demonstrates a simple user login. See [NativeClients/SimpleNativeClientWithDPoP/README.md](NativeClients/SimpleNativeClientWithUserLoginAndApiCall/README.md) for more information.
 
 ### <a name="APIAccessResourceIndicators"></a> Simple API access with resource indicators
 
