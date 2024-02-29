@@ -6,7 +6,7 @@ using HelseID.Samples.Configuration;
 namespace HelseId.Samples.ApiAccess;
 
 // This file is used for bootstrapping the example. Nothing of real interest here.
-public class Program
+public static class Program
 {
     public static async Task Main(string[] args)
     {
@@ -35,27 +35,17 @@ public class Program
             aliases: new [] {"--use-multi-tenant", "-mt"},
             description: "If set, the application will use a client set up for multi-tenancy, i.e. it makes use of an organization number that is connected to the client.",
             getDefaultValue: () => false);
-        
-        var useContextualClaimsOption = new Option<bool>(
-            aliases: new [] {"--use-contextual-claims", "-cc"},
-            description: "If set, the application will use submit a contextual claim to HelseID, which will in turn be returned to the sample API.",
-            getDefaultValue: () => false);
-        
-        var useDPoPOption = new Option<bool>(
-            aliases: new [] {"--use-dpop", "-dp"},
-            description: "If set, the application will use the demonstrating proof-of-possesion mechanism for sender-constraining the token sent to the example API.",
-            getDefaultValue: () => false);
-        
+
         var rootCommand = new RootCommand("An authorization code flow usage sample")
         {
-            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, useContextualClaimsOption, useDPoPOption
+            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption
         };
 
-        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useContextualClaims, useDPoP) =>
+        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant) =>
         {
-            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useContextualClaims, useDPoP);
+            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant);
             new Startup(settings).BuildWebApplication().Run();
-        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption, useContextualClaimsOption, useDPoPOption);
+        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption);
 
         await rootCommand.InvokeAsync(args);
     }
@@ -65,11 +55,9 @@ public class Program
         bool useTokenExchange,
         bool useRequestObjects,
         bool useResourceIndicators,
-        bool useMultiTenant,
-        bool useContextualClaims,
-        bool useDPoP)
+        bool useMultiTenant)
     {
-        var clientType = GetClientType(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant, useContextualClaims);
+        var clientType = GetClientType(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant);
 
         return new Settings
         {
@@ -78,8 +66,7 @@ public class Program
             ApiUrl2 = GetApiUrl2(clientType),
             ApiAudience1 = GetApiAudience1(clientType),
             ApiAudience2 = GetApiAudience2(clientType),
-            HelseIdConfiguration = SetSamplesConfiguration(clientType, useDPoP),
-            UseDPoP = useDPoP,
+            HelseIdConfiguration = SetSamplesConfiguration(clientType),
         };
     }
 
@@ -88,8 +75,7 @@ public class Program
         bool useTokenExchange,
         bool useRequestObjects,
         bool useResourceIndicators,
-        bool useMultiTenant,
-        bool useContextualClaims)
+        bool useMultiTenant)
     {
         if (userLoginOnly)
         {
@@ -116,11 +102,6 @@ public class Program
             return ClientType.ApiAccessForMultiTenantClient;
         }
 
-        if (useContextualClaims)
-        {
-            return ClientType.ApiAccessWithContextualClaims;
-        }
-
         return ClientType.ApiAccess;
     }
 
@@ -130,7 +111,7 @@ public class Program
         {
             ClientType.ApiAccessWithTokenExchange => ConfigurationValues.SampleApiUrlForTokenExchange,
             ClientType.ApiAccessWithResourceIndicators => ConfigurationValues.SampleApiUrlForResourceIndicators1,
-            _ => ConfigurationValues.SampleApiUrl
+            _ => ConfigurationValues.SampleApiUrl,
         };
     }
 
@@ -158,19 +139,16 @@ public class Program
             string.Empty;
     }
 
-    private static HelseIdConfiguration SetSamplesConfiguration(ClientType clientType, bool useDPoP)
+    private static HelseIdConfiguration SetSamplesConfiguration(ClientType clientType)
     {
-        var result = clientType switch
+        return clientType switch
         {
             ClientType.ApiAccessWithTokenExchange => HelseIdSamplesConfiguration.ApiAccessWithTokenExchange,
             ClientType.ApiAccessWithRequestObject => HelseIdSamplesConfiguration.ApiAccessWithRequestObject,
             ClientType.ApiAccessWithResourceIndicators => HelseIdSamplesConfiguration.ResourceIndicatorsClient,
             ClientType.UserLoginOnly => HelseIdSamplesConfiguration.UserAuthenticationClient,
             ClientType.ApiAccessForMultiTenantClient => HelseIdSamplesConfiguration.ApiAccessForMultiTenantClient,
-            ClientType.ApiAccessWithContextualClaims => HelseIdSamplesConfiguration.ApiAccessWithContextualClaimsClient,
             _ => HelseIdSamplesConfiguration.ApiAccess
         };
-        result.UseDPoP = useDPoP;
-        return result;
     }
 }

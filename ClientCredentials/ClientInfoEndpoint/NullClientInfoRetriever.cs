@@ -7,7 +7,7 @@ namespace HelseId.Samples.ClientCredentials.ClientInfoEndpoint;
 /// </summary>
 public class NullClientInfoRetriever : IClientInfoRetriever
 {
-    public Task ConsumeClientinfoEndpoint(HttpClient httpClient, string accessToken)
+    public Task ConsumeClientInfoEndpoint(HttpClient httpClient, string accessToken)
     {
         return Task.CompletedTask;
     }

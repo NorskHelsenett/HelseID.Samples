@@ -1,9 +1,11 @@
+using System.Linq;
 using IdentityModel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 
-namespace HelseId.SampleAPI.DPoPValidation;
+namespace HelseId.Samples.Common.ApiDPoPValidation;
 
-static class DPoPExtensions
+public static class DPoPExtensions
 {
     private const string DPoPAuthorizationSchema = OidcConstants.AuthenticationSchemes.AuthorizationHeaderDPoP + " ";
 
@@ -30,4 +32,3 @@ static class DPoPExtensions
         return Base64Url.Encode(jwk.ComputeJwkThumbprint());
     }
 }
-

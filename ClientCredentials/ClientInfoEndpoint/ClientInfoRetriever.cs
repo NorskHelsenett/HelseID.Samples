@@ -20,9 +20,9 @@ public class ClientInfoRetriever : IClientInfoRetriever
     /// <summary>
     /// This method gets the URL for the clientinfo endpoint from the discovery document on
     /// the HelseID server. Then, it uses the returned access token to access the
-    /// endpoint. The resulting information is printed out to the console. 
+    /// endpoint. The resulting information is printed out to the console.
     /// </summary>
-    public async Task ConsumeClientinfoEndpoint(HttpClient httpClient, string accessToken) {
+    public async Task ConsumeClientInfoEndpoint(HttpClient httpClient, string accessToken) {
 
         var clientInfoUrl = await _helseIdEndpointsDiscoverer.GetClientInfoEndpointFromHelseId();
 
@@ -30,11 +30,11 @@ public class ClientInfoRetriever : IClientInfoRetriever
 
         DisplayClientInfo(clientInfo);
     }
-    
+
     /// <summary>
-    /// We call HelseID to get information about our client 
+    /// We call HelseID to get information about our client
     /// </summary>
-    private async Task<string> GetClientInfoFromHelseId(HttpClient httpClient, string accessToken, string clientInfoUrl) 
+    private async Task<string> GetClientInfoFromHelseId(HttpClient httpClient, string accessToken, string clientInfoUrl)
     {
         // This extension from the IdentityModel library sets the token in the authorization header
         // value for the request: "Authorization: Bearer {token}"
@@ -48,7 +48,7 @@ public class ClientInfoRetriever : IClientInfoRetriever
         Console.WriteLine(FormatJsonText(clientInfo));
         Console.WriteLine("------");
     }
-    
+
     static string FormatJsonText(string jsonString)
     {
         var memoryStream = new MemoryStream();

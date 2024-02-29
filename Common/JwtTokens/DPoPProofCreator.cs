@@ -15,12 +15,12 @@ namespace HelseId.Samples.Common.JwtTokens;
 public class DPoPProofCreator : IDPoPProofCreator
 {
     private readonly HelseIdConfiguration _configuration;
-    
+
     public DPoPProofCreator(HelseIdConfiguration configuration)
     {
         _configuration = configuration;
     }
-    
+
     public string CreateDPoPProof(string url, string httpMethod, string? dPoPNonce = null, string? accessToken = null)
     {
         var securityKey = new JsonWebKey(_configuration.PrivateKeyJwk.JwkValue);
@@ -70,14 +70,14 @@ public class DPoPProofCreator : IDPoPProofCreator
         if (!string.IsNullOrEmpty(accessToken))
         {
             // ath: hash of the access token. The value MUST be the result of a base64url encoding
-            // the SHA-256 [SHS] hash of the ASCII encoding of the associated access token's value. 
+            // the SHA-256 [SHS] hash of the ASCII encoding of the associated access token's value.
             using var sha256 = SHA256.Create();
             var hash = sha256.ComputeHash(Encoding.ASCII.GetBytes(accessToken));
             var ath = Base64Url.Encode(hash);
 
             payload[JwtClaimTypes.DPoPAccessTokenHash] = ath;
         }
-        
+
         var jwtSecurityToken = new JwtSecurityToken(jwtHeader, payload);
         return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
     }

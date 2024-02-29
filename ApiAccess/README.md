@@ -11,7 +11,7 @@ If you want to use HelseID not only to log on as a user, but also to connect to 
 
 ### Architecture
 
-The client application is based on [ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/?view=aspnetcore-6.0). You can find relevant code in:
+The client application is based on [ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/?view=aspnetcore-8.0). You can find relevant code in:
 * The `Startup` class: this is the initial configuration of the project
 * The `OpenIdConnectOptionsInitializer` class sets up the OpenID Connect user login, using IClientAssertionsBuilder from the `Common` project
 * The `IUserSessionDataStore` interface abstracts the persisting of user tokens
@@ -43,7 +43,7 @@ The access token is set as a ``Bearer`` token in the Authorization Header, after
 
 ### Requirements
 
-The [.NET 7 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) is required to build the program.
+The [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) is required to build the program.
 
 If you need to use this sample to access an API, you will need to start the [Sample API project](../SampleAPI/README.md) in a separate terminal. Then, you can run this application. 
 
@@ -91,17 +91,6 @@ In addition to start the [Sample API project](../SampleAPI/README.md), you will 
 
 ```
 dotnet run --use-multi-tenant
-```
-
-### Use of contextual claims
-The use of *contextual claims* allows a client to send a structured claim as client assertion to HelseID. This claim will then be attached to the returned access token. In order to sample this functionality, use the extra option
-```
-dotnet run --use-contextual-claims
-```
-
-#### To use DPoP (Demonstrating Proof-of-Possession) tokens against the sample API:
-```
-dotnet run --use-dpop
 ```
 
 ### To list all options:

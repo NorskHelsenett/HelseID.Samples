@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using HelseId.SampleApi.Configuration;
 using HelseId.SampleAPI.Controllers;
-using HelseId.SampleAPI.DPoPValidation;
 using HelseId.SampleApi.Interfaces;
+using HelseId.Samples.Common.ApiDPoPValidation;
 using HelseID.Samples.Configuration;
 using IdentityModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -14,7 +14,6 @@ public  class Startup
     private readonly Settings _settings;
 
     public const string DPoPTokenAuthenticationScheme = "dpop_token_authentication_scheme";
-    public const string BearerTokenAuthenticationScheme = "bearer_token_authentication_scheme";
     public const string AuthCodePolicy = "auth_code_policy";
     public const string ClientCredentialsPolicy = "client_credentials_policy";
 
@@ -54,24 +53,7 @@ public  class Startup
         webApplicationBuilder.Services.AddSingleton<DPoPProofValidator>();
 
         webApplicationBuilder.Services
-            .AddAuthentication(BearerTokenAuthenticationScheme)
-            // Adds the authentication scheme to be used for bearer tokens:
-            .AddJwtBearer(BearerTokenAuthenticationScheme, options =>
-            {
-                options.RequireHttpsMetadata = true;
-                options.Authority = _settings.Authority;
-                options.Audience = _settings.Audience;
-
-                // Validation parameters are in agreement with HelseIDs requirements:
-                // https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/284229708/Guidelines+for+using+JSON+Web+Tokens+JWTs
-                // The following parameters (and a few others) are all true by default, but set to true here for instructive purposes:
-                options.TokenValidationParameters.ValidateLifetime = true;
-                options.TokenValidationParameters.ValidateIssuer = true;
-                options.TokenValidationParameters.ValidateAudience = true;
-                options.TokenValidationParameters.RequireSignedTokens = true;
-                options.TokenValidationParameters.RequireExpirationTime = true;
-                options.TokenValidationParameters.RequireAudience = true;
-            })
+            .AddAuthentication(DPoPTokenAuthenticationScheme)
             // Adds the authentication scheme to be used for DPoP tokens:
             .AddJwtBearer(DPoPTokenAuthenticationScheme, options =>
             {
@@ -111,30 +93,37 @@ public  class Startup
 
                 options.Events.OnTokenValidated = async tokenValidatedContext =>
                 {
-                    // This functionality validates the DPoP proof
-                    // https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-16.html#name-checking-dpop-proofs
-
-                    // Get the DPoP proof:
-                    var request = tokenValidatedContext.HttpContext.Request;
-                    if (!request.GetDPoPProof(out var dPopProof))
+                    try
                     {
-                        tokenValidatedContext.Fail("Missing DPoP proof");
-                        return;
+                        // This functionality validates the DPoP proof
+                        // https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-16.html#name-checking-dpop-proofs
+
+                        // Get the DPoP proof:
+                        var request = tokenValidatedContext.HttpContext.Request;
+                        if (!request.GetDPoPProof(out var dPopProof))
+                        {
+                            tokenValidatedContext.Fail("Missing DPoP proof");
+                            return;
+                        }
+
+                        // Get the access token:
+                        request.GetDPoPAccessToken(out var accessToken);
+
+                        // Get the cnf claim from the access token:
+                        var cnfClaimValue = tokenValidatedContext.Principal!.FindFirstValue(JwtClaimTypes.Confirmation);
+
+                        var data = new DPoPProofValidationData(request, dPopProof!, accessToken!, cnfClaimValue);
+
+                        var dPopProofValidator = tokenValidatedContext.HttpContext.RequestServices.GetRequiredService<DPoPProofValidator>();
+                        var validationResult = await dPopProofValidator.Validate(data);
+                        if (validationResult.IsError)
+                        {
+                            tokenValidatedContext.Fail(validationResult.ErrorDescription!);
+                        }
                     }
-
-                    // Get the access token:
-                    request.GetDPoPAccessToken(out var accessToken);
-
-                    // Get the cnf claim from the access token:
-                    var cnfClaimValue = tokenValidatedContext.Principal!.FindFirstValue(JwtClaimTypes.Confirmation);
-
-                    var data = new DPoPProofValidationData(request, dPopProof!, accessToken!, cnfClaimValue);
-
-                    var dPopProofValidator = tokenValidatedContext.HttpContext.RequestServices.GetRequiredService<DPoPProofValidator>();
-                    var validationResult = await dPopProofValidator.Validate(data);
-                    if (validationResult.IsError)
+                    catch (Exception)
                     {
-                        tokenValidatedContext.Fail(validationResult.ErrorDescription!);
+                        tokenValidatedContext.Fail("Invalid token!");
                     }
                 };
             });
@@ -175,8 +164,8 @@ public  class Startup
         webApplication.UseSwaggerUI(options =>
         {
             var testTokenProxyEndpointAddress = ConfigurationValues.TestTokenProxyUrl;
-            // This is needed in order to get the access token from the test token service proxy:
-            options.UseRequestInterceptor($"(req) => {{ return setBearerTokenInRequest(req, '{testTokenProxyEndpointAddress}'); }} ");
+            // This injection of JavaScript code is needed in order to get the access token from the test token service proxy:
+            options.UseRequestInterceptor($"(req) => {{ return setDPoPTokenInRequest(req, '{testTokenProxyEndpointAddress}'); }} ");
             options.InjectJavascript("extend-swagger.js");
         });
 

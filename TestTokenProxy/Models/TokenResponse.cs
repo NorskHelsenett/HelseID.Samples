@@ -1,5 +1,3 @@
-using TestTokenProxy.Controllers;
-
 namespace TestTokenProxy.Models;
 
 public class TokenResponse

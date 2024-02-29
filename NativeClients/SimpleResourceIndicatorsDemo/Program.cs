@@ -1,233 +1,249 @@
-﻿using IdentityModel;
-using IdentityModel.Client;
-using IdentityModel.OidcClient;
-using Microsoft.AspNetCore.Http;
-using Microsoft.IdentityModel.Tokens;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
-using System.IO;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices;
+using IdentityModel;
+using IdentityModel.Client;
+using IdentityModel.OidcClient;
+using IdentityModel.OidcClient.Browser;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.IdentityModel.Tokens;
 
-namespace HelseId.ResourceIndicatorsDemo
+namespace HelseId.Samples.SimpleResourceIndicatorsDemo;
+
+/*
+ * This sample application shows how Resource Indicators
+ * (https://datatracker.ietf.org/doc/html/rfc8707) work in order
+ * to download multiple Access Tokens without performing multiple
+ * calls to the Authorize endpoint.
+ * This is useful when calling national health APIs, as most
+ * of these APIs require Access Tokens with a single audience value.
+ *
+ * This client for this sample application has access to two APIs:
+ * nhn:helseid-public-sample-api-1 and nhn:helseid-public-sample-api-2.
+ * The application requests scopes from both APIs, but the first
+ * call to the /token endpoint only requests the first resource.
+ * The second call (using a Refresh Token) requests the second
+ * resource.
+ */
+public class Program
 {
-    /*
-     * This sample application shows how Resource Indicators 
-     * (https://datatracker.ietf.org/doc/html/rfc8707)
-     * to download multiple Access Tokens without performing multiple
-     * calls to the Authorize endpoint.
-     * This is important when calling national health APIs since most
-     * of these require Access Tokens where they are the only audience.
-     * 
-     * This sample app has access to two APIs: udelt:resource_indicator_api_1
-     * and udelt:resource_indicator_api_2. The app requests scopes from 
-     * both APIs but the first Token-call only requests the first resource.
-     * The second Token-call (using a Refresh Token) requests the second
-     * resource.
-     */
-    class Program
+    //
+    // The values below should normally be configurable
+    //
+
+    // In a production environment you would use your own private key stored somewhere safe (a vault, a certificate store, a secure database or similar).
+    private const string JwkPrivateKey = """
+                                         {
+                                           "d": "sck9fMkA2qXTPH11k2BHd6q7sNWglTG7B_QJ7ZlhAGxJavhcnb_qnDOJi_UcjvMHoLNqO02Tnvf6Sat5jxMVuPZRXsM494QbTKrDT_I6GnH0APL5f_ThuqL1g6bdK-w_PTNoy7VGciyGO-ROi-y94Sano_kDMSFNrgZbXPYjZ6PhP-frbWSgLLoNBoXqp6Or8hXxtLWX_eHzyLM9TDEOEKMnArOTSmmbzUjmAJOwHVjz8w-X5iATNsPM4rM_lZ4QX-oX-I-YsbuAqs6xvnTBv5GgRNVr7czx7gnMACsvBTSXhgKDREPf3rsocAmQWPOZG_ldZIvupPV_hx5pwAL_WBtPdMbVYcTajwR0iKHdcxuwAOasG8aGhthufWFNLw23nAxTxExpSO-azWbBYqC23oDPStkSpDAxN6uo4x038f2pPgFmSB5pOmu8knSjNuTTk6b63o71weK9-rqtLFFyh3VpsfKUas2ID8I76qfV-QfGwW61NF_1i8Gkca9hHZDdFleMEEIEk4Ab-tLRLvBlt3JuLCDgG8ngZbPNhrpXYkGMpUEOHngfZ-P14qhAh1pwjxs-r6cRmKJiXkMJNuyxKeqWCuh63zEtYvaHfyKtXQpTntw9rkbjeKG0esmVX3zL0Vq4410VTMpNIVhYwIrLXuPkkVnIINTkuQ8NSyP2eek",
+                                           "dp": "7lTTnc4-WIUDT0Jf3iyn_M0F4mkPQf_it7ohPvSHp8skO8W2bYaUvNwpP7tEu4KftJ5PEiTuP5mF_wKtsumoA1VJOQlmDCLL5JfjNiVh31OuhM6zGIlCjuZ2_w_VRumpDnPSOzieDj2v5nvv3TkDR3zx4LnJbVGe0DWEmEoCukotgRWEKOO5MKZla_-IeISVHqSRwBHaqTfE4duFVNJdUP_W-nI_xUIHx7NEErSAf9bkWJMHJZlqX8sNuyBM4W3A6kyApT5uRXxoNeYkO3ODPYjD57dv6DsbM5EtoB09C-OpafFW_LYgnaY30z4WF9BSTclGzwLOhzLrJH04bA3lIw",
+                                           "dq": "re5d1vNXA4kMmWm3Rb4UCxKyPyjtH1_xFKo_Lklr3ahboQJtwoTaw9BYDq4PkeaYxP6_vv8zlYMDJtzCKi0UaRbX-rtqAmddXbGVzmZ0-KwHV-mNS3DJGoTr-yUdbODyHqPUwcfOC8Hg3EGZPM8Mhge4W_Eh3g1j3bp2YZaxCBodwNUG2NT-N-J-Zbk5ujAgnxdv_GfhTU4BmiCvx7FpfKv-IbEgv9Zaw2Un5BL2H3SlloVfMY_DfWEUKzL_NgyBEoyfEgTO1hfjC49kQzysRSRu8C_n3LJ4rmNjyP7zL_oyKpmutyBWQ9nTQzTR-lkZX_uzmEIn6LQ9rvS8aVNiPw",
+                                           "e": "AQAB",
+                                           "kty": "RSA",
+                                           "n": "z7cMpqAavfl5KQy5XaXZ5sNmPE1xyaDyZgX6Xd1KbM5dHaCBfiwfyFmfQ5n-NhaAg7S6vlhCI_9GiTaR7KcOSOkzcEfQcJV8QbWcSO-gG_Liwm4bhhXSj5j4FICOVEpGrAeVwF9NImD0XUItOAfboFPeDrwdXSrBz5_NVszzjI05rQk5kse3t1GGqUGWM2FhObQq4AE57hnD-J7YtA99l-7yuldgu8tFbZj3EiTli0OBCTnRdRjXlkxzXX50RT-_JhUMLdrR9ShKb7yDdcQIdB4ewLVQFzAcKbYq49_Us2QM3QqtCMSENxI0pNo5Dv8NDz7CD2Ujduxeb7GB1P6VEusxELIuIsHaCPpg2Xpn-WMxDUCZsZzOGLGXbsImIxphohON4JWA6dwQsRJp5dQwF9iBGsCdyLHnENKexHuHOJBxTSKDJoRu-1t1w_fjc1wyVGliPtKRmS7aVj1fW_-i89k_G1VFgQ9A2GFas1AA9LYiZQxtejTqCWKE-BezqRIjfFsI3jMIjR4X5Tx7X6sSqEItcialVwMrc29N9FXprccTMAYDY1Q3JVkcJz8Y0E35QfA1xloEBInfUZ-Yz_nD39_yZ8BUlFvrgc4OAkv8A-xbdle4k5L8r9DhNuBRxiKR47-oGfGlxYQ7TfOydXwPTsHvZ5YCMwmgc31P7dAhD-U",
+                                           "p": "_xd73ImAb5f2SOWLOuX7pkyQNHDOrrc8ELGTJH55dMecypSfgY6y8rRQVuobS80OiKXyUExT9Fe9CoavpVJ68oWmC5vWu5EKEbe6dIpjMuAYUW6dBcrBvBThAU3A3yeY2X5WNttX1wJt__lnbXA88Var3dlehaAmRWmZnhpTvpTMBjeRt9zJ9IjGHgOwg14wkgDyT21HaO333uwohcmD5nOEkq_7ncpDYMmrHHHq40_3-HA2wWsrKhQIZ4K1CAaZUDumBJHtfrrRS-wXVgVN4-EeG8zXUHtvJtiiMMC1202ZO2ryZDQu28SJhh5M4LUxHQSOM5t25FdSzvJ4Y8yUfw",
+                                           "q": "0HRhuBG0k0f6p-ZZMwVb_iPlD9MKOJ-WCCIjETBPNQdZ8XgDux5uZyYL0isb0nfedanMPWXjBlFzzAjcvQlccmm983XEbm8vai-qO_2GdD88956cc7Mc9hupKtYgW9NCNXtGnnjsTYHMWqCOKUOrGdHcVaQ48Tnu-7L_rV3fSgjM887q1_B9hnYk9P3xNoZreZDFna2MLNiGYRPYNXMtAQEMONSNhIs9pl35QUdOJpRTNwbIPiDcIXwltzeRJXSgdaoCBoG6qVMsNIAt7cF7BmcnNfCZFrr6Mbo-_LGP1b3cK9sY1HZH1_bIWJzDB1AatWB1_jhIOKWuXBjT7t1Zmw",
+                                           "qi": "u6IPj2-r45lcxbpQdqHAbXrY0dPgaeokw56Ai4hEwSZ5TUvgkTDfyuoGcO0Jz9vQRC_NDY0HLt8zKgDze-wKKSE3WSrLOevRk0fts08khl5PuTum4yFpgmkhhGdcbuwIP6VpxOaq79dW0-0sQGu2x-7zWbedKIn8FJCaMB6z8v2ouvIJIDouUkWSVckyFWmZPcwdCabajnA8mxtk9a6SZvQC5decufLxChJTCHuAgP5IctpG5686jBp0lF0Ly8WYXmehPdfZ8aYV4jhdQ-PkpgexpwAGaQO7QUHaEyFPAe6XCvj39MF9oLnQzEmvrvVwM9dzcdd6Ie4dSZpA8RZySQ",
+                                           "kid": "7F0F6BF5DBFA20EE33F8736A995471E9"
+                                         }
+                                         """;
+
+    // This client_id is only to be used for this particular sample. Your application will use it's own client_id.
+    private const string ClientId = "helseid-sample-resource-indicators";
+
+    // The client is configured in the HelseID test environment, so we will point to that
+    private const string StsUrl = "https://helseid-sts.test.nhn.no";
+
+    private const int LocalhostPort = 8089;
+
+    // In a test environment, the port does not need to be pre-registered in HelseID Selvbetjening;
+    // this means that you can allocate any available port when launching the application:
+    private static readonly string RedirectUrl = $"http://localhost:{LocalhostPort.ToString()}/callback";
+
+    // This is the scope of the API you want to call (get an access token for)
+    private const string ApiScopes = $"{FirstResource}/some-scope {SecondResource}/some-scope";
+
+    // These scopes indicate that you want an ID-token ("openid"), and what information about the user you want the ID-token to contain
+    private const string IdentityScopes = "openid profile offline_access";
+
+    private const string FirstResource = "nhn:helseid-public-sample-api-1";
+    private const string SecondResource = "nhn:helseid-public-sample-api-2";
+
+    static async Task Main()
     {
-        const string ClientId = "helseid-sample-resource-indicators";
-        const string Localhost = "http://localhost:8089";
-        const string RedirectUrl = "/callback";
-        const string StartPage = "/start";
-        const string StsUrl = "https://helseid-sts.test.nhn.no";
-
-        const string firstResource = "nhn:helseid-public-sample-api-1";
-        const string secondResource = "nhn:helseid-public-sample-api-2";
-
-
-        static async Task Main()
+        try
         {
-            try
+            using var httpClient = new HttpClient();
+
+            // Download the HelseID metadata from https://helseid-sts.test.nhn.no/.well-known/openid-configuration to determine endpoints and public keys used by HelseID:
+            var disco = await httpClient.GetDiscoveryDocumentAsync(StsUrl);
+
+            // 1. Logging in the user
+            // ///////////////////////
+            // Perform user login, uses the /authorize endpoint in HelseID
+            // Use the Resource-parameter to indicate which API-s you want tokens for
+            // Use the Scope-parameter to indicate which scopes you want for these API-s
+
+            var options = new OidcClientOptions
             {
-                var httpClient = new HttpClient();
-                var disco = await httpClient.GetDiscoveryDocumentAsync(StsUrl);
-                if (disco.IsError)
-                {
-                    throw new Exception(disco.Error);
-                }
-
-                // 1. Logging in the user
-                // ///////////////////////
-                // Perfom user login, uses the /authorize endpoint in HelseID
-                // Use the Resource-parameter to indicate which API-s you want tokens for
-                // Use the Scope-parameter to indicate which scopes you want for these API-s
-
-                var clientAssertionPayload = GetClientAssertionPayload(ClientId, disco);
-
-                var firstScope = firstResource + "/some-scope";
-                var secondScope = secondResource + "/some-scope";
-
-                var oidcClient = new OidcClient(new OidcClientOptions
-                {                    
-                    Authority = StsUrl,
-                    LoadProfile = false,
-                    RedirectUri = "http://localhost:8089/callback",
-                    Scope = $"openid profile offline_access {firstScope} {secondScope}",
-                    ClientId = ClientId,
-                    Resource = new List<string> { firstResource, secondResource },
-                    ClientAssertion = clientAssertionPayload,                   
-                });
-
-                var state = await oidcClient.PrepareLoginAsync();
-                var response = await RunLocalWebBrowserUntilCallback(Localhost, RedirectUrl, StartPage, state);
-
-
-
-                // 2. Retrieving an access token for API 1, and a refresh token
-                ///////////////////////////////////////////////////////////////////////
-                // User login has finished, now we want to request tokens from the /token endpoint
-                // We add a Resource parameter indication that we want scopes for API 1
-                var parameters = new Parameters
-                {
-                    { "resource", firstResource }
-                };
-                var loginResult = await oidcClient.ProcessResponseAsync(response, state, parameters);
-
-                if (loginResult.IsError)
-                {
-                    throw new Exception(loginResult.Error);
-                }
-                var accessToken1 = loginResult.AccessToken;
-                var refreshToken = loginResult.RefreshToken;
-
-
-                Console.WriteLine("First request, resource: " + firstResource);
-                Console.WriteLine("Access Token: " + accessToken1);
-                Console.WriteLine("Refresh Token: " + refreshToken);
-                Console.WriteLine();
-
-
-
-                // 3. Using the refresh token to get an access token for API 2
-                //////////////////////////////////////////////////////////////
-                // Now we want a second access token to be used for API 2
-                // Again we use the /token-endpoint, but now we use the refresh token
-                // The Resource parameter indicates that we want a token for API 2.
-                var refreshTokenRequest = new RefreshTokenRequest
-                {
-                    Address = disco.TokenEndpoint,
-                    ClientId = ClientId,
-                    RefreshToken = refreshToken,
-                    Resource = new List<string> { secondResource },
-                    ClientAssertion = GetClientAssertionPayload(ClientId, disco)
-                };
-
-                var refreshTokenResult = await httpClient.RequestRefreshTokenAsync(refreshTokenRequest);
-
-                if (refreshTokenResult.IsError)
-                {
-                    throw new Exception(refreshTokenResult.Error);
-                }
-
-                Console.WriteLine("Second request, resource: " + secondResource);
-                Console.WriteLine("Access Token: " + refreshTokenResult.AccessToken);
-                Console.WriteLine("Refresh Token: " + refreshTokenResult.RefreshToken);
-                Console.WriteLine();
-
-            }
-            catch (Exception e)
-            {
-                Console.Error.WriteLine("Error:");
-                Console.Error.WriteLine(e.ToString());
-            }
-        }
-
-        private static ClientAssertion GetClientAssertionPayload(string clientId, DiscoveryDocumentResponse disco)
-        {
-            var clientAssertionString = BuildClientAssertion(clientId, disco);
-            return new ClientAssertion
-            {
-                Type = OidcConstants.ClientAssertionTypes.JwtBearer,
-                Value = clientAssertionString
+                Authority = StsUrl,
+                ClientId = ClientId,
+                RedirectUri = RedirectUrl,
+                LoadProfile = false,
             };
 
-        }
+            var oidcClient = new OidcClient(options);
 
-        private static string BuildClientAssertion(string clientId, DiscoveryDocumentResponse disco)
-        {
-            var claims = new List<Claim>
+            // The authorizeState object contains the state the needs to be held between starting the authorize request and the response
+            var authorizeState = await oidcClient.PrepareLoginAsync();
+
+            var pushedAuthorizationResponse = await GetPushedAuthorizationResponse(
+                httpClient,
+                disco,
+                authorizeState);
+
+            if (pushedAuthorizationResponse.IsError)
             {
-                new Claim(JwtClaimTypes.Subject, clientId),
-                new Claim(JwtClaimTypes.IssuedAt, DateTimeOffset.Now.ToUnixTimeSeconds().ToString()),
-                new Claim(JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N")),
+                throw new Exception($"{pushedAuthorizationResponse.Error}: JSON: {pushedAuthorizationResponse.Json}");
+            }
+
+            var startUrl = $"{disco.AuthorizeEndpoint}?client_id={ClientId}&request_uri={pushedAuthorizationResponse.RequestUri}";
+
+            var browserOptions = new BrowserOptions(startUrl, RedirectUrl);
+
+            // Create a redirect URI using an available port on the loopback address.
+            var browser = new SystemBrowser(port: LocalhostPort);
+
+            var browserResult = await browser.InvokeAsync(browserOptions, default);
+
+            // 2. Retrieving an access token for API 1, and a refresh token
+            ///////////////////////////////////////////////////////////////////////
+            // User login has finished, now we want to request tokens from the /token endpoint
+            // We add a Resource parameter indication that we want scopes for API 1
+
+            var parameters = new Parameters
+            {
+                {"resource", FirstResource}
             };
 
-            var credentials = new JwtSecurityToken(clientId, disco.TokenEndpoint, claims, DateTime.UtcNow, DateTime.UtcNow.AddSeconds(60), GetClientAssertionSigningCredentials());
+            // If the result type is success, the browser result should contain the authorization code.
+            // We can now call the /token endpoint with the authorization code in order to get tokens:
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            return tokenHandler.WriteToken(credentials);
-        }
+            var clientAssertionPayload = GetClientAssertionPayload(disco);
+            oidcClient.Options.ClientAssertion = clientAssertionPayload;
+            var loginResult = await oidcClient.ProcessResponseAsync(browserResult.Response, authorizeState, parameters);
 
-        private static SigningCredentials GetClientAssertionSigningCredentials()
-        {
-            var jwk = File.ReadAllText("jwk.json");
-            var securityKey = new JsonWebKey(jwk);
-            return new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256);
-        }
-
-        //private static SecurityKey GetSecurityKey()
-        //{
-        //    // TODO: Store the RSA key in a secure location!!
-        //    const string rsaPrivateKey = "<RSAKeyValue><Modulus>sHNMAYJkqAj9970orrqHgjPD0l+PgqVnureLgOvYffUs0NzkQXAlg1L8Kj3eZkldVdW7aTUnvBDtJfw/Ad0XxH00OkV9Lha9ewpJAGchz/bIp6j+GkzYajys6du9d8MJg8VQY3X+9MTjtAH6Kf1wzXE+7fRGFT2PkN/DedwT2KDTwWNOYk9uILka4QLrzonu2TL2Hme82fn744JuPIsV7DTJ9zEoxD2dziywsFz0Rg4KNNQaL+O4HI9tuQx9ivO7hdcgGOy4lCI2U8Kf27O3txW/Jkh7SMgpGL3k+Xb+uvQKuSgeqtpQublm78A3c1vLqepGD4ccuCZ+XSCzqKCn/4CmpFRL8psT1WsWGYbuCU4Ih18viKgOqxaFOHgOC4NnRR0FoUXBdPK1Q3HLHGoPoUV47PNDaasJRVwZWBA7MQICC2mrvPpkcmoDwrsAAcGvY9YOb2e04tMjHvTYUsP+9pk1kfy1N/3hjWCpJDX8i44pWD6eSmTkpQX9lK6HigEPq414tOd4EzfxcNRAfMkg/OKLkaORdG1WKsrOoo8pCPUqTdq72JhYFJ0/vYDzRIWAphm9VM0KDP5lnK2fXku5Kn+5m8u6NJHWxBlm47OEhyWo6r1Z9hdvhXUREti+RnqQsqRzeDn46XCwuKaVIhrShXoViiiFs82DslMDDExUjm0=</Modulus><Exponent>AQAB</Exponent><P>yubldftOSBBcQEXizaxjK2aHwnGOiz4obUT9+mepWe1G/Ev3iG627rA8l2+MSvP/DJEyhypDk5sx7BLpW4oQqBJcUoigaD13OWuUQe52vDcTQlkTrAPSS0xOODISEJ4nAgzAPgoYDvcCYDF61S83LMudQnwmxgdkpkspcfbgiZeNFCPo3W2CKh2GXuvNpk9XDmJ72Vl9g9+rTJl6P2XnjHBy5knSBKWDJI3Zt+waBoQzAkgjsAi9wncc7rxx/eurwp8B7lqoX/Nne+oHZZ3OvRHn5ht10r3qsyQEUfz/TQ74li17IS5o0Sqf5jSFaBUUkhGJiu2AsTkuv2nPtYEyIw==</P><Q>3qBRpO/614MI8zuSl7RvIIaFW+HLNXf3dWC2h32WFLD384BzjD3avyjeTSWsGV+poVevpixnwM7KGK4FtKakynSKHPeIa8twcE+4kOIIVjmwbz4zGOW81Mnfvh8Ee1iLKP81IsaG+nPAZKkTbE5hjEvCP8bLb1gRbNjWOAc+mtPUx4WSjUoTcdbPY3ktO7ZSTD8tsdJ2sTN2ZEwdQ22+BftFTxcOC1J+rAbDeIkk31V2Hf0a8V9RZK15I8jUxH4EtErZ018Ay+tG+tegVSzKcsyyfx1FfHLwqcASfNT1JMS3iFZ7LEacN/IK3drnBhu/d5NCvFOWhHePbFrJHHbeLw==</Q><DP>xqtyviUFL1alnWFQhCZpK9PG1kMuWXTRTLyjGo5pqd3FBcC0bOhLQkdZ7MWSTsm+T+XT3bkqVds99HNH/xOe35Kqxz10It0cYiLOFgiSRhR/TRW/R0yumn/qjuen/JF+jGlDyvtDN1PxBZMtPJRwp/Hu12yM4pXWnWU2/ZnHnbHAt5m5pyZUrzwdl8+3m0JQcYtIzTbsyTU2m1gj9POo10A7oPVjKJ2PXTlvlsEdcof7Eh7korbMZx8OO0xVKVWa5oOe9m3aM6k3CIPMHll4VnSz5gG5SlIe/q0jdcwNhrxD93gs+f5hL31W96cxgQozDBsT2+5VdjIRbecDNCt+lQ==</DP><DQ>Q5X4M1KHnJWzSeR0BIpKkl1EbziFMJ5TCddqkoeV4II5RDti2NiOaCpIErO1I57fKJQuRwyEEwy0Xfm20bklnjDzHQgo6lDAudf5+EImtcadwafoa06TnSYMPvO7sJaY6MFRqFUM9UvexLBvrRm+k5EMT8BSUmMyJxFNN4U7hFV663epnis27ACCxXgsO0yGf49OmAWE8xbkgl55I9dVMQuvZutg4B8TRbZn8VfxUbvoOAJ3A4AkfaQMesilj2GSnAl9R6Y337B1xAFiM3l9nIx4RA7m4XkjhuVAt5UPNzJhZYqbqj1lf7aDhgbGzBvwbKTQRcw6jcyeRg7przKHEQ==</DQ><InverseQ>C8z88QY93r/05id2daU9obsIEe7R1bjUHNj+3rKo8T+L8PUoXuWQTm/NsQryoSgi5/JwZL7gyh7IQDPDFbf4jWg6nZ8ZfJs0Qisjih3cPjPMIxYvi0bG38Z1RECysNqBDTNrULMHIScOA+BhvnSPoXGQU8vJTO4yjH7V4wFcE6J9qcPPAUSy/KtgWRd91JWH/oX7PUgUDMVWc3hQ8RTyPCl60G7pFjeKhSqhRzfXIF45AmfSlOTY2l9aO1swp/cQsebym96AkYA71q2c+08KZvERvUuS0FGpZ7VQSgZ+sUe8WZb9XzJXdirtuU/sz74BFwTiT9YkoGC9hH1aMDBiFA==</InverseQ><D>sGNxtYiN6tSiXUeBJbpdwDDTLrhMlAOZgDP/hu89Sh0PofNPUoMzXOZWIjwa2RG59hZk9LUodX5OM0zIB6rnGYs37JCOpMYiwJ71fyuZx3Uh/UiYS95J8VmaWWVLMC+OkWVsCSFpr3IrVkUruVIbs6PjjqhEbvNNUzv9AxKX3FRZmtcVAn34z0l7rzfmVl/YntOs6ZQ2W4jk3vgCDw/S6H+U7kD8ScB2wiY2svcZUfazCUCGtRzlbdeLjhMIZSFlclQtR/1MPvk8adsDRvOPUbyxiyml5IoDWzJpdWAZIPbYyWNr1MvNKvxGBKGYTP+UxtTlGJyufwAsDhikwItpo/2q8tsK4CIPsR4+vxyzOCwpH7s64MBv6Sf/5sDq46hblIscyCmkgdTSaM9Q8hMxZz7LxZk6IsQhE4X3YW+jCwXRypMzgTQfCsNRLFzhMbjR1/DcFYk3zQIOi9NFiVNSIGYnvuCwUp7/KWc7yvfQ+Bs7jfVtMui+MMKf87HHVUYgDXNsfkFRg7+t86OUVXWcAZK6p0PMI7MagDyglGTN7z5E2v+jwxNBR0nGP9V3RVPl8LnJ7A/OLh1CacIfASxIgOvSEl1tUeyrZaVjnGH2LAUrK8oN3d9TlWH5hjK9RPxrRdxyIuU2q9tHS+IIXCaotOJ8MbTBi/DR9zRL39CQKZk=</D></RSAKeyValue>";
-        //    var rsa = RSA.Create();
-        //    rsa.FromXmlString(rsaPrivateKey);
-
-        //    return new RsaSecurityKey(rsa.ExportParameters(true));
-        //}
-
-        private static async Task<string> RunLocalWebBrowserUntilCallback(string localhost, string redirectUrl, string startPage, AuthorizeState state)
-        {
-            // Build a HTML form that does a POST of the data from the url
-            // This is a workaround since the url may be too long to pass to the browser directly
-            var startPageHtml = UrlToHtmlForm.Parse(state.StartUrl);
-
-            // Setup a temporary http server that listens to the given redirect uri and to 
-            // the given start page. At the start page we can publish the html that we
-            // generated from the StartUrl and at the redirect uri we can retrieve the 
-            // authorization code and return it to the application
-            var listener = new ContainedHttpServer(localhost, redirectUrl,
-                new Dictionary<string, Action<HttpContext>> {
-                    { startPage, async ctx => await ctx.Response.WriteAsync(startPageHtml) }
-                });
-
-            RunBrowser(localhost + startPage);
-
-            return await listener.WaitForCallbackAsync();
-        }
-
-        private static void RunBrowser(string url)
-        {
-            try
+            if (loginResult.IsError)
             {
-                Process.Start(url);
+                throw new Exception($"{loginResult.Error}: Description: {loginResult.ErrorDescription}");
             }
-            catch
+
+            var accessToken1 = loginResult.AccessToken;
+            var refreshToken = loginResult.RefreshToken;
+
+            Console.WriteLine("First request, resource: " + FirstResource);
+            Console.WriteLine("Access Token: " + accessToken1);
+            Console.WriteLine("Refresh Token: " + refreshToken);
+            Console.WriteLine();
+
+            // 3. Using the refresh token to get an access token for API 2
+            //////////////////////////////////////////////////////////////
+            // Now we want a second access token to be used for API 2
+            // Again we use the /token-endpoint, but now we use the refresh token
+            // The Resource parameter indicates that we want a token for API 2.
+            var refreshTokenRequest = new RefreshTokenRequest
             {
-                // Thanks Brock! https://brockallen.com/2016/09/24/process-start-for-urls-on-net-core/
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    url = url.Replace("&", "^&");
-                    Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                {
-                    Process.Start("xdg-open", url);
-                }
-                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                {
-                    Process.Start("open", url);
-                }
-                else
-                {
-                    throw new Exception("Unrecognized operating system");
-                }
+                Address = disco.TokenEndpoint,
+                ClientId = ClientId,
+                RefreshToken = refreshToken,
+                Resource = new List<string> {SecondResource},
+                ClientAssertion = GetClientAssertionPayload(disco),
+                ClientCredentialStyle = ClientCredentialStyle.PostBody,
+            };
+
+            var refreshTokenResult = await httpClient.RequestRefreshTokenAsync(refreshTokenRequest);
+
+            if (refreshTokenResult.IsError)
+            {
+                throw new Exception(refreshTokenResult.Error);
             }
+
+            Console.WriteLine("Second request, resource: " + SecondResource);
+            Console.WriteLine("Access Token: " + refreshTokenResult.AccessToken);
+            Console.WriteLine("Refresh Token: " + refreshTokenResult.RefreshToken);
+            Console.WriteLine();
         }
+        catch (Exception e)
+        {
+            await Console.Error.WriteLineAsync("Error:");
+            await Console.Error.WriteLineAsync(e.ToString());
+        }
+    }
+
+    private static async Task<PushedAuthorizationResponse> GetPushedAuthorizationResponse(
+        HttpClient httpClient,
+        DiscoveryDocumentResponse disco,
+        AuthorizeState authorizeState)
+    {
+        // Sets the pushed authorization request parameters:
+        var challengeBytes = SHA256.HashData(Encoding.UTF8.GetBytes(authorizeState.CodeVerifier));
+        var codeChallenge = WebEncoders.Base64UrlEncode(challengeBytes);
+        // Setup a client assertion - this will authenticate the client (this application)
+        var clientAssertionPayload = GetClientAssertionPayload(disco);
+
+        var pushedAuthorizationRequest = new PushedAuthorizationRequest
+        {
+            Resource = new List<string> {FirstResource, SecondResource},
+            Address = disco.PushedAuthorizationRequestEndpoint,
+            ClientId = ClientId,
+            ClientAssertion = clientAssertionPayload,
+            RedirectUri = RedirectUrl,
+            Scope = $"{IdentityScopes} {ApiScopes}",
+            ResponseType = OidcConstants.ResponseTypes.Code,
+            ClientCredentialStyle = ClientCredentialStyle.PostBody,
+            CodeChallenge = codeChallenge,
+            CodeChallengeMethod = OidcConstants.CodeChallengeMethods.Sha256,
+            State = authorizeState.State,
+        };
+
+        // Calls the /par endpoint in order to get a request URI for the /authorize endpoint
+        return await httpClient.PushAuthorizationAsync(pushedAuthorizationRequest);
+    }
+
+    private static ClientAssertion GetClientAssertionPayload(DiscoveryDocumentResponse disco)
+    {
+        var clientAssertion = BuildClientAssertion(disco);
+
+        return new ClientAssertion
+        {
+            Type = OidcConstants.ClientAssertionTypes.JwtBearer,
+            Value = clientAssertion,
+        };
+    }
+
+    private static string BuildClientAssertion(DiscoveryDocumentResponse disco)
+    {
+        var claims = new List<Claim>
+        {
+            new Claim(JwtClaimTypes.Subject, ClientId),
+            new Claim(JwtClaimTypes.IssuedAt, DateTimeOffset.Now.ToUnixTimeSeconds().ToString()),
+            new Claim(JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N")),
+        };
+
+        var credentials = new JwtSecurityToken(ClientId, disco.Issuer, claims, DateTime.UtcNow,
+            DateTime.UtcNow.AddSeconds(60), GetClientAssertionSigningCredentials());
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        return tokenHandler.WriteToken(credentials);
+    }
+
+    private static SigningCredentials GetClientAssertionSigningCredentials()
+    {
+        var securityKey = new JsonWebKey(JwkPrivateKey);
+        return new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256);
     }
 }

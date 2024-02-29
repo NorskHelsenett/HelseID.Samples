@@ -17,13 +17,32 @@ public class DPoPAuthCodeController : ControllerBase
     }
 
     [HttpGet]
-    [Route(ConfigurationValues.AuthCodeClientResourceForDPoP)]
+    [Route(ConfigurationValues.AuthCodeClientResource)]
     public ActionResult<ApiResponse> GetGreetings()
     {
-        // Get the claims of the current principal (a system user, not a personal user)
+        return CreateResult("Sample API (with DPoP)");
+    }
+
+    [HttpGet]
+    [Route(ConfigurationValues.ResourceIndicatorsResource1)]
+    public ActionResult<ApiResponse> GetForIndicator1()
+    {
+        return CreateResult("Sample API (indicator 1 with DPoP)");
+    }
+
+    [HttpGet]
+    [Route(ConfigurationValues.ResourceIndicatorsResource2)]
+    public ActionResult<ApiResponse> GetForIndicator2()
+    {
+        return CreateResult("Sample API (indicator 2 with DPoP)");
+    }
+
+    private ActionResult<ApiResponse> CreateResult(string apiName)
+    {
+        // The claims of the logged in user:
         var claims = User.Claims.ToList();
 
-        var apiResponse = _responseCreator.CreateApiResponse(claims, "Sample API (with DPoP)");
+        var apiResponse = _responseCreator.CreateApiResponse(claims, apiName);
 
         return new JsonResult(apiResponse);
     }

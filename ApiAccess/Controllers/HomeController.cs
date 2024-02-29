@@ -44,7 +44,7 @@ public class HomeController : Controller
     }
 
     // Starts the configured authentication scheme when the user clicks Login
-    [Authorize(Startup.SecurityLevelClaimPolicy)] 
+    [Authorize(Startup.SecurityLevelClaimPolicy)]
     public async Task<IActionResult> Login()
     {
         var responseViewModel = await _viewModelCreator.GetApiResponseViewModel(claimsPrincipal: HttpContext.User);
@@ -54,7 +54,7 @@ public class HomeController : Controller
         {
             if (string.IsNullOrEmpty(responseViewModel.UserSessionData.SessionId))
             {
-                // Not a logged on user; redirect to login 
+                // Not a logged on user; redirect to login
                 return Challenge(OpenIdConnectDefaults.AuthenticationScheme);
             }
             if (responseViewModel.UserSessionData.SelectedOrganization.IsEmpty)
@@ -78,9 +78,9 @@ public class HomeController : Controller
             return View(responseViewModel);
         } catch (SessionIdDoesNotExistException)
         {
-            // The user's session was not found in the token store -- log in the user: 
+            // The user's session was not found in the token store -- log in the user:
             return Challenge(OpenIdConnectDefaults.AuthenticationScheme);
-        }        
+        }
     }
 
     [Authorize(Startup.SecurityLevelClaimPolicy)]
@@ -95,11 +95,11 @@ public class HomeController : Controller
             return RedirectToAction(nameof(Login));
         } catch (SessionIdDoesNotExistException)
         {
-            // The user's session was not found in the token store -- log in the user: 
+            // The user's session was not found in the token store -- log in the user:
             return Challenge(OpenIdConnectDefaults.AuthenticationScheme);
         }
     }
-    
+
     [Route("home/call-api-1-with-resource-indicators")]
     [Authorize(Startup.SecurityLevelClaimPolicy)]
     public async Task<IActionResult> CallApi1WithResourceIndicators()
@@ -149,7 +149,7 @@ public class HomeController : Controller
             var accessToken = await _accessTokenUpdater.GetValidAccessToken(httpClient, HttpContext.User, apiIndicators);
 
             // We use the token to call the API endpoint
-            var apiResponse = await _apiConsumer.CallApiWithBearerToken(httpClient, apiUrl, accessToken);
+            var apiResponse = await _apiConsumer.CallApiWithDPoPToken(httpClient, apiUrl, accessToken);
 
             return View("Login", await _viewModelCreator.GetApiResponseViewModel(
                 claimsPrincipal: HttpContext.User,
@@ -158,12 +158,12 @@ public class HomeController : Controller
         }
         catch (SessionIdDoesNotExistException)
         {
-            // The user's session was not found in the token store -- log in the user: 
+            // The user's session was not found in the token store -- log in the user:
             return Challenge(OpenIdConnectDefaults.AuthenticationScheme);
         }
         catch (RefreshTokenExpiredException)
         {
-            // The refresh token has expired -- log in the user: 
+            // The refresh token has expired -- log in the user:
             return Challenge(OpenIdConnectDefaults.AuthenticationScheme);
         }
         catch (HttpRequestException e)
@@ -177,7 +177,7 @@ public class HomeController : Controller
     public IActionResult Logout()
     {
         return SignOut(CookieAuthenticationDefaults.AuthenticationScheme, OpenIdConnectDefaults.AuthenticationScheme);
-    }    
+    }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

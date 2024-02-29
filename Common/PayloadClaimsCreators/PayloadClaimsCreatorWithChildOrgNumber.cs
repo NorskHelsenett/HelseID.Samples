@@ -25,8 +25,8 @@ public class PayloadClaimsCreatorWithChildOrgNumber : IPayloadClaimsCreator {
         {
             throw new Exception("Need payload claim parameters with child organization number");
         }
-        
-        // When the client requires a child organization claim, HelseID will 
+
+        // When the client requires a child organization claim, HelseID will
         // require an authorization details claim with the following structure:
         //
         //  "authorization_details":{
@@ -41,28 +41,32 @@ public class PayloadClaimsCreatorWithChildOrgNumber : IPayloadClaimsCreator {
         //          }
         //      }
         //  }
-        // 
-        // We use anonymous types to insert the structured claim into the payload:
 
-        var authorizationDetails = new
+        var orgNumberDetails = new Dictionary<string, string>
         {
-            type = "helseid_authorization",
-            practitioner_role = new
-            {
-                organization = new
-                {
-                    identifier = new
-                    {
-                        system = "urn:oid:2.16.578.1.12.4.1.2.101",
-                        type = "ENH",
-                        value = $"{payloadClaimParameters.ChildOrganizationNumber}"
-                    }
-                }
-            }
+            { "system", "urn:oid:2.16.578.1.12.4.1.2.101" },
+            { "type", "ENH" },
+            { "value", $"{payloadClaimParameters.ChildOrganizationNumber}" }
+        };
+
+        var identifier = new Dictionary<string, object>
+        {
+            { "identifier", orgNumberDetails }
+        };
+
+        var organization = new Dictionary<string, object>
+        {
+            { "organization", identifier }
+        };
+
+        var authorizationDetails = new Dictionary<string, object>
+        {
+            { "type", "helseid_authorization" },
+            { "practitioner_role", organization }
         };
 
         return new List<PayloadClaim> {
-            new PayloadClaim("authorization_details", authorizationDetails),
+            new("authorization_details", authorizationDetails),
         };
     }
 }

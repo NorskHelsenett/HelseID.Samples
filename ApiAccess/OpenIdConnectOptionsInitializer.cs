@@ -3,12 +3,14 @@ using HelseId.Samples.ApiAccess.Exceptions;
 using HelseId.Samples.ApiAccess.Interfaces.Stores;
 using HelseId.Samples.ApiAccess.Models;
 using HelseId.Samples.Common.Interfaces.ClientAssertions;
+using HelseId.Samples.Common.Interfaces.Endpoints;
 using HelseId.Samples.Common.Interfaces.JwtTokens;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Interfaces.TokenExpiration;
 using HelseId.Samples.Common.Models;
 using HelseID.Samples.Configuration;
 using IdentityModel;
+using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -19,6 +21,7 @@ namespace HelseId.Samples.ApiAccess;
 
 public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConnectOptions>
 {
+    private readonly IDiscoveryDocumentGetter _discoveryDocumentGetter;
     private readonly IClientAssertionsBuilder _clientAssertionsBuilder;
     private readonly ISigningTokenCreator _signingTokenCreator;
     private readonly IUserSessionDataStore _userSessionDataStore;
@@ -28,6 +31,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
     private readonly IExpirationTimeCalculator _expirationTimeCalculator;
 
     public OpenIdConnectOptionsInitializer(
+        IDiscoveryDocumentGetter discoveryDocumentGetter,
         IClientAssertionsBuilder clientAssertionsBuilder,
         ISigningTokenCreator signingTokenCreator,
         IUserSessionDataStore userSessionDataStore,
@@ -36,6 +40,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         Settings settings,
         IExpirationTimeCalculator expirationTimeCalculator)
     {
+        _discoveryDocumentGetter = discoveryDocumentGetter;
         _clientAssertionsBuilder = clientAssertionsBuilder;
         _signingTokenCreator = signingTokenCreator;
         _userSessionDataStore = userSessionDataStore;
@@ -89,10 +94,11 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         // This matches the value set on the HelseID clients:
         openIdConnectOptions.SignedOutCallbackPath = "/signout-callback-oidc";
 
-        // We use POST as the authentication method; the default method is GET
-        openIdConnectOptions.AuthenticationMethod = OpenIdConnectRedirectBehavior.FormPost;
+        // We use GET as the authentication method; this is okay when PAR is used
+        // (no overlong request parameters)
+        openIdConnectOptions.AuthenticationMethod = OpenIdConnectRedirectBehavior.RedirectGet;
     }
-    
+
     private void SetUpScopes(OpenIdConnectOptions openIdConnectOptions)
     {
         openIdConnectOptions.Scope.Clear();
@@ -169,12 +175,12 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         // -----------------------------------------------------------------------
         // Redirecting to the authentication endpoint
         // -----------------------------------------------------------------------
-        openIdConnectOptions.Events.OnRedirectToIdentityProvider = redirectContext =>
+        openIdConnectOptions.Events.OnRedirectToIdentityProvider = async redirectContext =>
         {
             // Invoked before redirecting to the identity provider to authenticate. This can be used to
             // set a ProtocolMessage.State that will be persisted through the authentication process.
             // The ProtocolMessage can also be used to add or customize parameters sent to the identity provider.
-            
+
             // For certain features, we need to establish a custom request message for creating
             // request objects or resource indicators.  The implementation of the former ('resource')
             // is not in conformance with the specification (https://www.rfc-editor.org/rfc/rfc8707), and
@@ -182,36 +188,23 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             // is not currently implemented
             if (redirectContext.ProtocolMessage.RequestType == OpenIdConnectRequestType.Authentication)
             {
-                var customOpenIdConnectMessageParameters =
-                    new CustomOpenIdConnectMessageParameters
-                    {
-                        RequestObject = CreateRequestObject(),
-                        ResourceIndicators = _settings.HelseIdConfiguration.ResourceIndicators,
-                    }; 
+                var pushedAuthorizationResponse = await PushAuthorizationParameters(redirectContext);
 
-                // We need a custom class for creating the message to the authorization endpoint:
-                var customProtocolMessage = new CustomOpenIdConnectMessage(
-                    customOpenIdConnectMessageParameters,
-                    redirectContext.ProtocolMessage.Clone());
+                // Remove all the parameters from the protocol message, and replace with what we got from the PAR response
+                redirectContext.ProtocolMessage.Parameters.Clear();
 
-                redirectContext.ProtocolMessage = customProtocolMessage;
+                // Then, set client id and request uri as parameters
+                redirectContext.ProtocolMessage.ClientId = _settings.HelseIdConfiguration.ClientId;
+                redirectContext.ProtocolMessage.RequestUri = pushedAuthorizationResponse.RequestUri;
 
-                /*
-                The metadata endpoint https://helseid-sts.test.nhn.no/connect/availableidps list the available IDPs
-                in the test environment. If you want to redirect the user to a specific IDP, you can specify this value.
-                */
+                // Mark the request as handled, because we don't want the normal
+                // behavior that attaches state to the outgoing request (we already
+                // did that in the PAR request).
+                redirectContext.HandleResponse();
 
-                // redirectContext.ProtocolMessage.AcrValues = "idp:idporten-oidc";
-
-                /*
-                See https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/5571426/Use+of+ID-porten for more examples:
-                If you want to authenticate the user on behalf of a specific organization, you can add this parameter:
-                */
-
-                // redirectContext.ProtocolMessage.Parameters.Add("on_behalf_of", "912159523");
+                // Finally redirect to the authorize endpoint
+                RedirectToAuthorizeEndpoint(redirectContext);
             }
-
-            return Task.CompletedTask;
         };
 
         // -----------------------------------------------------------------------
@@ -224,7 +217,71 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
 
             // Here, you might want to inform the user about a failed authentication
             return Task.CompletedTask;
-        }; 
+        };
+    }
+
+    private async Task<PushedAuthorizationResponse> PushAuthorizationParameters(RedirectContext redirectContext)
+    {
+        // See https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/5571426/Use+of+ID-porten for more examples:
+        // If you want to authenticate the user on behalf of a specific organization, you can add this parameter:
+        // redirectContext.ProtocolMessage.Parameters.Add("on_behalf_of", "912159523");
+
+        // Construct the state parameter and add it to the protocol message so that we can include it in the pushed authorization request
+        redirectContext.Properties.Items.Add(OpenIdConnectDefaults.RedirectUriForCodePropertiesKey, redirectContext.ProtocolMessage.RedirectUri);
+        redirectContext.ProtocolMessage.State = redirectContext.Options.StateDataFormat.Protect(redirectContext.Properties);
+
+        var discoveryDocumentResponse = await _discoveryDocumentGetter.GetDiscoveryDocument();
+
+        // The client assertion is required for HelseID to authenticate the client
+        var clientAssertion = _clientAssertionsBuilder.BuildClientAssertion(_payloadClaimsCreatorForClientAssertion, CreatePayloadClaimParameters());
+
+        var par = new PushedAuthorizationRequest
+        {
+            // Most parameters are take from the protocol message:
+            Parameters = new Parameters(redirectContext.ProtocolMessage.Parameters),
+            Address = discoveryDocumentResponse.PushedAuthorizationRequestEndpoint,
+            ClientCredentialStyle = ClientCredentialStyle.PostBody,
+            ClientAssertion = clientAssertion,
+            Resource = _settings.HelseIdConfiguration.ResourceIndicators,
+            Request = CreateRequestObject(),
+            // The metadata endpoint https://helseid-sts.test.nhn.no/connect/availableidps list the available IDPs
+            // in the test environment. If you want to redirect the user to a specific IDP, you can specify this value.
+            // AcrValues = "idp:testidpnew-oidc",
+        };
+
+        using var httpClient = new HttpClient();
+
+        var response = await httpClient.PushAuthorizationAsync(par);
+
+        if (response.IsError)
+        {
+            throw new Exception($"PAR failure: {response.Json.ToString()}");
+        }
+
+        return response;
+    }
+
+    private void RedirectToAuthorizeEndpoint(RedirectContext context)
+    {
+        // This code is copied from the ASP.NET handler. We use most of its default behavior related to
+        // redirecting to the identity provider, except that we have already pushed the state parameter,
+        // so that is left out here.
+        // See https://github.com/dotnet/aspnetcore/blob/c85baf8db0c72ae8e68643029d514b2e737c9fae/src/Security/Authentication/OpenIdConnect/src/OpenIdConnectHandler.cs#L364
+
+        var message = context.ProtocolMessage;
+        if (string.IsNullOrEmpty(message.IssuerAddress))
+        {
+            throw new InvalidOperationException(
+                "Cannot redirect to the authorization endpoint, the configuration may be missing or invalid.");
+        }
+
+        var redirectUri = message.CreateAuthenticationRequestUrl();
+        if (!Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
+        {
+            throw new InvalidOperationException($"The redirect URI is not well-formed. The URI is: '{redirectUri}'.");
+        }
+
+        context.Response.Redirect(redirectUri);
     }
 
     // Created a request object if the client type requires it.
@@ -240,9 +297,9 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         // This value is set as a static value from configuration here:
         var payloadClaimParameters = new PayloadClaimParameters
         {
-            ChildOrganizationNumber = ConfigurationValues.ApiAccessWithRequestObjectChildOrganizationNumber
+            ChildOrganizationNumber = ConfigurationValues.GranfjelldalKommuneChildOrganizationNumber1
         };
-        // We create a signing token (as used in a client assertion), and use this as a request object: 
+        // We create a signing token (as used in a client assertion), and use this as a request object:
         return _signingTokenCreator.CreateSigningToken(_payloadClaimsCreatorForRequestObjects, payloadClaimParameters);
     }
 
@@ -328,22 +385,8 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         if (_settings.ClientType == ClientType.ApiAccessWithRequestObject)
         {
             // This value will typically be assigned to a logged on user:
-            result.ChildOrganizationNumber = ConfigurationValues.ApiAccessWithRequestObjectChildOrganizationNumber;
+            result.ChildOrganizationNumber = ConfigurationValues.GranfjelldalKommuneChildOrganizationNumber1;
         }
-
-        if (_settings.ClientType == ClientType.ApiAccessForMultiTenantClient)
-        {
-            // This instructs the payload claim creator for multi-tenancy to not create an 'authorization_details' claim
-            // (it is not validated with the code grant).
-            result.IsAuthCodeRequest = true;
-        }
-
-        if (_settings.ClientType == ClientType.ApiAccessWithContextualClaims)
-        {
-            // This sets the contextual claim type for the call to HelseID:
-            result.ContextualClaimType = ConfigurationValues.TestContextClaim;
-        }
-
         return result;
     }
 }

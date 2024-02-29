@@ -13,7 +13,7 @@ namespace HelseId.Samples.Common.TokenRequests;
 /// <summary>
 /// This class creates a token requests which can be used as refresh token grants,
 /// token exchange grants, or client credentials grants to the HelseID service.
-/// It requires an IClientAssertionsBuilder that will create the client 
+/// It requires an IClientAssertionsBuilder that will create the client
 /// assertion which is used for building the token request.
 /// It also requires an IHelseIdEndpointDiscoverer for finding the URL of the token endpoint.
 /// </summary>
@@ -53,11 +53,8 @@ public class TokenRequestBuilder : ITokenRequestBuilder
             GrantType = OidcConstants.GrantTypes.RefreshToken,
             ClientCredentialStyle = ClientCredentialStyle.PostBody,
             RefreshToken = tokenRequestParameters.RefreshToken,
+            DPoPProofToken = _dPoPProofCreator.CreateDPoPProof(tokenEndpoint, "POST", dPoPNonce: dPoPNonce),
         };
-        if (_configuration.UseDPoP)
-        {
-            request.DPoPProofToken = _dPoPProofCreator.CreateDPoPProof(tokenEndpoint, "POST", dPoPNonce: dPoPNonce);
-        }
         if (tokenRequestParameters.HasResourceIndicator)
         {
             request.Resource = tokenRequestParameters.Resource;
@@ -73,7 +70,7 @@ public class TokenRequestBuilder : ITokenRequestBuilder
         var tokenEndpoint = await FindTokenEndpoint();
         var clientAssertion = BuildClientAssertion(payloadClaimsCreator, tokenRequestParameters.PayloadClaimParameters);
 
-        // This class comes from the IdentityModel library and abstracts a request for a token using the exchange token grant 
+        // This class comes from the IdentityModel library and abstracts a request for a token using the exchange token grant
         var request = new TokenExchangeTokenRequest
         {
             Address = tokenEndpoint,
@@ -84,11 +81,8 @@ public class TokenRequestBuilder : ITokenRequestBuilder
             ClientCredentialStyle = ClientCredentialStyle.PostBody,
             SubjectTokenType = OidcConstants.TokenTypeIdentifiers.AccessToken,
             SubjectToken = tokenRequestParameters.SubjectToken,
+            DPoPProofToken = _dPoPProofCreator.CreateDPoPProof(tokenEndpoint, "POST", dPoPNonce: dPoPNonce),
         };
-        if (_configuration.UseDPoP)
-        {
-            request.DPoPProofToken = _dPoPProofCreator.CreateDPoPProof(tokenEndpoint, "POST", dPoPNonce: dPoPNonce);
-        }
         return request;
     }
 
@@ -100,8 +94,8 @@ public class TokenRequestBuilder : ITokenRequestBuilder
         var tokenEndpoint = await FindTokenEndpoint();
         var clientAssertion = BuildClientAssertion(payloadClaimsCreator, tokenRequestParameters.PayloadClaimParameters);
 
-        // This class comes from the IdentityModel library and abstracts a request for a token using the client credential grant 
-        var request = new ClientCredentialsTokenRequest
+        // This class comes from the IdentityModel library and abstracts a request for a token using the client credential grant
+        return new ClientCredentialsTokenRequest
         {
             Address = tokenEndpoint,
             ClientAssertion = clientAssertion,
@@ -109,12 +103,8 @@ public class TokenRequestBuilder : ITokenRequestBuilder
             Scope = _configuration.Scope,
             GrantType = OidcConstants.GrantTypes.ClientCredentials,
             ClientCredentialStyle = ClientCredentialStyle.PostBody,
+            DPoPProofToken = _dPoPProofCreator.CreateDPoPProof(tokenEndpoint, "POST", dPoPNonce: dPoPNonce),
         };
-        if (_configuration.UseDPoP)
-        {
-            request.DPoPProofToken = _dPoPProofCreator.CreateDPoPProof(tokenEndpoint, "POST", dPoPNonce: dPoPNonce);
-        }
-        return request;
     }
 
     public async Task<AuthorizationCodeTokenRequest> CreateAuthorizationCodeTokenRequest(
@@ -125,8 +115,8 @@ public class TokenRequestBuilder : ITokenRequestBuilder
         var tokenEndpoint = await FindTokenEndpoint();
         var clientAssertion = BuildClientAssertion(payloadClaimsCreator, tokenRequestParameters.PayloadClaimParameters);
 
-        // This class comes from the IdentityModel library and abstracts a request for a token using the authorization code grant  
-        var request = new AuthorizationCodeTokenRequest
+        // This class comes from the IdentityModel library and abstracts a request for a token using the authorization code grant
+        return new AuthorizationCodeTokenRequest
         {
             Address = tokenEndpoint,
             ClientAssertion = clientAssertion,
@@ -136,12 +126,8 @@ public class TokenRequestBuilder : ITokenRequestBuilder
             Code = tokenRequestParameters.Code,
             RedirectUri = tokenRequestParameters.RedirectUri,
             CodeVerifier = tokenRequestParameters.CodeVerifier,
+            DPoPProofToken = _dPoPProofCreator.CreateDPoPProof(tokenEndpoint, "POST", dPoPNonce: dPoPNonce),
         };
-        if (_configuration.UseDPoP)
-        {
-            request.DPoPProofToken = _dPoPProofCreator.CreateDPoPProof(tokenEndpoint, "POST", dPoPNonce: dPoPNonce);
-        }
-        return request;
     }
 
     private async Task<string> FindTokenEndpoint()

@@ -26,12 +26,11 @@ public class ClientConfigurator
     public Machine2MachineClient ConfigureClient(
         bool useChildOrganizationNumberOptionValue,
         bool useClientInfoEndpointOptionValue,
-        bool useMultiTenantPatternOptionValue,
-        bool useDPoPOptionValue)
+        bool useMultiTenantPatternOptionValue)
     {
         var discoveryDocumentGetter = new DiscoveryDocumentGetter(ConfigurationValues.StsUrl);
         var endpointDiscoverer = new HelseIdEndpointsDiscoverer(discoveryDocumentGetter);
-        var configuration = SetUpHelseIdConfiguration(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue, useDPoPOptionValue);
+        var configuration = SetUpHelseIdConfiguration(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue);
         var tokenRequestBuilder = CreateTokenRequestBuilder(configuration, endpointDiscoverer);
         var clientInfoRetriever = SetUpClientInfoRetriever(useClientInfoEndpointOptionValue, endpointDiscoverer);
         var tokenRequestParameters = SetUpTokenRequestParameters(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue);
@@ -39,7 +38,7 @@ public class ClientConfigurator
         var payloadClaimsCreator = SetUpPayloadClaimsCreator(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue);
         var dPopProofCreator = new DPoPProofCreator(configuration);
         var apiConsumer = new ApiConsumer(dPopProofCreator);
-        
+
         return new Machine2MachineClient(
             apiConsumer,
             tokenRequestBuilder,
@@ -62,7 +61,7 @@ public class ClientConfigurator
         //     the HelseID service, and also finds the token endpoint for this request
         //  Also, we need a payloadClaimsCreator that sets the claims for the client assertion token.
         //  The instance of this may or may not create a structured claim for the purpose of
-        //  getting back an access token with an underenhet (child organization). 
+        //  getting back an access token with an underenhet (child organization).
         var clientAssertionsBuilder = new ClientAssertionsBuilder(signingJwtTokenCreator);
         var dPopProofCreator = new DPoPProofCreator(configuration);
         return new TokenRequestBuilder(clientAssertionsBuilder, endpointsDiscoverer, configuration, dPopProofCreator);
@@ -77,7 +76,7 @@ public class ClientConfigurator
             new NullClientInfoRetriever();
     }
 
-    private  HelseIdConfiguration SetUpHelseIdConfiguration(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue, bool useDPoPOptionValue)
+    private  HelseIdConfiguration SetUpHelseIdConfiguration(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue)
     {
         var result = HelseIdSamplesConfiguration.ClientCredentialsClient;
 
@@ -92,10 +91,9 @@ public class ClientConfigurator
             result = HelseIdSamplesConfiguration.ClientCredentialsWithChildOrgNumberClient;
         }
 
-        result.UseDPoP = useDPoPOptionValue;
         return result;
     }
-    
+
     private  IPayloadClaimsCreatorForClientAssertion SetUpPayloadClaimsCreator(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue)
     {
         var tokenRequestPayloadClaimsCreator = new ClientAssertionPayloadClaimsCreator(new DateTimeService());
@@ -135,7 +133,7 @@ public class ClientConfigurator
         {
             result.PayloadClaimParameters = new PayloadClaimParameters()
             {
-                ChildOrganizationNumber = ConfigurationValues.ClientCredentialsWithChildOrganizationNumber,
+                ChildOrganizationNumber = ConfigurationValues.GranfjelldalKommuneChildOrganizationNumber2,
             };
         }
         if (useMultiTenantPatternOptionValue)

@@ -1,9 +1,9 @@
-using System.Text.Json;
+using System.Linq;
 using IdentityModel;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-namespace HelseId.SampleAPI.DPoPValidation;
+namespace HelseId.Samples.Common.ApiDPoPValidation;
 
 public class DPoPProofValidator
 {
@@ -29,7 +29,7 @@ public class DPoPProofValidator
     };
 
     private readonly IReplayCache _replayCache;
-    
+
     public DPoPProofValidator(IReplayCache replayCache)
     {
         _replayCache = replayCache;
@@ -42,14 +42,14 @@ public class DPoPProofValidator
         {
             return validationResult;
         }
-        
+
         validationResult = ValidateHeader(data);
         if (validationResult.IsError)
         {
             return validationResult;
         }
 
-        validationResult = ValidateSignature(data);
+        validationResult = await ValidateSignature(data);
         if (validationResult.IsError)
         {
             return validationResult;
@@ -60,7 +60,7 @@ public class DPoPProofValidator
         {
             return validationResult;
         }
-        
+
         // Check for a replayed DPoP proof
         validationResult = await ValidateReplayAsync(data);
 
@@ -115,13 +115,13 @@ public class DPoPProofValidator
             return ValidationResult.Error("Invalid 'alg' value.");
         }
 
-        if (!token.TryGetHeaderValue<IDictionary<string, object>>(JwtClaimTypes.JsonWebKey, out var jwkValues))
+        if (!token.TryGetHeaderValue<JsonElement>(JwtClaimTypes.JsonWebKey, out var jwkValues))
         {
             return ValidationResult.Error("Invalid 'jwk' value.");
         }
 
         var jwkJson = JsonSerializer.Serialize(jwkValues);
-        
+
         JsonWebKey jwk;
         try
         {
@@ -147,7 +147,7 @@ public class DPoPProofValidator
         return ValidationResult.Success();
     }
 
-    private ValidationResult ValidateSignature(DPoPProofValidationData data)
+    private async Task<ValidationResult> ValidateSignature(DPoPProofValidationData data)
     {
         TokenValidationResult tokenValidationResult;
         try
@@ -161,7 +161,7 @@ public class DPoPProofValidator
             };
 
             var handler = new JsonWebTokenHandler();
-            tokenValidationResult = handler.ValidateToken(data.ProofToken, tvp);
+            tokenValidationResult = await handler.ValidateTokenAsync(data.ProofToken, tvp);
         }
         catch (Exception)
         {
@@ -238,10 +238,10 @@ public class DPoPProofValidator
         {
             return ValidationResult.Error("Invalid 'iat' value.");
         }
-        
+
         return ValidationResult.Success();
     }
-    
+
     private bool IssuedAtTimeIsInvalid(long issuedAtTime)
     {
         var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -270,7 +270,7 @@ public class DPoPProofValidator
             return ValidationResult.Error("Detected a DPoP proof token replay.");
         }
 
-        // The client clock skew is doubled because the clock may be either before or after the correct time 
+        // The client clock skew is doubled because the clock may be either before or after the correct time
         // Cache duration is then set longer than the likelihood of proof token expiration:
         var skew = ClientClockSkew *= 2;
         var cacheDuration = ProofTokenValidityDuration + skew;
