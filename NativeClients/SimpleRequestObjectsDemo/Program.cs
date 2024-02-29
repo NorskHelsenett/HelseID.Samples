@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using IdentityModel;
 using IdentityModel.Client;
@@ -12,7 +13,6 @@ using IdentityModel.OidcClient;
 using IdentityModel.OidcClient.Browser;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 
 namespace HelseId.Samples.SimpleRequestObjectsDemo;
 
@@ -220,7 +220,7 @@ class Program
             {"practitioner_role", organization}
         };
 
-        var serialized = JsonConvert.SerializeObject(authorizationDetails);
+        var serialized = JsonSerializer.Serialize(authorizationDetails);
 
         var claims = new List<Claim>
         {

@@ -2,14 +2,11 @@ using IdentityModel;
 using IdentityModel.Client;
 using IdentityModel.OidcClient;
 using IdentityModel.OidcClient.DPoP;
-using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
-using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -60,10 +57,7 @@ namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
                 using var httpClient = new HttpClient();
 
                 // Download the HelseID metadata from https://helseid-sts.test.nhn.no/.well-known/openid-configuration to determine endpoints and public keys used by HelseID:
-                var disco = await httpClient.GetDiscoveryDocumentAsync(StsUrl);
-
-                // Setup a client assertion - this will authenticate the client (this application)
-                var clientAssertionPayload = GetClientAssertionPayload(disco, ClientId);
+                DiscoveryDocumentResponse disco = await httpClient.GetDiscoveryDocumentAsync(StsUrl);
 
                 // Setup the oidc client for user authentication against HelseID (using the browser)
                 var options = new OidcClientOptions
@@ -71,7 +65,6 @@ namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
                     Authority = StsUrl,
                     ClientId = ClientId,
                     RedirectUri = RedirectUrl,
-                    ClientAssertion = clientAssertionPayload,
                     FilterClaims = false,
                 };
 
@@ -86,8 +79,7 @@ namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
 
                 var pushedAuthorizationResponse = await GetPushedAuthorizationResponse(
                     httpClient,
-                    disco.PushedAuthorizationRequestEndpoint,
-                    clientAssertionPayload,
+                    disco,
                     authorizeState);
 
                 if (pushedAuthorizationResponse.IsError)
@@ -103,6 +95,10 @@ namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
                 var browser = new SystemBrowser(port:LocalhostPort);
 
                 var browserResult = await browser.InvokeAsync(browserOptions, default);
+
+                // We need a new client assertion for the call to the /token endpoint
+                var clientAssertionPayload = GetClientAssertionPayload(disco);
+                oidcClient.Options.ClientAssertion = clientAssertionPayload;
 
                 // If the result type is success, the browser result should contain the authorization code.
                 // We can now call the /token endpoint with the authorization code in order to get tokens:
@@ -128,18 +124,20 @@ namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
 
         private static async Task<PushedAuthorizationResponse> GetPushedAuthorizationResponse(
             HttpClient httpClient,
-            string pushedAuthorizationRequestEndpoint,
-            ClientAssertion clientAssertionPayload,
+            DiscoveryDocumentResponse disco,
             AuthorizeState authorizeState)
         {
             // Sets the pushed authorization request parameters:
             var challengeBytes = SHA256.HashData(Encoding.UTF8.GetBytes(authorizeState.CodeVerifier));
             var codeChallenge = WebEncoders.Base64UrlEncode(challengeBytes);
 
+            // Setup a client assertion - this will authenticate the client (this application)
+            var clientAssertionPayload = GetClientAssertionPayload(disco);
+
             var pushedAuthorizationRequest = new PushedAuthorizationRequest
             {
 
-                Address = pushedAuthorizationRequestEndpoint,
+                Address = disco.PushedAuthorizationRequestEndpoint,
                 ClientId = ClientId,
                 ClientAssertion = clientAssertionPayload,
                 RedirectUri = RedirectUrl,
@@ -155,9 +153,9 @@ namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
             return await httpClient.PushAuthorizationAsync(pushedAuthorizationRequest);
         }
 
-        private static ClientAssertion GetClientAssertionPayload(DiscoveryDocumentResponse disco, string clientId )
+        private static ClientAssertion GetClientAssertionPayload(DiscoveryDocumentResponse disco)
         {
-            var clientAssertion = BuildClientAssertion(disco, clientId);
+            var clientAssertion = BuildClientAssertion(disco);
 
             return new ClientAssertion
             {
@@ -166,18 +164,18 @@ namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
             };
         }
 
-        private static string BuildClientAssertion(DiscoveryDocumentResponse disco, string clientId)
+        private static string BuildClientAssertion(DiscoveryDocumentResponse disco)
         {
             var claims = new List<Claim>
             {
-                new Claim(JwtClaimTypes.Subject, clientId),
+                new Claim(JwtClaimTypes.Subject, ClientId),
                 new Claim(JwtClaimTypes.IssuedAt, DateTimeOffset.Now.ToUnixTimeSeconds().ToString()),
                 new Claim(JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N")),
             };
 
             var credentials =
                 new JwtSecurityToken(
-                    clientId,
+                    ClientId,
                     disco.Issuer,
                     claims,
                     DateTime.UtcNow,

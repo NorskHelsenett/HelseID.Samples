@@ -84,19 +84,15 @@ public class Program
 
             // 1. Logging in the user
             // ///////////////////////
-            // Perfom user login, uses the /authorize endpoint in HelseID
+            // Perform user login, uses the /authorize endpoint in HelseID
             // Use the Resource-parameter to indicate which API-s you want tokens for
             // Use the Scope-parameter to indicate which scopes you want for these API-s
-
-            // Setup a client assertion - this will authenticate the client (this application)
-            var clientAssertionPayload = GetClientAssertionPayload(disco);
 
             var options = new OidcClientOptions
             {
                 Authority = StsUrl,
                 ClientId = ClientId,
                 RedirectUri = RedirectUrl,
-                ClientAssertion = clientAssertionPayload,
                 LoadProfile = false,
             };
 
@@ -107,8 +103,7 @@ public class Program
 
             var pushedAuthorizationResponse = await GetPushedAuthorizationResponse(
                 httpClient,
-                disco.PushedAuthorizationRequestEndpoint,
-                clientAssertionPayload,
+                disco,
                 authorizeState);
 
             if (pushedAuthorizationResponse.IsError)
@@ -125,25 +120,6 @@ public class Program
 
             var browserResult = await browser.InvokeAsync(browserOptions, default);
 
-            /*
-            var firstScope = FirstResource + "/some-scope";
-            var secondScope = SecondResource + "/some-scope";
-
-            var oidcClient = new OidcClient(new OidcClientOptions
-            {
-                Authority = StsUrl,
-                LoadProfile = false,
-                RedirectUri = "http://localhost:8089/callback",
-                Scope = $"openid profile offline_access {firstScope} {secondScope}",
-                ClientId = ClientId,
-                Resource = new List<string> {FirstResource, SecondResource},
-                ClientAssertion = clientAssertionPayload,
-            });
-
-            var state = await oidcClient.PrepareLoginAsync();
-            var response = await RunLocalWebBrowserUntilCallback(Localhost, RedirectUrl, StartPage, state);
-*/
-
             // 2. Retrieving an access token for API 1, and a refresh token
             ///////////////////////////////////////////////////////////////////////
             // User login has finished, now we want to request tokens from the /token endpoint
@@ -157,6 +133,8 @@ public class Program
             // If the result type is success, the browser result should contain the authorization code.
             // We can now call the /token endpoint with the authorization code in order to get tokens:
 
+            var clientAssertionPayload = GetClientAssertionPayload(disco);
+            oidcClient.Options.ClientAssertion = clientAssertionPayload;
             var loginResult = await oidcClient.ProcessResponseAsync(browserResult.Response, authorizeState, parameters);
 
             if (loginResult.IsError)
@@ -167,12 +145,10 @@ public class Program
             var accessToken1 = loginResult.AccessToken;
             var refreshToken = loginResult.RefreshToken;
 
-
             Console.WriteLine("First request, resource: " + FirstResource);
             Console.WriteLine("Access Token: " + accessToken1);
             Console.WriteLine("Refresh Token: " + refreshToken);
             Console.WriteLine();
-
 
             // 3. Using the refresh token to get an access token for API 2
             //////////////////////////////////////////////////////////////
@@ -210,18 +186,19 @@ public class Program
 
     private static async Task<PushedAuthorizationResponse> GetPushedAuthorizationResponse(
         HttpClient httpClient,
-        string pushedAuthorizationRequestEndpoint,
-        ClientAssertion clientAssertionPayload,
+        DiscoveryDocumentResponse disco,
         AuthorizeState authorizeState)
     {
         // Sets the pushed authorization request parameters:
         var challengeBytes = SHA256.HashData(Encoding.UTF8.GetBytes(authorizeState.CodeVerifier));
         var codeChallenge = WebEncoders.Base64UrlEncode(challengeBytes);
+        // Setup a client assertion - this will authenticate the client (this application)
+        var clientAssertionPayload = GetClientAssertionPayload(disco);
 
         var pushedAuthorizationRequest = new PushedAuthorizationRequest
         {
             Resource = new List<string> {FirstResource, SecondResource},
-            Address = pushedAuthorizationRequestEndpoint,
+            Address = disco.PushedAuthorizationRequestEndpoint,
             ClientId = ClientId,
             ClientAssertion = clientAssertionPayload,
             RedirectUri = RedirectUrl,
