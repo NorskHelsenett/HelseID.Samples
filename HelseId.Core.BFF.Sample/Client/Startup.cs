@@ -1,11 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
+using Duende.AccessTokenManagement;
+using HelseId.Core.BFF.Sample.Client.Auth;
 using HelseId.Core.BFF.Sample.Client.Middleware;
 using HelseId.Core.BFF.Sample.Client.Services;
+using HelseId.Core.BFF.Sample.Models.Model;
+using HelseId.Core.BFF.Sample.WebCommon.Identity;
+using HelseId.Core.BFF.Sample.WebCommon.Middleware;
+using IdentityModel;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -13,15 +15,19 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
-using HelseId.Core.BFF.Sample.WebCommon.Identity;
-using HelseId.Core.BFF.Sample.WebCommon.Middleware;
-using IdentityModel;
-using HelseId.Core.BFF.Sample.Client.Auth;
-using Duende.AccessTokenManagement;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
+using System.Security.Cryptography;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace HelseId.Core.BFF.Sample.Client
 {
@@ -98,6 +104,7 @@ namespace HelseId.Core.BFF.Sample.Client
                     options.RequireHttpsMetadata = true;
                     options.ClientId = hidOptions.ClientId;
                     options.ResponseType = OidcConstants.ResponseTypes.Code;
+                    options.UsePkce = true;
                     options.TokenValidationParameters.ValidAudience = hidOptions.ClientId;
                     options.CallbackPath = "/signin-oidc";
                     options.SignedOutCallbackPath = "/signout-callback-oidc";
@@ -133,6 +140,12 @@ namespace HelseId.Core.BFF.Sample.Client
                         return Task.CompletedTask;
                     };
 
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        NameClaimType = "name",
+                        RoleClaimType = "role"
+                    };
+
                     // Use client assertion instead of client secret for initial token retrieval
                     options.Events.OnAuthorizationCodeReceived = context =>
                     {
@@ -146,14 +159,21 @@ namespace HelseId.Core.BFF.Sample.Client
                     };
                 });
 
+            var dpopKey = CreateDPoPJwk();
+            services.AddSingleton(dpopKey);
+
             // Automatic refresh of access token
             services.AddOpenIdConnectAccessTokenManagement(options =>
             {
                 options.RefreshBeforeExpiration = TimeSpan.FromSeconds(10);
+
+                options.DPoPJsonWebKey = dpopKey.Jwk;
             });
 
             // Use client assertion for automatic refresh of tokens
             services.AddTransient<IClientAssertionService, ClientAssertionService>();
+
+            services.Replace(ServiceDescriptor.Transient<OpenIdConnectHandler, DPoPOpenIdConnectHandler>());
 
             var authenticatedHidUserPolicy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
@@ -191,6 +211,17 @@ namespace HelseId.Core.BFF.Sample.Client
 #endif
         }
 
+        private static DPoPJwk CreateDPoPJwk()
+        {
+            var rsaKey = new RsaSecurityKey(RSA.Create(2048));
+            var jwk = JsonWebKeyConverter.ConvertFromSecurityKey(rsaKey);
+            jwk.Alg = SecurityAlgorithms.RsaSsaPssSha256;
+            string jwkJson = JsonSerializer.Serialize(jwk);
+
+            var dpopKey = new DPoPJwk(jwkJson, jwk.Alg);
+            return dpopKey;
+        }
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiClient apiClient)
         {
             if (env.IsDevelopment())
@@ -225,6 +256,7 @@ namespace HelseId.Core.BFF.Sample.Client
             app.UseEndpoints(
                 endpoints =>
                 {
+                    endpoints.MapDefaultControllerRoute();
                     endpoints.MapControllers();
                     endpoints.MapRazorPages();
                 });

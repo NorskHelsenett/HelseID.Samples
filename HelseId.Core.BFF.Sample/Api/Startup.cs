@@ -1,8 +1,8 @@
-using System;
-using System.Text.Json.Serialization;
 using HelseId.Core.BFF.Sample.Api.Authorization;
+using HelseId.Core.BFF.Sample.Api.DPoP;
 using HelseId.Core.BFF.Sample.Api.Options;
 using HelseId.Core.BFF.Sample.Api.Services;
+using HelseId.Core.BFF.Sample.WebCommon.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -15,7 +15,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
-using HelseId.Core.BFF.Sample.WebCommon.Middleware;
+using System;
+using System.Text.Json.Serialization;
 
 namespace HelseId.Core.BFF.Sample.Api
 {
@@ -77,8 +78,14 @@ namespace HelseId.Core.BFF.Sample.Api
                             ValidateLifetime = true,
                             AudienceValidator = TokenValidation.ValidateSingleAudience,
                         };
+
+                        DPoPHandler.Handle(options);
                     }
                 );
+
+            services.AddSingleton<IReplayCache, DPoPReplayCache>();
+            services.AddSingleton<DPoPProofValidator>();
+            services.AddDistributedMemoryCache();
 
             services.AddAuthorization(
                 config =>
