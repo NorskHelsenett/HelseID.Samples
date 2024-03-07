@@ -87,9 +87,9 @@ namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
                     throw new Exception($"{pushedAuthorizationResponse.Error}: JSON: {pushedAuthorizationResponse.Json}");
                 }
 
-                var startUrl = $"{disco.AuthorizeEndpoint}?client_id={ClientId}&request_uri={pushedAuthorizationResponse.RequestUri}";
+                var urlForAuthorizeEndpoint = $"{disco.AuthorizeEndpoint}?client_id={ClientId}&request_uri={pushedAuthorizationResponse.RequestUri}";
 
-                var browserOptions = new BrowserOptions(startUrl, RedirectUrl);
+                var browserOptions = new BrowserOptions(urlForAuthorizeEndpoint, RedirectUrl);
 
                 // Create a redirect URI using an available port on the loopback address.
                 var browser = new SystemBrowser(port:LocalhostPort);
@@ -136,7 +136,6 @@ namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
 
             var pushedAuthorizationRequest = new PushedAuthorizationRequest
             {
-
                 Address = disco.PushedAuthorizationRequestEndpoint,
                 ClientId = ClientId,
                 ClientAssertion = clientAssertionPayload,
