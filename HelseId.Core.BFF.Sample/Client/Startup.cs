@@ -108,6 +108,7 @@ namespace HelseId.Core.BFF.Sample.Client
                     options.TokenValidationParameters.ValidAudience = hidOptions.ClientId;
                     options.CallbackPath = "/signin-oidc";
                     options.SignedOutCallbackPath = "/signout-callback-oidc";
+                    options.MapInboundClaims = false;
 
                     options.AccessDeniedPath = "/Forbidden";
 
@@ -138,12 +139,6 @@ namespace HelseId.Core.BFF.Sample.Client
                         }
 
                         return Task.CompletedTask;
-                    };
-
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        NameClaimType = "name",
-                        RoleClaimType = "role"
                     };
 
                     // Use client assertion instead of client secret for initial token retrieval
