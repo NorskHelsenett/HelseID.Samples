@@ -46,9 +46,11 @@ public class DPoPOpenIdConnectHandler : OpenIdConnectHandler
             throw new Exception("Token endpoint must be set.");
         }
 
-        var requestMessage = new HttpRequestMessage(HttpMethod.Post, tokenEndpoint);
-        requestMessage.Content = new FormUrlEncodedContent(tokenEndpointRequest.Parameters);
-        requestMessage.Version = Backchannel.DefaultRequestVersion;
+        var requestMessage = new HttpRequestMessage(HttpMethod.Post, tokenEndpoint)
+        {
+            Content = new FormUrlEncodedContent(tokenEndpointRequest.Parameters),
+            Version = Backchannel.DefaultRequestVersion
+        };
         var responseMessage = await Backchannel.SendAsync(requestMessage, Context.RequestAborted);
 
         const string dpopNonceHeaderName = "DPoP-Nonce";
