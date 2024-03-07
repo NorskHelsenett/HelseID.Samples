@@ -160,6 +160,12 @@ public class Startup
         services.AddTransient<IConfigureOptions<AuthenticationOptions>, AuthenticationOptionsInitializer>();
         services.AddTransient<IConfigureNamedOptions<OpenIdConnectOptions>, OpenIdConnectOptionsInitializer>();
 
+        services.AddOptions<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme)
+            .Configure<IConfigureNamedOptions<OpenIdConnectOptions>>((options, initializer) =>
+            {
+                initializer.Configure(nameof(OpenIdConnectOptionsInitializer), options);
+            });
+
         // Set authentication options (these will call the AuthenticationOptionsInitializer and OpenIdConnectOptionsInitializer instances)
         services.AddAuthentication()
             .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
@@ -167,13 +173,7 @@ public class Startup
                 // Path to access denied endpoint. Used when authorization fails
                 options.AccessDeniedPath = "/authorization/access-denied";
             })
-            .AddOpenIdConnect(openIdConnectOptions =>
-            {
-                // We need to extract the OpenID Connect options initializer from the service provider:
-                var serviceProvider =  services.BuildServiceProvider();
-                var  initializer = serviceProvider.GetService<IConfigureNamedOptions<OpenIdConnectOptions>>();
-                initializer!.Configure(nameof(OpenIdConnectOptionsInitializer), openIdConnectOptions);
-            });
+            .AddOpenIdConnect();
 
         var securityLevelClaimPolicy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
