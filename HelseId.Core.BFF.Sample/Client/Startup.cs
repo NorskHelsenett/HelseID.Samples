@@ -123,32 +123,19 @@ namespace HelseId.Core.BFF.Sample.Client
 
                     options.SaveTokens = true;
 
-                    options.Events.OnRedirectToIdentityProvider = ctx =>
+                    options.Events.OnRedirectToIdentityProvider = context =>
                     {
+                        if (context.ProtocolMessage.RequestType != OpenIdConnectRequestType.Authentication)
+                        {
+                            return Task.CompletedTask;
+                        }
+
                         // API requests should get a 401 status instead of being redirected to login
-                        if (ctx.Request.Path.StartsWithSegments("/api"))
+                        if (context.Request.Path.StartsWithSegments("/api"))
                         {
-                            ctx.Response.Headers["Location"] = ctx.ProtocolMessage.CreateAuthenticationRequestUrl();
-                            ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                            ctx.HandleResponse();
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            context.HandleResponse();
                         }
-
-                        if (ctx.ProtocolMessage.RequestType == OpenIdConnectRequestType.Authentication && hasAcrValues)
-                        {
-                            ctx.ProtocolMessage.AcrValues = acrValues;
-                        }
-
-                        return Task.CompletedTask;
-                    };
-
-                    // Use client assertion instead of client secret for initial token retrieval
-                    options.Events.OnAuthorizationCodeReceived = context =>
-                    {
-                        var clientAssertion = ClientAssertionBuilder.GetClientAssertion(hidOptions.ClientId, hidOptions.ClientJwk, hidOptions.Authority);
-
-                        var tokenEndpointRequest = context.TokenEndpointRequest!;
-                        tokenEndpointRequest.ClientAssertionType = clientAssertion.Type;
-                        tokenEndpointRequest.ClientAssertion = clientAssertion.Value;
 
                         return Task.CompletedTask;
                     };
@@ -164,6 +151,8 @@ namespace HelseId.Core.BFF.Sample.Client
 
                 options.DPoPJsonWebKey = dpopKey.Jwk;
             });
+
+            services.ConfigureOptions<ConfigureOpenIdConnectOptionsForHelseId>();
 
             // Use client assertion for automatic refresh of tokens
             services.AddTransient<IClientAssertionService, ClientAssertionService>();
