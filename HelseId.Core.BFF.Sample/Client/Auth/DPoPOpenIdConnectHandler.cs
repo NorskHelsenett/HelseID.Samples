@@ -89,6 +89,11 @@ public class DPoPOpenIdConnectHandler : OpenIdConnectHandler
             result = new OpenIdConnectMessage(responseContent);
         }
 
+        if (!string.IsNullOrEmpty(result.AccessToken) && result.TokenType != "DPoP")
+        {
+            throw new Exception($"Expected 'DPoP' token type, but received '{result.TokenType}' token");
+        }
+
         return result;
     }
 }
