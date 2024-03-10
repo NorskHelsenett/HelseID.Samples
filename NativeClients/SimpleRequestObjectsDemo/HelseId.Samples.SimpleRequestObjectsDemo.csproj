@@ -7,7 +7,8 @@
 
   <ItemGroup>
     <PackageReference Include="IdentityModel" Version="7.0.0-preview.3" />
-    <PackageReference Include="IdentityModel.OidcClient" Version="6.0.0-preview.1" />
+    <PackageReference Include="IdentityModel.OidcClient.DPoP" Version="6.0.0-preview.1" />
+    <PackageReference Include="IdentityModel.OidcClient.IdentityTokenValidator" Version="6.0.0-preview.1" />
 
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.4.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.4.0" />

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -13,6 +14,7 @@ using IdentityModel.OidcClient;
 using IdentityModel.OidcClient.Browser;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Tokens;
+using IdentityModel.OidcClient.DPoP;
 
 namespace HelseId.Samples.SimpleRequestObjectsDemo;
 
@@ -22,18 +24,27 @@ class Program
     // The values below should normally be configurable
     //
 
-    // In a production environment you would use your own private key stored somewhere safe (a vault, a certificate store, a secure database or similar).
-    private const string JwkPrivateKey = """{"d":"wUJFbzCvRwDlDyVyCmLmXQy0Xod81R5Cwk8U1vW2cJg1E88dQurAkgGAYcISUJKGW1haCVn-WZqmJm2WXLTjNHvGIH-sZapWqINVuwrl1FF_hQ-Cf2hRCyV8P-eU0tn_GH0gCRS2_ER5AbtDw26JfkHy9Y3ZRrL9EXjH_ZEd-7fNM_g_UelGe1a0xBLrCf80HkZaO-U10MV-iu88kqsUFb3RdIsbykGgrYVHmr87Y6K1DLYzJESQU3z_rJmubSELE6-HWw_gf1zb-FXhb1M3i1fbFlB0muom_BnbyOvOFRhGV5ngi8tyRBaz9BMbtyWLEEJzLorjz7C4iKfelefjjaUh-BinhpZ35j_Ki0aY5rwXjcyxQiciUHdfDcntzu815Rq5vu2lcL7VHz4mIp-X7Er4PfKqlrIgBp52SVJpWI1JEL8c7vA2ABGM9hqqY_Akh6YJmdMwNUpqE_Madr_cI2X3R9D0AxeGYrhwwYx41izST9X8dPrJ9X9w2UGlOCweHBi3Ok8gGIYvZzbi6cmXMkzo5J0-qCTQYDS2Lb6h4YKEVN7TQpp3PjXOfeZrc4AW8pHVjnirMoI7GGioGDMMEMA2n60I2qMmX-nyb5K5OsbWPDqMKZLBdTk5mfNfQvQy6cF5BR25QjxFGvXH0ThWjFaUWCgSBa0O3azzkcG1-b0","dp":"Y9CvDg6yfbZGyE-ycLasng1NLT1_cfiYkMLXa4c9TN2L7Ta1R4sBc4vX4IvZ_kSD3ubHD4q3vKSGxEawD7x-3odyrkamLZPHmkvafrkIZPZWcNqGTZAwqCpHxmodJsJIOkPWI_xn2uD2yU9aAaZEoxTqA7Oac-kLdDPjLKsvCRJcilQyD4kvodoK0n4YKINJM-taLIgsxwA7ZkH2GBlV49ZCvKLRZGERhEiunxncx4LNKUd5CBbKCBTZse8EpdhFxbzRgUxOQZujXaVOzdZB_IUkfDPFsN5Fjf6rYQmbyp1W7rUlqJQ5sqRgZngjrCMUdKCzMhVN7X34IMzUDv8ppQ","dq":"zcQhwDxvPDIPUMbIyyWw5G-tnMueZS8KlSmSTzUaLC9QDOU9RbSK6SbNSP-zahG13IJwtAJ9TqYlmj9AbVpdrXtctdcZkUn_wX5P-Qz6J_w-0xODjM_YB3ma_qYsh4yYoEm4lgS0JZN2F7fnc1rOXpzBjm-jsJyRbulD1K908dy6ui9kuO4FfoWpXwX7Jixqfz55koIm1umSVjwI6otz7NOLd8gZcapeBFPrCZnCMIVrGBU0DDVAolEF2GMps4a3259VYPYPkDDs7lwSY8Jk1jFUmdkqwXLwaDzlgnpJJI2boHMOxt1QAuMdToLphah5R3HNLh1NTrLQn0Uehiazhw","e":"AQAB","kty":"RSA","n":"4e76k7QF01kw3hhdHyc3iyUn6c465yrLD9KV7m4gNIc3Tm66Iq3P72xq9w5abAXJG9GJUkbhtTG5isFmXLCU4MOlU5T2a7iBqx2dmao72LSsQ7WZQVtIv5JvWYAXpd4rlgTaJfO3Unv9Tn8v5wWgL9ZbplVmR_GWMY5l-7i44PWwLwGZge_KUVGQmKtx7XXsnezG4JfEAPJbO9zfD4CH6AGtRdcAn2r-2-jqk_-uU1BVoWwDdrCJ_DKOyYNDUfkRneTATY5RDdH5flNd-19XW31L1q3dTMqHbcMzFMfiqwyBYX5kFJrDT-W7poIex7jhZfA5by8K1tfwJqdYRGH4Qp5QtBTs76iuANNBUz3tO0vmV8bYez2AWegvRqrZGHPsMPtA5pCjXw1rueJdH5WqpCHrBsnNkOHNVcd8yHLPmXRokwi3cSanOuquLOI5Qh-pqeuTTJAv8QQ3X5aQRnHmZoyVuOP9Qqq05MGRPp6W-7Vdbi6mslDP-FwUnkHb2C-XenxHesqfcbqBOELa-PD6Fj_usVKPcL9HR_J4IK38XFFOT669_Xhpyaq6iRtvlmj1n_fQNvRcGpZIfIAFgf64cIwLAz2vimj5ywXneyDIRv5Wge8VyhfsAe9S01x0dNq-aR16clayKDn48e6fETeTWJJaPK7lvi1-Oc-tlaA7Pfk","p":"8fDDtrup_sHpmpnAQ6arzA6S2zG23OlRwsrPQu1bByDJSAB6Y0RQDIxQB06NjNCyyoetpiUlblgpcLQpy-R9xAgdvw-gcxNYW4hxkQdbnSP0U9vv8V3tGtxN8szjBEsNz0vhs0Gc4Wz01IYGVY6OJhOg3qshAFrjZie49MsIRw_w0dJA6UAXbx19fvoFtKDSyp-w2FnFQHMnzwsoJULiCPB6R77XJZLx3gyQN4ad-s63E7f89055JNIO8rt-cigkL_ilQh-x9m-oX_nBWb_N4gjVdnyoH2Vjlq2os2l209URLPl4bq6AMCfe7SAnuyLA9U_aTiLOF2eAlbgznmUWjw","q":"7xAWBXurm-Qv60KwKF2dqkGbCyNTrQv1Ep8L2ArTVeTMcQb54dQiwLZb-NDaiRIAyBXOsrkWEyh8tru5fvicn-EdAnajGTxEwwKktaUA-ufDw8vy4HOfATXGuA0DFt1L6nZ_n9lFYxd09iEUj0GwvaRM21A7nbOz3Qf6JThCaP8JOK3doOYsr7fufD8E9gcE7CiTcbbpm8BOa6-h2fY3tENCOV76a9_G2RfPOrvIu-tgVPU_2K-r8vSWQobXhGELOYc0XAipUxEAPxGLOq3T-OTQk2SvPnom2mEG_-5V1PG1sxH0WGf53XpUjjsUW1Zj9bidmuhLPqbMBf-ZhbLm9w","qi":"3h-0vyBkKf0WsPhCiIWXm8yPU-J_qgM4JjkrBzwWOU6CpnQyIdoSfStXhas7ehoODnb7sAQ2PEh4RBls2kJrXmzqC_0wsUEFdnfSERsf8eb8Sgu1NF5JgqRU9UBe9-4bvLZAcFpBG_PJyMg8QhCEuqFbjrjNjg9r3EVfeRHyjl7dPEGF5RwIUiGbkyLmXmcqf0L4GhuvqGdd56krht_kvwI-lppMB4OoZDgwfOH0fcKuHJUyc0RyfZ-iS9YZTQI-1AO2gA-RsjCjvtZB2QBdhvqPp2OujkYlcGXukSBtoBsU3elGBqFPRqlPsDMN8dj0bw_xjNxue7fKh9a68CPedA","kid":"B2C61A07EE0661237D19BEE1E0A1463C"}""";
+    // In a production environment you MUST use your own private key stored somewhere safe (a vault, a certificate store, a secure database or similar).
+    private const string JwkPrivateKey = """
+                                         {
+                                           "alg": "RS256",
+                                           "d": "wUJFbzCvRwDlDyVyCmLmXQy0Xod81R5Cwk8U1vW2cJg1E88dQurAkgGAYcISUJKGW1haCVn-WZqmJm2WXLTjNHvGIH-sZapWqINVuwrl1FF_hQ-Cf2hRCyV8P-eU0tn_GH0gCRS2_ER5AbtDw26JfkHy9Y3ZRrL9EXjH_ZEd-7fNM_g_UelGe1a0xBLrCf80HkZaO-U10MV-iu88kqsUFb3RdIsbykGgrYVHmr87Y6K1DLYzJESQU3z_rJmubSELE6-HWw_gf1zb-FXhb1M3i1fbFlB0muom_BnbyOvOFRhGV5ngi8tyRBaz9BMbtyWLEEJzLorjz7C4iKfelefjjaUh-BinhpZ35j_Ki0aY5rwXjcyxQiciUHdfDcntzu815Rq5vu2lcL7VHz4mIp-X7Er4PfKqlrIgBp52SVJpWI1JEL8c7vA2ABGM9hqqY_Akh6YJmdMwNUpqE_Madr_cI2X3R9D0AxeGYrhwwYx41izST9X8dPrJ9X9w2UGlOCweHBi3Ok8gGIYvZzbi6cmXMkzo5J0-qCTQYDS2Lb6h4YKEVN7TQpp3PjXOfeZrc4AW8pHVjnirMoI7GGioGDMMEMA2n60I2qMmX-nyb5K5OsbWPDqMKZLBdTk5mfNfQvQy6cF5BR25QjxFGvXH0ThWjFaUWCgSBa0O3azzkcG1-b0",
+                                           "dp": "Y9CvDg6yfbZGyE-ycLasng1NLT1_cfiYkMLXa4c9TN2L7Ta1R4sBc4vX4IvZ_kSD3ubHD4q3vKSGxEawD7x-3odyrkamLZPHmkvafrkIZPZWcNqGTZAwqCpHxmodJsJIOkPWI_xn2uD2yU9aAaZEoxTqA7Oac-kLdDPjLKsvCRJcilQyD4kvodoK0n4YKINJM-taLIgsxwA7ZkH2GBlV49ZCvKLRZGERhEiunxncx4LNKUd5CBbKCBTZse8EpdhFxbzRgUxOQZujXaVOzdZB_IUkfDPFsN5Fjf6rYQmbyp1W7rUlqJQ5sqRgZngjrCMUdKCzMhVN7X34IMzUDv8ppQ",
+                                           "dq": "zcQhwDxvPDIPUMbIyyWw5G-tnMueZS8KlSmSTzUaLC9QDOU9RbSK6SbNSP-zahG13IJwtAJ9TqYlmj9AbVpdrXtctdcZkUn_wX5P-Qz6J_w-0xODjM_YB3ma_qYsh4yYoEm4lgS0JZN2F7fnc1rOXpzBjm-jsJyRbulD1K908dy6ui9kuO4FfoWpXwX7Jixqfz55koIm1umSVjwI6otz7NOLd8gZcapeBFPrCZnCMIVrGBU0DDVAolEF2GMps4a3259VYPYPkDDs7lwSY8Jk1jFUmdkqwXLwaDzlgnpJJI2boHMOxt1QAuMdToLphah5R3HNLh1NTrLQn0Uehiazhw",
+                                           "e": "AQAB",
+                                           "kty": "RSA",
+                                           "n": "4e76k7QF01kw3hhdHyc3iyUn6c465yrLD9KV7m4gNIc3Tm66Iq3P72xq9w5abAXJG9GJUkbhtTG5isFmXLCU4MOlU5T2a7iBqx2dmao72LSsQ7WZQVtIv5JvWYAXpd4rlgTaJfO3Unv9Tn8v5wWgL9ZbplVmR_GWMY5l-7i44PWwLwGZge_KUVGQmKtx7XXsnezG4JfEAPJbO9zfD4CH6AGtRdcAn2r-2-jqk_-uU1BVoWwDdrCJ_DKOyYNDUfkRneTATY5RDdH5flNd-19XW31L1q3dTMqHbcMzFMfiqwyBYX5kFJrDT-W7poIex7jhZfA5by8K1tfwJqdYRGH4Qp5QtBTs76iuANNBUz3tO0vmV8bYez2AWegvRqrZGHPsMPtA5pCjXw1rueJdH5WqpCHrBsnNkOHNVcd8yHLPmXRokwi3cSanOuquLOI5Qh-pqeuTTJAv8QQ3X5aQRnHmZoyVuOP9Qqq05MGRPp6W-7Vdbi6mslDP-FwUnkHb2C-XenxHesqfcbqBOELa-PD6Fj_usVKPcL9HR_J4IK38XFFOT669_Xhpyaq6iRtvlmj1n_fQNvRcGpZIfIAFgf64cIwLAz2vimj5ywXneyDIRv5Wge8VyhfsAe9S01x0dNq-aR16clayKDn48e6fETeTWJJaPK7lvi1-Oc-tlaA7Pfk",
+                                           "p": "8fDDtrup_sHpmpnAQ6arzA6S2zG23OlRwsrPQu1bByDJSAB6Y0RQDIxQB06NjNCyyoetpiUlblgpcLQpy-R9xAgdvw-gcxNYW4hxkQdbnSP0U9vv8V3tGtxN8szjBEsNz0vhs0Gc4Wz01IYGVY6OJhOg3qshAFrjZie49MsIRw_w0dJA6UAXbx19fvoFtKDSyp-w2FnFQHMnzwsoJULiCPB6R77XJZLx3gyQN4ad-s63E7f89055JNIO8rt-cigkL_ilQh-x9m-oX_nBWb_N4gjVdnyoH2Vjlq2os2l209URLPl4bq6AMCfe7SAnuyLA9U_aTiLOF2eAlbgznmUWjw",
+                                           "q": "7xAWBXurm-Qv60KwKF2dqkGbCyNTrQv1Ep8L2ArTVeTMcQb54dQiwLZb-NDaiRIAyBXOsrkWEyh8tru5fvicn-EdAnajGTxEwwKktaUA-ufDw8vy4HOfATXGuA0DFt1L6nZ_n9lFYxd09iEUj0GwvaRM21A7nbOz3Qf6JThCaP8JOK3doOYsr7fufD8E9gcE7CiTcbbpm8BOa6-h2fY3tENCOV76a9_G2RfPOrvIu-tgVPU_2K-r8vSWQobXhGELOYc0XAipUxEAPxGLOq3T-OTQk2SvPnom2mEG_-5V1PG1sxH0WGf53XpUjjsUW1Zj9bidmuhLPqbMBf-ZhbLm9w",
+                                           "qi": "3h-0vyBkKf0WsPhCiIWXm8yPU-J_qgM4JjkrBzwWOU6CpnQyIdoSfStXhas7ehoODnb7sAQ2PEh4RBls2kJrXmzqC_0wsUEFdnfSERsf8eb8Sgu1NF5JgqRU9UBe9-4bvLZAcFpBG_PJyMg8QhCEuqFbjrjNjg9r3EVfeRHyjl7dPEGF5RwIUiGbkyLmXmcqf0L4GhuvqGdd56krht_kvwI-lppMB4OoZDgwfOH0fcKuHJUyc0RyfZ-iS9YZTQI-1AO2gA-RsjCjvtZB2QBdhvqPp2OujkYlcGXukSBtoBsU3elGBqFPRqlPsDMN8dj0bw_xjNxue7fKh9a68CPedA",
+                                           "kid": "B2C61A07EE0661237D19BEE1E0A1463C"}
+                                         """;
 
     // This client_id is only to be used for this particular sample. Your application will use it's own client_id.
     private const string ClientId = "f7cd1256-0526-4b5a-b4c3-f054c984ace8";
 
     // The client is configured in the HelseID test environment, so we will point to that
     private const string StsUrl = "https://helseid-sts.test.nhn.no";
-
-    // An API which requires a logged in user
-    // You can find the source code for this API at https://github.com/NorskHelsenett/HelseID.Samples/tree/master/HelseId.SampleAPI
-    private const string ApiUrl = "https://localhost:5081/user-login-clients/greetings";
 
     private const int LocalhostPort = 8080;
 
@@ -54,29 +65,30 @@ class Program
             using var httpClient = new HttpClient();
 
             // Download the HelseID metadata from https://helseid-sts.test.nhn.no/.well-known/openid-configuration to determine endpoints and public keys used by HelseID:
+            // In a production environment, this document must be cached for better efficiency (both for this client and for HelseID)
             var disco = await httpClient.GetDiscoveryDocumentAsync(StsUrl);
-
-            // Setup a client assertion - this will authenticate the client (this application)
-            var clientAssertionPayload = GetClientAssertionPayload(disco);
 
             var options = new OidcClientOptions
             {
                 Authority = StsUrl,
                 ClientId = ClientId,
                 RedirectUri = RedirectUrl,
-                ClientAssertion = clientAssertionPayload,
                 LoadProfile = false,
+                // This validates the identity token (important!):
+                IdentityTokenValidator = new JwtHandlerIdentityTokenValidator(),
             };
+
+            // Set the DPoP proof, we can use the same key for this as for the client assertion:
+            options.ConfigureDPoP(JwkPrivateKey);
 
             // Setup the oidc client for authentication against HelseID
             var oidcClient = new OidcClient(options);
 
-            // The authorizeState object contains the state the needs to be held between starting the authorize request and the response
+            // The authorizeState object contains the state that needs to be held between starting the authorize request and the response
             var authorizeState = await oidcClient.PrepareLoginAsync();
 
             var pushedAuthorizationResponse = await GetPushedAuthorizationResponse(
                 httpClient,
-                clientAssertionPayload,
                 authorizeState,
                 disco);
 
@@ -96,7 +108,16 @@ class Program
 
             // If the result type is success, the browser result should contain the authorization code.
             // We can now call the /token endpoint with the authorization code in order to get tokens:
+
+            // We need a client assertion on the request in order to authenticate the client:
+            oidcClient.Options.ClientAssertion = GetClientAssertionPayload(disco);
+
             var loginResult = await oidcClient.ProcessResponseAsync(browserResult.Response, authorizeState);
+
+            if (loginResult.IsError == false)
+            {
+                loginResult = ValidateIdentityClaims(loginResult);
+            }
 
             if (loginResult.IsError)
             {
@@ -111,16 +132,20 @@ class Program
             Console.WriteLine($"Identity token from login: {loginResult.IdentityToken}");
             Console.WriteLine($"Access token from login: {loginResult.AccessToken}");
 
-            var rt = await httpClient.RequestRefreshTokenAsync(new RefreshTokenRequest
+            // We can now call the /token endpoint again with the refresh token in order to get a new access token:
+            // Client assertions cannot be used twice, so we need a new payload:
+            oidcClient.Options.ClientAssertion = GetClientAssertionPayload(disco);
+
+            var refreshTokenResult = await oidcClient.RefreshTokenAsync(loginResult.RefreshToken);
+
+            if (refreshTokenResult.IsError)
             {
-                RefreshToken = loginResult.RefreshToken,
-                Address = disco.TokenEndpoint,
-                ClientAssertion = GetClientAssertionPayload(disco)
-            });
+                throw new Exception($"{refreshTokenResult.Error}: Description: {refreshTokenResult.ErrorDescription}");
+            }
 
             Console.WriteLine();
             Console.WriteLine("New Access Token after using Refresh Token:");
-            Console.WriteLine(rt.AccessToken);
+            Console.WriteLine(refreshTokenResult.AccessToken);
         }
         catch (Exception ex)
         {
@@ -131,10 +156,11 @@ class Program
 
     private static async Task<PushedAuthorizationResponse> GetPushedAuthorizationResponse(
         HttpClient httpClient,
-        ClientAssertion clientAssertionPayload,
         AuthorizeState authorizeState,
         DiscoveryDocumentResponse disco)
     {
+        // Setup a client assertion - this will authenticate the client (this application)
+        var clientAssertionPayload = GetClientAssertionPayload(disco);
         var pushedAuthorizationRequest = new PushedAuthorizationRequest
         {
             Address = disco.PushedAuthorizationRequestEndpoint,
@@ -269,5 +295,21 @@ class Program
     {
         var securityKey = new JsonWebKey(JwkPrivateKey);
         return new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256);
+    }
+
+    private static LoginResult ValidateIdentityClaims(LoginResult loginResult)
+    {
+        // The claims from the identity token has ben set on the User object;
+        // We validate that the user claims match the required security level:
+        if (loginResult.User.Claims.Any(c => c is
+            {
+                Type: "helseid://claims/identity/security_level",
+                Value: "4",
+            }))
+        {
+            return loginResult;
+        }
+
+        return new LoginResult("Invalid security level", "The security level is not at the required value");
     }
 }

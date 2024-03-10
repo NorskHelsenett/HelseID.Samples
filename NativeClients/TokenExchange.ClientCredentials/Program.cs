@@ -92,7 +92,7 @@ public class Program
             return String.Empty;
         }
 
-        return result.AccessToken;
+        return result.AccessToken!;
     }
 
     private static async Task<TokenResponse> PerformTokenExchange(string subjectToken)

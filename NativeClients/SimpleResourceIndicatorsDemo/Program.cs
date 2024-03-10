@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -10,6 +11,7 @@ using IdentityModel;
 using IdentityModel.Client;
 using IdentityModel.OidcClient;
 using IdentityModel.OidcClient.Browser;
+using IdentityModel.OidcClient.DPoP;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Tokens;
 
@@ -36,9 +38,10 @@ public class Program
     // The values below should normally be configurable
     //
 
-    // In a production environment you would use your own private key stored somewhere safe (a vault, a certificate store, a secure database or similar).
+    // In a production environment you MUST use your own private key stored somewhere safe (a vault, a certificate store, a secure database or similar).
     private const string JwkPrivateKey = """
                                          {
+                                           "alg": "RS256",
                                            "d": "sck9fMkA2qXTPH11k2BHd6q7sNWglTG7B_QJ7ZlhAGxJavhcnb_qnDOJi_UcjvMHoLNqO02Tnvf6Sat5jxMVuPZRXsM494QbTKrDT_I6GnH0APL5f_ThuqL1g6bdK-w_PTNoy7VGciyGO-ROi-y94Sano_kDMSFNrgZbXPYjZ6PhP-frbWSgLLoNBoXqp6Or8hXxtLWX_eHzyLM9TDEOEKMnArOTSmmbzUjmAJOwHVjz8w-X5iATNsPM4rM_lZ4QX-oX-I-YsbuAqs6xvnTBv5GgRNVr7czx7gnMACsvBTSXhgKDREPf3rsocAmQWPOZG_ldZIvupPV_hx5pwAL_WBtPdMbVYcTajwR0iKHdcxuwAOasG8aGhthufWFNLw23nAxTxExpSO-azWbBYqC23oDPStkSpDAxN6uo4x038f2pPgFmSB5pOmu8knSjNuTTk6b63o71weK9-rqtLFFyh3VpsfKUas2ID8I76qfV-QfGwW61NF_1i8Gkca9hHZDdFleMEEIEk4Ab-tLRLvBlt3JuLCDgG8ngZbPNhrpXYkGMpUEOHngfZ-P14qhAh1pwjxs-r6cRmKJiXkMJNuyxKeqWCuh63zEtYvaHfyKtXQpTntw9rkbjeKG0esmVX3zL0Vq4410VTMpNIVhYwIrLXuPkkVnIINTkuQ8NSyP2eek",
                                            "dp": "7lTTnc4-WIUDT0Jf3iyn_M0F4mkPQf_it7ohPvSHp8skO8W2bYaUvNwpP7tEu4KftJ5PEiTuP5mF_wKtsumoA1VJOQlmDCLL5JfjNiVh31OuhM6zGIlCjuZ2_w_VRumpDnPSOzieDj2v5nvv3TkDR3zx4LnJbVGe0DWEmEoCukotgRWEKOO5MKZla_-IeISVHqSRwBHaqTfE4duFVNJdUP_W-nI_xUIHx7NEErSAf9bkWJMHJZlqX8sNuyBM4W3A6kyApT5uRXxoNeYkO3ODPYjD57dv6DsbM5EtoB09C-OpafFW_LYgnaY30z4WF9BSTclGzwLOhzLrJH04bA3lIw",
                                            "dq": "re5d1vNXA4kMmWm3Rb4UCxKyPyjtH1_xFKo_Lklr3ahboQJtwoTaw9BYDq4PkeaYxP6_vv8zlYMDJtzCKi0UaRbX-rtqAmddXbGVzmZ0-KwHV-mNS3DJGoTr-yUdbODyHqPUwcfOC8Hg3EGZPM8Mhge4W_Eh3g1j3bp2YZaxCBodwNUG2NT-N-J-Zbk5ujAgnxdv_GfhTU4BmiCvx7FpfKv-IbEgv9Zaw2Un5BL2H3SlloVfMY_DfWEUKzL_NgyBEoyfEgTO1hfjC49kQzysRSRu8C_n3LJ4rmNjyP7zL_oyKpmutyBWQ9nTQzTR-lkZX_uzmEIn6LQ9rvS8aVNiPw",
@@ -68,7 +71,7 @@ public class Program
     private const string ApiScopes = $"{FirstResource}/some-scope {SecondResource}/some-scope";
 
     // These scopes indicate that you want an ID-token ("openid"), and what information about the user you want the ID-token to contain
-    private const string IdentityScopes = "openid profile offline_access";
+    private const string IdentityScopes = "openid profile offline_access helseid://scopes/identity/security_level";
 
     private const string FirstResource = "nhn:helseid-public-sample-api-1";
     private const string SecondResource = "nhn:helseid-public-sample-api-2";
@@ -79,14 +82,11 @@ public class Program
         {
             using var httpClient = new HttpClient();
 
-            // Download the HelseID metadata from https://helseid-sts.test.nhn.no/.well-known/openid-configuration to determine endpoints and public keys used by HelseID:
-            var disco = await httpClient.GetDiscoveryDocumentAsync(StsUrl);
-
-            // 1. Logging in the user
+            // 1. Authenticating the client
             // ///////////////////////
-            // Perform user login, uses the /authorize endpoint in HelseID
-            // Use the Resource-parameter to indicate which API-s you want tokens for
-            // Use the Scope-parameter to indicate which scopes you want for these API-s
+            // Perform client authentication; uses the /par endpoint in HelseID
+            // Use the Resource-parameter to indicate which APIs you want tokens for
+            // Use the Scope-parameter to indicate which scopes you want for these APIs
 
             var options = new OidcClientOptions
             {
@@ -94,12 +94,21 @@ public class Program
                 ClientId = ClientId,
                 RedirectUri = RedirectUrl,
                 LoadProfile = false,
+                // This validates the identity token (important!):
+                IdentityTokenValidator = new JwtHandlerIdentityTokenValidator(),
             };
+
+            // Set the DPoP proof, we can use the same key for this as for the client assertion:
+            options.ConfigureDPoP(JwkPrivateKey);
 
             var oidcClient = new OidcClient(options);
 
-            // The authorizeState object contains the state the needs to be held between starting the authorize request and the response
+            // The authorizeState object contains the state that needs to be held between starting the authorize request and the response
             var authorizeState = await oidcClient.PrepareLoginAsync();
+
+            // Download the HelseID metadata from https://helseid-sts.test.nhn.no/.well-known/openid-configuration to determine endpoints and public keys used by HelseID:
+            // In a production environment, this document must be cached for better efficiency (both for this client and for HelseID)
+            var disco = await httpClient.GetDiscoveryDocumentAsync(StsUrl);
 
             var pushedAuthorizationResponse = await GetPushedAuthorizationResponse(
                 httpClient,
@@ -113,6 +122,9 @@ public class Program
 
             var startUrl = $"{disco.AuthorizeEndpoint}?client_id={ClientId}&request_uri={pushedAuthorizationResponse.RequestUri}";
 
+            // 2. Logging in the user
+            // ///////////////////////
+            // Perform user login, uses the /authorize endpoint in HelseID
             var browserOptions = new BrowserOptions(startUrl, RedirectUrl);
 
             // Create a redirect URI using an available port on the loopback address.
@@ -120,10 +132,10 @@ public class Program
 
             var browserResult = await browser.InvokeAsync(browserOptions, default);
 
-            // 2. Retrieving an access token for API 1, and a refresh token
+            // 3. Retrieving an access token for API 1, and a refresh token
             ///////////////////////////////////////////////////////////////////////
             // User login has finished, now we want to request tokens from the /token endpoint
-            // We add a Resource parameter indication that we want scopes for API 1
+            // We add a Resource parameter that indicates that we want scopes for API 1
 
             var parameters = new Parameters
             {
@@ -133,9 +145,14 @@ public class Program
             // If the result type is success, the browser result should contain the authorization code.
             // We can now call the /token endpoint with the authorization code in order to get tokens:
 
-            var clientAssertionPayload = GetClientAssertionPayload(disco);
-            oidcClient.Options.ClientAssertion = clientAssertionPayload;
+            // We need a client assertion on the request in order to authenticate the client:
+            oidcClient.Options.ClientAssertion = GetClientAssertionPayload(disco);
             var loginResult = await oidcClient.ProcessResponseAsync(browserResult.Response, authorizeState, parameters);
+
+            if (loginResult.IsError == false)
+            {
+                loginResult = ValidateIdentityClaims(loginResult);
+            }
 
             if (loginResult.IsError)
             {
@@ -150,26 +167,28 @@ public class Program
             Console.WriteLine("Refresh Token: " + refreshToken);
             Console.WriteLine();
 
-            // 3. Using the refresh token to get an access token for API 2
+            // 4. Using the refresh token to get an access token for API 2
             //////////////////////////////////////////////////////////////
             // Now we want a second access token to be used for API 2
             // Again we use the /token-endpoint, but now we use the refresh token
             // The Resource parameter indicates that we want a token for API 2.
-            var refreshTokenRequest = new RefreshTokenRequest
+
+            // We can now call the /token endpoint with the refresh token in order to get a new access token:
+            // Client assertions cannot be used twice, so we need a new payload:
+            oidcClient.Options.ClientAssertion = GetClientAssertionPayload(disco);
+
+            // User login has finished, now we want to request tokens from the /token endpoint
+            // We add a Resource parameter that indicates that we want scopes for API 2
+            parameters = new Parameters
             {
-                Address = disco.TokenEndpoint,
-                ClientId = ClientId,
-                RefreshToken = refreshToken,
-                Resource = new List<string> {SecondResource},
-                ClientAssertion = GetClientAssertionPayload(disco),
-                ClientCredentialStyle = ClientCredentialStyle.PostBody,
+                {"resource", SecondResource}
             };
 
-            var refreshTokenResult = await httpClient.RequestRefreshTokenAsync(refreshTokenRequest);
+            var refreshTokenResult = await oidcClient.RefreshTokenAsync(refreshToken, parameters);
 
             if (refreshTokenResult.IsError)
             {
-                throw new Exception(refreshTokenResult.Error);
+                throw new Exception($"{refreshTokenResult.Error}: Description: {refreshTokenResult.ErrorDescription}");
             }
 
             Console.WriteLine("Second request, resource: " + SecondResource);
@@ -234,8 +253,13 @@ public class Program
             new Claim(JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N")),
         };
 
-        var credentials = new JwtSecurityToken(ClientId, disco.Issuer, claims, DateTime.UtcNow,
-            DateTime.UtcNow.AddSeconds(60), GetClientAssertionSigningCredentials());
+        var credentials = new JwtSecurityToken(
+            ClientId,
+            disco.Issuer,
+            claims,
+            DateTime.UtcNow,
+            DateTime.UtcNow.AddSeconds(30),
+            GetClientAssertionSigningCredentials());
 
         var tokenHandler = new JwtSecurityTokenHandler();
         return tokenHandler.WriteToken(credentials);
@@ -245,5 +269,21 @@ public class Program
     {
         var securityKey = new JsonWebKey(JwkPrivateKey);
         return new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256);
+    }
+
+    private static LoginResult ValidateIdentityClaims(LoginResult loginResult)
+    {
+        // The claims from the identity token has ben set on the User object;
+        // We validate that the user claims match the required security level:
+        if (loginResult.User.Claims.Any(c => c is
+            {
+                Type: "helseid://claims/identity/security_level",
+                Value: "4",
+            }))
+        {
+            return loginResult;
+        }
+
+        return new LoginResult("Invalid security level", "The security level is not at the required value");
     }
 }
