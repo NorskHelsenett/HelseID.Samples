@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 using Duende.AccessTokenManagement;
 using HelseId.Core.BFF.Sample.WebCommon.Extensions;
 using IdentityModel.Client;
@@ -146,12 +147,15 @@ public class ConfigureOpenIdConnectOptionsForHelseId : IConfigureNamedOptions<Op
                 "Cannot redirect to the authorization endpoint, the configuration may be missing or invalid: IssuerAddress is missing");
         }
 
-        var redirectUri = message.CreateAuthenticationRequestUrl();
-        if (!Uri.IsWellFormedUriString(redirectUri, UriKind.Absolute))
-        {
-            throw new InvalidOperationException($"The redirect URI is not well-formed. The URI is: '{redirectUri}'.");
-        }
+        var redirectUri = new Uri(message.CreateAuthenticationRequestUrl(), UriKind.Absolute);
 
-        context.Response.Redirect(redirectUri);
+        // Remove parameters added by .NET which are not relevant for the protocol
+        // https://github.com/AzureAD/microsoft-identity-web/discussions/1460#discussioncomment-1395626
+        var query = HttpUtility.ParseQueryString(redirectUri.Query);
+        query.Remove("x-client-SKU");
+        query.Remove("x-client-ver");
+        redirectUri = new Uri(redirectUri.GetLeftPart(UriPartial.Path) + '?' + query.ToString());
+
+        context.Response.Redirect(redirectUri.ToString());
     }
 }
