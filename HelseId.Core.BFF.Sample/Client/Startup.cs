@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -137,6 +138,9 @@ namespace HelseId.Core.BFF.Sample.Client
                         return Task.CompletedTask;
                     };
                 });
+
+            // An instance of IDistributedCache is required by Duende.AccessTokenManagement for nonce caching
+            services.AddDistributedMemoryCache();
 
             var dpopKey = CreateDPoPJwk();
             services.AddSingleton(dpopKey);
