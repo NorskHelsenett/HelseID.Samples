@@ -13,6 +13,10 @@ using System.Threading.Tasks;
 
 namespace HelseId.Core.BFF.Sample.Client.Auth;
 
+/// <summary>
+/// This handler is a workaround for a bug in Duende.AccessTokenManagement that affects logon.
+/// They are working on a fix.
+/// </summary>
 public class DPoPOpenIdConnectHandler : OpenIdConnectHandler
 {
     private readonly IDPoPProofService _dpopProofService;

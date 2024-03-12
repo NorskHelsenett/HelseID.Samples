@@ -157,6 +157,7 @@ namespace HelseId.Core.BFF.Sample.Client
             // Use client assertion for automatic refresh of tokens
             services.AddTransient<IClientAssertionService, ClientAssertionService>();
 
+            // This handler is a workaround for a bug in Duende.AccessTokenManagement that affects logon.
             services.Replace(ServiceDescriptor.Transient<OpenIdConnectHandler, DPoPOpenIdConnectHandler>());
 
             var authenticatedHidUserPolicy = new AuthorizationPolicyBuilder()
