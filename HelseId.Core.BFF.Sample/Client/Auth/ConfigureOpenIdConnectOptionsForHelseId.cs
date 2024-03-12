@@ -66,14 +66,12 @@ public class ConfigureOpenIdConnectOptionsForHelseId : IConfigureNamedOptions<Op
         return Callback;
     }
 
-    private async Task OnRedirectToIdentityProvider(RedirectContext context)
+    private static async Task OnRedirectToIdentityProvider(RedirectContext context)
     {
-        var acrValues = ""; // TODO
-
         // Pushed Authorization Request is not supported by the middleware, so do it ourselves
-        var parResult = await PushAuthorizationParameters(context, acrValues);
+        var parResult = await PushAuthorizationParameters(context);
 
-        // // Replace standard parameters with PAR parameters
+        // Replace standard parameters with PAR parameters
         context.ProtocolMessage.Parameters.Clear();
         context.ProtocolMessage.ClientId = context.Options.ClientId;
         context.ProtocolMessage.RequestUri = parResult.RequestUri;
@@ -95,7 +93,7 @@ public class ConfigureOpenIdConnectOptionsForHelseId : IConfigureNamedOptions<Op
         tokenEndpointRequest.ClientAssertion = clientAssertion.Value;
     }
 
-    private static async Task<PushedAuthorizationResponse> PushAuthorizationParameters(RedirectContext context, string? acrValues)
+    private static async Task<PushedAuthorizationResponse> PushAuthorizationParameters(RedirectContext context)
     {
         // Construct the state parameter and add it to the protocol message so that we can include it in the pushed authorization request
         context.Properties.Items.Add(OpenIdConnectDefaults.RedirectUriForCodePropertiesKey, context.ProtocolMessage.RedirectUri);
@@ -115,6 +113,8 @@ public class ConfigureOpenIdConnectOptionsForHelseId : IConfigureNamedOptions<Op
             ClientAssertion = clientAssertion,
         };
 
+        var helseIdOptions = context.HttpContext.RequestServices.GetRequiredService<IOptions<HelseIdAuthOptions>>();
+        var acrValues = helseIdOptions.Value.AcrValues;
         if (!string.IsNullOrWhiteSpace(acrValues))
         {
             par.AcrValues = acrValues;

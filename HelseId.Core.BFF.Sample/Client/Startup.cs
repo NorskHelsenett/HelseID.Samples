@@ -97,9 +97,6 @@ namespace HelseId.Core.BFF.Sample.Client
                 })
                 .AddOpenIdConnect("HelseID", options =>
                 {
-                    var acrValues = hidOptions.AcrValues;
-                    var hasAcrValues = !string.IsNullOrWhiteSpace(acrValues);
-
                     options.Authority = hidOptions.Authority;
                     options.RequireHttpsMetadata = true;
                     options.ClientId = hidOptions.ClientId;
