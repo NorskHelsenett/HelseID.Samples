@@ -152,6 +152,7 @@ namespace HelseId.Core.BFF.Sample.Client
                 options.DPoPJsonWebKey = dpopKey.Jwk;
             });
 
+            // Workaround to use Client Assertion and Pushed Authorization Request during logon.
             services.ConfigureOptions<ConfigureOpenIdConnectOptionsForHelseId>();
 
             // Use client assertion for automatic refresh of tokens

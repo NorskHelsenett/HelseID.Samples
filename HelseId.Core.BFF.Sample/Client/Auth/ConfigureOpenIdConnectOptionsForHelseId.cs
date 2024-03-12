@@ -11,7 +11,10 @@ using Microsoft.Extensions.Options;
 namespace HelseId.Core.BFF.Sample.Client.Auth;
 
 /// <summary>
-/// Configures OpenIdConnectOptions for supporting Pushed Authorization Requests and Client Assertions
+/// Configures OpenIdConnectOptions for supporting Pushed Authorization Requests and Client Assertions,
+/// which is currently not handled by Duende.AccessTokenManagement during logon.
+///
+/// Must be added after AddOpenIdConnectAccessTokenManagement.
 /// </summary>
 public class ConfigureOpenIdConnectOptionsForHelseId : IConfigureNamedOptions<OpenIdConnectOptions>
 {
@@ -82,6 +85,7 @@ public class ConfigureOpenIdConnectOptionsForHelseId : IConfigureNamedOptions<Op
 
     private static async Task OnAuthorizationCodeReceived(AuthorizationCodeReceivedContext context)
     {
+        // Reuse IClientAssertionService from Duende.AccessTokenManagement for generating client assertion
         var clientAssertionBuilder = context.HttpContext.RequestServices.GetRequiredService<IClientAssertionService>();
         var clientAssertion = (await clientAssertionBuilder.GetClientAssertionAsync()).ExpectNotNull();
 
