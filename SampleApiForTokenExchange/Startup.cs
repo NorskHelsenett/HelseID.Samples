@@ -164,7 +164,7 @@ public class Startup
         });
     }
 
-    private void SetUpKestrel(WebApplicationBuilder webApplicationBuilder)
+    private static void SetUpKestrel(WebApplicationBuilder webApplicationBuilder)
     {
         webApplicationBuilder.WebHost.UseKestrel(kestrelServerOptions =>
         {
@@ -173,7 +173,7 @@ public class Startup
         });
     }
 
-    private void ConfigureServices(WebApplication webApplication)
+    private static void ConfigureServices(WebApplication webApplication)
     {
         // Configure the HTTP request pipeline.
         webApplication.UseHttpsRedirection();

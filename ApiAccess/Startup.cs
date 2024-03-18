@@ -54,7 +54,7 @@ public class Startup
         return Configure(webApplication);
     }
 
-    private void ConfigureHttpServer(WebApplicationBuilder builder)
+    private static void ConfigureHttpServer(WebApplicationBuilder builder)
     {
         // Sets the server to use the port that is described in ConfigurationValues.
         const int serverPort = ConfigurationValues.ApiAccessWebServerPort;
@@ -65,7 +65,7 @@ public class Startup
         });
     }
 
-    private void DisableDefaultNamespaces()
+    private static void DisableDefaultNamespaces()
     {
         // Disables default namespaces added by ASP.NET Core, and uses the exact claims created with the OpenID Server instead,
         // e.g. 'given_name' gets converted to 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'
@@ -189,7 +189,7 @@ public class Startup
         services.Replace(ServiceDescriptor.Transient<OpenIdConnectHandler, OpenIdConnectHandlerForDPoP>());
     }
 
-    private WebApplication Configure(WebApplication webApplication)
+    private static WebApplication Configure(WebApplication webApplication)
     {
         // Configure the HTTP request pipeline.
         if (!webApplication.Environment.IsDevelopment())

@@ -156,7 +156,7 @@ public  class Startup
         });
     }
 
-    private void ConfigureServices(WebApplication webApplication)
+    private static void ConfigureServices(WebApplication webApplication)
     {
         // Set up functionality for getting a bearer token (see extend-swagger.js for details):
         webApplication.UseStaticFiles();

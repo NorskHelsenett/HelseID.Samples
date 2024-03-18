@@ -72,7 +72,7 @@ public class PayloadClaimsCreatorForMultiTenantClient : IPayloadClaimsCreator {
         };
     }
 
-    private string GetOrganizationNumberValue(PayloadClaimParameters payloadClaimParameters)
+    private static string GetOrganizationNumberValue(PayloadClaimParameters payloadClaimParameters)
     {
         var organizationNumberValue = payloadClaimParameters.ParentOrganizationNumber;
         if (!string.IsNullOrEmpty(payloadClaimParameters.ChildOrganizationNumber))

@@ -244,9 +244,12 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
             ClientAssertion = clientAssertion,
             Resource = _settings.HelseIdConfiguration.ResourceIndicators,
             Request = CreateRequestObject(),
+
             // The metadata endpoint https://helseid-sts.test.nhn.no/connect/availableidps list the available IDPs
             // in the test environment. If you want to redirect the user to a specific IDP, you can specify this value.
             // AcrValues = "idp:testidpnew-oidc",
+            // Use Buypass with smart card:
+            // AcrValues = "idp:buypass-oidc bp:amr:sc",
         };
 
         using var httpClient = new HttpClient();
@@ -261,7 +264,7 @@ public class OpenIdConnectOptionsInitializer : IConfigureNamedOptions<OpenIdConn
         return response;
     }
 
-    private void RedirectToAuthorizeEndpoint(RedirectContext context)
+    private static void RedirectToAuthorizeEndpoint(RedirectContext context)
     {
         // This code is copied from the ASP.NET handler. We use most of its default behavior related to
         // redirecting to the identity provider, except that we have already pushed the state parameter,
