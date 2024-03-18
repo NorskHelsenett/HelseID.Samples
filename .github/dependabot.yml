@@ -13,3 +13,19 @@ updates:
     directory: "/HelseId.RsaJwk"
     schedule:
       interval: "daily"
+  - package-ecosystem: nuget
+    directory: "/NativeClients/SimpleNativeClientWithDPoP"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: nuget
+    directory: "/NativeClients/SimpleRequestObjectsDemo"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: nuget
+    directory: "/NativeClients/SimpleResourceIndicatorsDemo"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: nuget
+    directory: "/NativeClients/TokenExchange.ClientCredentials"
+    schedule:
+      interval: "daily"
