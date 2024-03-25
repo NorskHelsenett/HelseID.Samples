@@ -6,7 +6,7 @@ This is a command line program to generate a key pair as a JWK (JSON Web Key). I
 
 ### Requirements
 
-The [.NET 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) is required to build the program.
+The [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) is required to build the program.
 
 ## Usage
 
