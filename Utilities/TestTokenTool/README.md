@@ -143,6 +143,18 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen) med DPoP:
   --orgnrParent                              <TEXT>             []
   The returned token will contain a 'helseid://claims/client/claims/orgnr_parent' claim matching the injected value
 
+  --orgnrChild                               <TEXT>             []
+  The returned token will contain a 'helseid://claims/client/claims/orgnr_child' claim matching the injected value
+
+  --orgnrSupplier                            <TEXT>             []
+  The returned token will contain a 'helseid://claims/client/claims/orgnr_supplier' claim matching the injected value
+
+  --clientTenancy
+  The returned token will contain a 'helseid://claims/client/claims/client_tenancy' claim matching the injected value
+
+  --sfmJournalId                             <GUID>
+  The returned token will contain a 'nhn:sfm:journal_id' claim matching the injected value
+
   --clientId                                 <GUID>
   The returned token will contain a 'client_id' claim matching the injected value
 

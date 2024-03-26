@@ -45,6 +45,14 @@ public class GetTokenOptions : IArgumentModel
     public string? helseidClientAmr { get; set; } = string.Empty;
     [Named(Description = "The returned token will contain a 'helseid://claims/client/claims/orgnr_parent' claim matching the injected value")]
     public string? orgnrParent { get; set; } = string.Empty;
+    [Named(Description = "The returned token will contain a 'helseid://claims/client/claims/orgnr_child' claim matching the injected value")]
+    public string? orgnrChild { get; set; } = string.Empty;
+    [Named(Description = "The returned token will contain a 'helseid://claims/client/claims/orgnr_supplier' claim matching the injected value")]
+    public string? orgnrSupplier { get; set; } = string.Empty;
+    [Named(Description = "The returned token will contain a 'helseid://claims/client/claims/client_tenancy' claim matching the injected value")]
+    public bool clientTenancy { get; set; }
+    [Named(Description = "The returned token will contain a 'nhn:sfm:journal_id' claim matching the injected value")]
+    public Guid? sfmJournalId { get; set;} = default;
     [Named(Description = "The returned token will contain a 'client_id' claim matching the injected value")]
     public Guid? clientId { get; set;} = default;
     [Named(Description = "The returned token will contain a 'helseid://claims/client/client_name' claim matching the injected value")]
