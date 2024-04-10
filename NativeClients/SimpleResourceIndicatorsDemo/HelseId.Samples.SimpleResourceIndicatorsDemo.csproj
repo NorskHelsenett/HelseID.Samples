@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="IdentityModel" Version="7.0.0-preview.4" />
+        <PackageReference Include="IdentityModel" Version="7.0.0" />
         <PackageReference Include="IdentityModel.OidcClient.DPoP" Version="6.0.0-preview.1" />
         <PackageReference Include="IdentityModel.OidcClient.IdentityTokenValidator" Version="6.0.0-preview.1" />
 
