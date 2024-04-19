@@ -64,11 +64,11 @@ For å liste ut alle parametrene som kan brukes med `getToken`-kommandoen:
 
 For å få skrevet ut et token i JSON-format som inneholder kun obligatoriske claim:
 
-`dotnet run getToken --prettyPrintToken --generalClaimsCreation ParameterValues --userClaimsCreation ParameterValues`
+`dotnet run getToken --prettyPrintToken --withoutDefaultGeneralClaims --withoutDefaultUserClaims`
 
 For å hente ut navn fra Persontjenesten og HPR-nummer fra HPR-registeret:
 
-`dotnet run getToken --prettyPrintToken --generalClaimsCreation ParameterValues --userClaimsCreation ParameterValues --pid 16858399649 --getPersonFromPersontjenesten --getHprNumberFromHprregisteret`
+`dotnet run getToken --prettyPrintToken --withoutDefaultGeneralClaims --withoutDefaultUserClaims --pid 16858399649 --getPersonFromPersontjenesten --getHprNumberFromHprregisteret`
 
 
 For å få en liste over alle parametrene, kan du bruke kommandoen
@@ -94,6 +94,13 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen) med DPoP:
 ```
 ### Metaparametre: brukes for å beskrive bruken av enkelte av parametrene nedenfor
 ```
+  
+  --withoutDefaultGeneralClaims              <BOOLEAN>          [False]
+  No default general claims are created
+  
+  --withoutDefaultUserClaims                 <BOOLEAN>          [False]
+  No default user claims are created
+  
   --generalClaimsCreation                    <CLAIMGENERATION>  [DefaultWithParameterValues]
   Instructs how common claims are created
   Allowed values: None, Default, ParameterValues, DefaultWithParameterValues

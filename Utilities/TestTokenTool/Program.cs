@@ -70,6 +70,8 @@ public class Program
             GetHprNumberFromHprregisteret =     options.getHprNumberFromHprregisteret,
             // Usage of parameters
             IssuerEnvironment =                 options.issuerEnvironment,
+            WithoutDefaultGeneralClaims =       options.withoutDefaultGeneralClaims,
+            WithoutDefaultUserClaims =          options.withoutDefaultUserClaims,
             GeneralClaimsParametersGeneration = options.generalClaimsCreation.ToParametersGeneration(),
             UserClaimsParametersGeneration =    options.userClaimsCreation.ToParametersGeneration(),
             CreateTillitsrammeverkClaims =      options.createTillitsrammeverkClaims,
