@@ -6,6 +6,10 @@ public class TokenRequest
     public ParametersGeneration GeneralClaimsParametersGeneration { get; set; }
     
     public ParametersGeneration UserClaimsParametersGeneration { get; set; }
+    
+    public bool WithoutDefaultGeneralClaims { get; set; }
+    
+    public bool WithoutDefaultUserClaims { get; set; }
 
     public IssuerEnvironment IssuerEnvironment { get; set; }
 

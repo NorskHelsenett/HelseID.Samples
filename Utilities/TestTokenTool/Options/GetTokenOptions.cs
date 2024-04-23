@@ -141,6 +141,10 @@ public class GetTokenOptions : IArgumentModel
     public string patientsDepartmentName { get; set; } = string.Empty;
     // -----------------------------------------
     // Usage of parameters
+    [Named(Description = "No default general claims values are created")]
+    public bool withoutDefaultGeneralClaims { get; set; } = false;
+    [Named(Description = "No default user claims values are created")]
+    public bool withoutDefaultUserClaims { get; set; } = false;
     [Named(Description = "Instructs how common claims are created")]
     public ClaimGeneration generalClaimsCreation { get; set; } = ClaimGeneration.DefaultWithParameterValues;
     [Named(Description = "Instructs how user claims are created")]
