@@ -21,9 +21,8 @@ the [Sample API](../../SampleAPI/README.md).
 
 By using options on the command line, you can instruct the application to
   * Make use of a child organization number (underenhet) to get a claim in the access token
-  * Make use of the access token to consume the `clientinfo` endpoint on HelseID for debugging purposes. This will
-return information about the HelseID client that is used.
-
+  * Use the multi-tenant pattern to send an organization number (for the tenant) to HelseID
+  
 ### A short description of the folder structure in this project
 * The main folder contains
   * The `Program` class that configures the machine-to-machine client
@@ -57,11 +56,6 @@ This option makes use of both parent and child units in the call to the token en
 ````
 dotnet run --use-multi-tenant-pattern
 ````
-
-#### To consume the clientinfo endpoint
-```
-dotnet run --use-client-info-endpoint
-```
 
 #### To list all options
 ```

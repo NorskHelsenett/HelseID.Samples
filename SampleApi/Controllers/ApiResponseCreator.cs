@@ -18,7 +18,7 @@ public class ApiResponseCreator : IApiResponseCreator
         };
     }
 
-    private string CreateGreeting(IEnumerable<Claim> claims, string apiName)
+    private static string CreateGreeting(IEnumerable<Claim> claims, string apiName)
     {
         var name = claims.SingleOrDefault(c => c.Type == "name")?.Value;
 

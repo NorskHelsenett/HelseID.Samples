@@ -1,8 +1,6 @@
-using HelseId.Samples.Common.Interfaces;
 using HelseId.Samples.Common.TokenRequests;
 using HelseId.Samples.Common.ApiConsumers;
 using HelseId.Samples.ClientCredentials.Client;
-using HelseId.Samples.ClientCredentials.ClientInfoEndpoint;
 using HelseId.Samples.Common.ClientAssertions;
 using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Endpoints;
@@ -25,14 +23,12 @@ public class ClientConfigurator
     /// </summary>
     public Machine2MachineClient ConfigureClient(
         bool useChildOrganizationNumberOptionValue,
-        bool useClientInfoEndpointOptionValue,
         bool useMultiTenantPatternOptionValue)
     {
         var discoveryDocumentGetter = new DiscoveryDocumentGetter(ConfigurationValues.StsUrl);
         var endpointDiscoverer = new HelseIdEndpointsDiscoverer(discoveryDocumentGetter);
         var configuration = SetUpHelseIdConfiguration(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue);
         var tokenRequestBuilder = CreateTokenRequestBuilder(configuration, endpointDiscoverer);
-        var clientInfoRetriever = SetUpClientInfoRetriever(useClientInfoEndpointOptionValue, endpointDiscoverer);
         var tokenRequestParameters = SetUpTokenRequestParameters(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue);
         var expirationTimeCalculator = new ExpirationTimeCalculator(new DateTimeService());
         var payloadClaimsCreator = SetUpPayloadClaimsCreator(useChildOrganizationNumberOptionValue, useMultiTenantPatternOptionValue);
@@ -42,14 +38,12 @@ public class ClientConfigurator
         return new Machine2MachineClient(
             apiConsumer,
             tokenRequestBuilder,
-            clientInfoRetriever,
             expirationTimeCalculator,
             payloadClaimsCreator,
-            tokenRequestParameters,
-            configuration);
+            tokenRequestParameters);
     }
 
-    private ITokenRequestBuilder CreateTokenRequestBuilder(HelseIdConfiguration configuration, IHelseIdEndpointsDiscoverer endpointsDiscoverer)
+    private static ITokenRequestBuilder CreateTokenRequestBuilder(HelseIdConfiguration configuration, IHelseIdEndpointsDiscoverer endpointsDiscoverer)
     {
         // This sets up the building of a token request for the client credentials grant
         var jwtPayloadCreator = new JwtPayloadCreator();
@@ -67,16 +61,7 @@ public class ClientConfigurator
         return new TokenRequestBuilder(clientAssertionsBuilder, endpointsDiscoverer, configuration, dPopProofCreator);
     }
 
-    private static IClientInfoRetriever SetUpClientInfoRetriever(bool useClientInfoEndpointOptionValue, IHelseIdEndpointsDiscoverer endpointsDiscoverer)
-    {
-        return useClientInfoEndpointOptionValue ?
-            // We need the "special" client info retriever if the '--use-client-info-endpoint' option is used on the command line:
-            new ClientInfoRetriever(endpointsDiscoverer) :
-            // Normal flow: we don't need a client info retriever, and set the null (do nothing) version here:
-            new NullClientInfoRetriever();
-    }
-
-    private  HelseIdConfiguration SetUpHelseIdConfiguration(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue)
+    private static HelseIdConfiguration SetUpHelseIdConfiguration(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue)
     {
         var result = HelseIdSamplesConfiguration.ClientCredentialsClient;
 
@@ -94,7 +79,7 @@ public class ClientConfigurator
         return result;
     }
 
-    private  IPayloadClaimsCreatorForClientAssertion SetUpPayloadClaimsCreator(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue)
+    private static IPayloadClaimsCreatorForClientAssertion SetUpPayloadClaimsCreator(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue)
     {
         var tokenRequestPayloadClaimsCreator = new ClientAssertionPayloadClaimsCreator(new DateTimeService());
 
@@ -126,7 +111,7 @@ public class ClientConfigurator
         return tokenRequestPayloadClaimsCreator;
     }
 
-    private ClientCredentialsTokenRequestParameters SetUpTokenRequestParameters(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue)
+    private static ClientCredentialsTokenRequestParameters SetUpTokenRequestParameters(bool useChildOrganizationNumberOptionValue, bool useMultiTenantPatternOptionValue)
     {
         var result = new ClientCredentialsTokenRequestParameters();
         if (useChildOrganizationNumberOptionValue)

@@ -37,7 +37,7 @@ public class TokenExchangeController : ControllerBase
         _configuration = configuration;
     }
 
-    private string ApiUrl => ConfigurationValues.SampleApiUrlForM2M;
+    private static string ApiUrl => ConfigurationValues.SampleApiUrlForM2M;
 
     [HttpGet]
     [Route(ConfigurationValues.TokenExchangeResource)]

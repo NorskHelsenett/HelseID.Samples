@@ -67,7 +67,7 @@ public class DPoPProofValidator
         return validationResult;
     }
 
-    private ValidationResult ValidateCnfClaimFromAccessToken(DPoPProofValidationData data)
+    private static ValidationResult ValidateCnfClaimFromAccessToken(DPoPProofValidationData data)
     {
         if (string.IsNullOrEmpty(data.CnfClaimValueFromAccessToken))
         {
@@ -92,7 +92,7 @@ public class DPoPProofValidator
         return ValidationResult.Success();
     }
 
-    private ValidationResult ValidateHeader(DPoPProofValidationData data)
+    private static ValidationResult ValidateHeader(DPoPProofValidationData data)
     {
         JsonWebToken token;
         try
@@ -147,7 +147,7 @@ public class DPoPProofValidator
         return ValidationResult.Success();
     }
 
-    private async Task<ValidationResult> ValidateSignature(DPoPProofValidationData data)
+    private static async Task<ValidationResult> ValidateSignature(DPoPProofValidationData data)
     {
         TokenValidationResult tokenValidationResult;
         try

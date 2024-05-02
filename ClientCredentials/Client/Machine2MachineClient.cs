@@ -1,5 +1,3 @@
-using HelseId.Samples.Common.Configuration;
-using HelseId.Samples.Common.Interfaces;
 using HelseId.Samples.Common.Interfaces.ApiConsumers;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Interfaces.TokenExpiration;
@@ -15,46 +13,36 @@ public class Machine2MachineClient
     private ITokenRequestBuilder _tokenRequestBuilder;
     private IApiConsumer _apiConsumer;
     private ClientCredentialsTokenRequestParameters _tokenRequestParameters;
-    private readonly HelseIdConfiguration _configuration;
     private IExpirationTimeCalculator _expirationTimeCalculator;
     private DateTime _persistedAccessTokenExpiresAt = DateTime.MinValue;
     private string _persistedAccessToken = string.Empty;
     private readonly IPayloadClaimsCreatorForClientAssertion _payloadClaimsCreatorForClientAssertion;
-    // Can be used for debugging purposes:
-    private IClientInfoRetriever _clientInfoRetriever;
 
     public Machine2MachineClient(
         IApiConsumer apiConsumer,
         ITokenRequestBuilder tokenRequestBuilder,
-        IClientInfoRetriever clientInfoRetriever,
         IExpirationTimeCalculator expirationTimeCalculator,
         IPayloadClaimsCreatorForClientAssertion payloadClaimsCreatorForClientAssertion,
-        ClientCredentialsTokenRequestParameters tokenRequestParameters,
-        HelseIdConfiguration configuration)
+        ClientCredentialsTokenRequestParameters tokenRequestParameters)
     {
         _tokenRequestBuilder = tokenRequestBuilder;
         _apiConsumer = apiConsumer;
         // The client info retriever can be used for debugging purposes.
         // When activated, it accesses the client info endpoint on the HelseID service,
         // which returns info about the client that was used to get an access token.
-        _clientInfoRetriever = clientInfoRetriever;
         _expirationTimeCalculator = expirationTimeCalculator;
         _payloadClaimsCreatorForClientAssertion = payloadClaimsCreatorForClientAssertion;
         _tokenRequestParameters = tokenRequestParameters;
-        _configuration = configuration;
     }
 
     public async Task CallApiWithToken()
     {
         using var httpClient = new HttpClient();
 
-        // 1: get the token
+        // Get the token
         var accessToken = await GetAccessToken(httpClient);
 
-        // 2: (optional) get information on the client
-        await _clientInfoRetriever.ConsumeClientInfoEndpoint(httpClient, accessToken);
-
-        // 3: consume the API
+        // Consume the API
         await CallApi(httpClient, accessToken);
     }
 
@@ -105,12 +93,12 @@ public class Machine2MachineClient
         return tokenResponse;
     }
 
-    private async Task WriteErrorToConsole(TokenResponse tokenResponse) {
+    private static async Task WriteErrorToConsole(TokenResponse tokenResponse) {
         await Console.Error.WriteLineAsync("An error occured:");
         await Console.Error.WriteLineAsync(tokenResponse.Error);
     }
 
-    private void WriteAccessTokenFromTokenResult(TokenResponse tokenResponse) {
+    private static void WriteAccessTokenFromTokenResult(TokenResponse tokenResponse) {
         Console.WriteLine("The application received this access token from HelseID:");
         Console.WriteLine(tokenResponse.AccessToken);
         Console.WriteLine("Copy/paste the access token string at https://jwt.ms to see the contents");

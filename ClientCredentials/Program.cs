@@ -20,26 +20,21 @@ static class Program
             description: "If set, the application will request an child organization (underenhet) claim for the access token.",
             getDefaultValue: () => false);
 
-        var useClientInfoEndpointOption = new Option<bool>(
-            aliases: new [] {"--use-client-info-endpoint", "-ci"},
-            description: "If set, the application will use the access token to access the client info endpoint on the HelseID service.",
-            getDefaultValue: () => false);
-
         var rootCommand = new RootCommand("A client credentials usage sample")
         {
-            useChildOrgNumberOption, useClientInfoEndpointOption, useMultiTenantPattern
+            useChildOrgNumberOption, useMultiTenantPattern
         };
 
-        rootCommand.SetHandler(async (useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue, useMultiTenantPatternOptionValue) =>
+        rootCommand.SetHandler(async (useChildOrgNumberOptionValue, useMultiTenantPatternOptionValue) =>
         {
             var clientConfigurator = new ClientConfigurator();
-            var client = clientConfigurator.ConfigureClient(useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue, useMultiTenantPatternOptionValue);
+            var client = clientConfigurator.ConfigureClient(useChildOrgNumberOptionValue, useMultiTenantPatternOptionValue);
             var repeatCall = true;
             while (repeatCall)
             {
                 repeatCall = await CallApiWithToken(client);
             }
-        }, useChildOrgNumberOption, useClientInfoEndpointOption, useMultiTenantPattern);
+        }, useChildOrgNumberOption, useMultiTenantPattern);
 
         await rootCommand.InvokeAsync(args);
     }
