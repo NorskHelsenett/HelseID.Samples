@@ -5,8 +5,9 @@ namespace HelseID.Samples.Configuration;
 
 public static class ConfigurationValues
 {
-    // The URL for HelseID
-    public const string StsUrl = "https://helseid-sts.test.nhn.no";
+    // The URL for HelseID (may be set as an environment variable)
+    private static readonly string? StsFromEnvironment = Environment.GetEnvironmentVariable("PrivateHelseIdUrl");
+    public static string StsUrl { get;  } = StsFromEnvironment ?? "https://helseid-sts.test.nhn.no";
 
     // Audience and scopes for using the 'regular' sample API:
     public const string SampleApiNameAudience = "nhn:helseid-public-samplecode";
