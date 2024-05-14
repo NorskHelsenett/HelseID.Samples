@@ -306,3 +306,12 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen) med DPoP:
   Allowed values: None, DontSetHtuClaimValue, DontSetHtmClaimValue, SetIatValueInThePast, SetIatValueInTheFuture, DontSetAthClaimValue, DontSetAlgHeader, DontSetJwkHeader, DontSetJtiClaim, SetAlgHeaderToASymmetricAlgorithm, SetPrivateKeyInJwkHeader, SetInvalidTypHeaderValue, SetAnInvalidSignature   
 ```
 
+### Brukerparametre: for å legge til et API-spesifikt claim
+```
+  --apiSpecificClaimType
+  This will set the claim type for the API specific claim. Both type and value must be set in order to get an API specific claim.
+
+  --apiSpecificClaimValue
+  This will set the claim value for the API specific claim. Both type and value must be set in order to get an API specific claim.
+ ```
+
