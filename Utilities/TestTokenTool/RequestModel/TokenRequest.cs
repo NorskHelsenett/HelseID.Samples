@@ -44,4 +44,6 @@ public class TokenRequest
     public TillitsrammeverkClaimsParameters TillitsrammeverkClaimsParameters { get; set; } = new();
     
     public DPoPProofParameters DPoPProofParameters { get; set; } = new();
+
+    public ApiSpecificClaim[]? ApiSpecificClaims { get; set; } = [];
 }
