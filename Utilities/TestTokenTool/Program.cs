@@ -1,6 +1,8 @@
+using System.Collections;
 using CommandDotNet;
 using CommandDotNet.Help;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using TestTokenTool.ApiCalls;
 using TestTokenTool.Commands;
 using TestTokenTool.Configuration;
@@ -55,7 +57,6 @@ public class Program
             Console.WriteLine("Ooops! The private key for usage with HelseID is missing. [Read the README.md file for how to create this key and use its public equivalent in HelseID Selvbetjening.]");
             return;
         }
-
         var tokenRequest = new TokenRequest
         {
             // Invalid output from TTT
@@ -145,7 +146,8 @@ public class Program
                 HtuClaimValue = options.htuClaimValue,
                 PrivateKeyForProofCreation = options.privateKeyForProofCreation,
                 InvalidDPoPProofParameters = options.invalidDPoPProof,
-            }
+            },
+            ApiSpecificClaims = AddApiSpecificClaims(options.apiSpecificClaimType, options.apiSpecificClaimValue),
         };
 
         var tokenResponse = await TokenRetriever.GetToken(_builder!, tokenRequest);
@@ -167,5 +169,14 @@ public class Program
     public async Task CreateKeys()
     {
         await JwkGenerator.GenerateKey();
+    }
+
+    private static ApiSpecificClaim[]? AddApiSpecificClaims(string type, string value)
+    {
+        if (!type.IsNullOrEmpty() && !value.IsNullOrEmpty())
+        {
+            return [new ApiSpecificClaim{Value = value, Type = type}];
+        }
+        return [];
     }
 }

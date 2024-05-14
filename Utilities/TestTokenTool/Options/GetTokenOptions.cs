@@ -164,4 +164,8 @@ public class GetTokenOptions : IArgumentModel
     public string privateKeyForProofCreation { get; set; } = string.Empty;
     [Named(Description = "If this value is set, the application will call the sample API with the returned token")]
     public bool callApi { get; set; } = false;
+    [Named(Description = "Type for an API specific claim. Both type and value must be set to obtain an API specific claim.")]
+    public string apiSpecificClaimType { get; set; } = string.Empty;
+    [Named(Description = "Value for an API specific claim. Both type and value must be set to obtain an API specific claim.")]
+    public string apiSpecificClaimValue { get; set; } = string.Empty;
 }
