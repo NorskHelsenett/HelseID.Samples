@@ -272,7 +272,8 @@ public class DPoPProofValidator
 
         // The client clock skew is doubled because the clock may be either before or after the correct time
         // Cache duration is then set longer than the likelihood of proof token expiration:
-        var skew = ClientClockSkew *= 2;
+        var skew = ClientClockSkew;
+        skew *= 2;
         var cacheDuration = ProofTokenValidityDuration + skew;
         await _replayCache.AddAsync(ReplayCachePurpose, data.TokenId!, DateTimeOffset.UtcNow.Add(cacheDuration));
 
