@@ -26,7 +26,7 @@ public static class ClientAssertionBuilder
         var claims = new List<Claim>
         {
             new(JwtClaimTypes.Subject, clientId),
-            new(JwtClaimTypes.IssuedAt, DateTimeOffset.Now.ToUnixTimeSeconds().ToString()),
+            new(JwtClaimTypes.IssuedAt, DateTimeOffset.Now.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
             new(JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N")),
         };
 
