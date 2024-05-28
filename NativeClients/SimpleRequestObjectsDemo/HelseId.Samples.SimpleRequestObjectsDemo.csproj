@@ -6,16 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IdentityModel" Version="7.0.0-preview.4" />
-    <PackageReference Include="IdentityModel.OidcClient.DPoP" Version="6.0.0-preview.1" />
-    <PackageReference Include="IdentityModel.OidcClient.IdentityTokenValidator" Version="6.0.0-preview.1" />
+    <PackageReference Include="IdentityModel" Version="7.0.0" />
+    <PackageReference Include="IdentityModel.OidcClient.DPoP" Version="6.0.0" />
+    <PackageReference Include="IdentityModel.OidcClient.IdentityTokenValidator" Version="6.0.0" />
 
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.4.1" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.4.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.6.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.6.0" />
 
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.2.0" />
   </ItemGroup>
 
