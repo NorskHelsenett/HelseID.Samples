@@ -1,85 +1,157 @@
 ﻿<!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-        />
-        <meta name="Description" content="HelseID BFF Sample" />
-        <base href="/" />
-        <title>HelseID BFF Sample</title>
-    </head>
-    <body>
-        <main>
-            <h1>HelseID BFF Sample</h1>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="Description" content="HelseID BFF Sample" />
+    <base href="/" />
+    <title>HelseID BFF Sample</title>
 
-            <div style="margin-bottom: 1rem;">
-                <a href="/account/logout">Log out</a>
-            </div>
+    <style>
+        pre {
+            outline: 1px solid #ccc;
+            padding: 5px;
+            margin: 5px;
+            word-break: break-all; /* webkit */
+            word-wrap: break-word;
+            white-space: pre;
+            white-space: -moz-pre-wrap; /* fennec */
+            white-space: pre-wrap;
+            white-space: pre\9; /* IE7+ */
+        }
 
-            <h3>Current user</h3>
-            <div>
-                <pre><code id="current-user"></code></pre>
-            </div>
+        .string {
+            color: green;
+        }
 
-            <h3>Sample API</h3>
-            <button id="sample-button">Get sample</button>
-            <div>
-                <pre><code id="sample"></code></pre>
-            </div>
-        </main>
+        .number {
+            color: darkorange;
+        }
 
-        <script type="text/javascript">
-            const currentUserEl = document.getElementById('current-user');
-            currentUserEl.innerHTML = 'Loading...';
+        .boolean {
+            color: blue;
+        }
 
-            // Fetch current user immediately
-            fetch('/api/current-user', { credentials: 'include' })
-                .then(response => {
-                    // Not authenticated, force login
-                    // May happen if index.html is cached by the browser
-                    if (response.status === 401) {
-                        window.location.href = '/account/login';
-                        return;
+        .null {
+            color: magenta;
+        }
+
+        .key {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div style="float: right;">
+            <a href="/account/logout">Log out</a>
+        </div>
+
+        <h1>HelseID BFF Sample</h1>
+
+        <h3>Current user</h3>
+        <div>
+            <pre><code id="current-user"></code></pre>
+        </div>
+
+        <h3>Sample API</h3>
+        <div id="sampleDiv" style="display: none">
+            <pre><code id="sample"></code></pre>
+        </div>
+        <button id="sample-button">Get sample</button>
+    </main>
+
+    <script type="text/javascript">
+        const escapeHtml = (str) =>
+            str.replace(
+                /[&<>']/g,
+                tag =>
+                    ({
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        "'": '&#39;',
+                    })[tag] || tag,
+            );
+
+        const highlightJson = (json) => {
+            json = escapeHtml(json);
+
+            const highlighted = json.replace(
+                // eslint-disable-next-line no-useless-escape
+                /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+                match => {
+                    let cls = 'number';
+                    if (/^"/.test(match)) {
+                        if (/:$/.test(match)) {
+                            cls = 'key';
+                        } else {
+                            cls = 'string';
+                        }
+                    } else if (/true|false/.test(match)) {
+                        cls = 'boolean';
+                    } else if (/null/.test(match)) {
+                        cls = 'null';
                     }
+                    return `<span class="${cls}">${match}</span>`;
+                },
+            );
 
+            return highlighted;
+        };
+
+        const currentUserEl = document.getElementById('current-user');
+        currentUserEl.innerHTML = 'Loading...';
+
+        // Fetch current user immediately
+        fetch('/api/current-user', { credentials: 'include' })
+            .then(response => {
+                // Not authenticated, force login
+                // May happen if index.html is cached by the browser
+                if (response.status === 401) {
+                    window.location.href = '/account/login';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(
+                        `Response status ${response.status} ${response.statusText}`,
+                    );
+                }
+
+                return response.json().then(currentUser => {
+                    currentUserEl.innerHTML = highlightJson(JSON.stringify(currentUser, undefined, 2));
+                });
+            })
+            .catch(e => {
+                currentUserEl.innerHTML = `An error occurred: ${e.message}`;
+            });
+
+        const sampleButton = document.getElementById('sample-button');
+        const sampleEl = document.getElementById('sample');
+
+        sampleButton.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            fetch('/api/sample', { credentials: 'include' })
+                .then(response => {
                     if (!response.ok) {
                         throw new Error(
                             `Response status ${response.status} ${response.statusText}`,
                         );
                     }
 
-                    return response.json().then(currentUser => {
-                        currentUserEl.innerHTML = JSON.stringify(currentUser, null, '\t');
-                    });
+                    return response.json();
+                })
+                .then(sample => {
+                    document.getElementById('sampleDiv').style.display = 'block';
+                    sampleEl.innerHTML = highlightJson(JSON.stringify(sample, undefined, 2));
                 })
                 .catch(e => {
-                    currentUserEl.innerHTML = `An error occurred: ${e.message}`;
+                    sampleEl.innerHTML = `An error occurred: ${e.message}`;
                 });
-
-            const sampleButton = document.getElementById('sample-button');
-            const sampleEl = document.getElementById('sample');
-
-            sampleButton.addEventListener('click', () => {
-                sampleEl.innerHTML = 'Loading...';
-                fetch('/api/sample', { credentials: 'include' })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(
-                                `Response status ${response.status} ${response.statusText}`,
-                            );
-                        }
-
-                        return response.json();
-                    })
-                    .then(sample => {
-                        sampleEl.innerHTML = JSON.stringify(sample, null, '\t');
-                    })
-                    .catch(e => {
-                        sampleEl.innerHTML = `An error occurred: ${e.message}`;
-                    });
-            });
-        </script>
-    </body>
+        });
+    </script>
+</body>
 </html>
