@@ -1,10 +1,10 @@
 import com.google.gson.Gson;
-import sf.nhn.helseid.demo.persontjenesten.ApiClient;
-import sf.nhn.helseid.demo.persontjenesten.ApiException;
-import sf.nhn.helseid.demo.persontjenesten.Configuration;
-import sf.nhn.helseid.demo.persontjenesten.api.EventWithLegalBasisApi;
-import sf.nhn.helseid.demo.persontjenesten.auth.HttpBearerAuth;
-import sf.nhn.helseid.demo.persontjenesten.model.EventDocument;
+import org.openapitools.client.ApiClient;
+import org.openapitools.client.ApiException;
+import org.openapitools.client.Configuration;
+import org.openapitools.client.api.EventWithLegalBasisApi;
+import org.openapitools.client.auth.HttpBearerAuth;
+import org.openapitools.client.model.EventDocument;
 import sf.nhn.helseid.demo.token.HelseIdTokenExchanger;
 
 import java.net.http.HttpClient;

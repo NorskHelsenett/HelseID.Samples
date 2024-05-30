@@ -1,0 +1,16 @@
+
+
+# OrganizationAsContact
+
+Organization as contact  Used in Residuary estate, if there is an organization that takes care of the estate  <br>FREG: OrganisasjonSomKontakt
+
+## Properties
+
+| Name | Type | Description | Notes |
+|------------ | ------------- | ------------- | -------------|
+|**organizationName** | **String** | Name of organization, may be foreign  &lt;br&gt;FREG: Organisasjonsnavn |  [optional] |
+|**organizationNumber** | **String** | Norwegian organization number, must be 9 digits and start with 8 or 9  &lt;br&gt;FREG: Organisasjonsnummer |  [optional] |
+|**contactPersonName** | [**OrganizationAsContactContactPersonName**](OrganizationAsContactContactPersonName.md) |  |  [optional] |
+
+
+
