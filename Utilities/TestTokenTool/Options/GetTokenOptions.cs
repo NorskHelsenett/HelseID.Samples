@@ -59,6 +59,10 @@ public class GetTokenOptions : IArgumentModel
     public string? clientName { get; set; } = string.Empty;
     [Named(Description = "The returned token will contain a 'scope' claim matching the injected value. Use quotes and spaces to insert several scopes.")]
     public string? scope { get; set; } = string.Empty;
+    [Named(Description = "The returned token will contain a 'cnf' claim matching the injected value")]
+    public string? cnfJkt { get; set; } = string.Empty;
+    [Named(Description = "The returned token will contain a 'cnf' claim with a hash matching the injected value")]
+    public string? cnfPublicKey { get; set; } = string.Empty;
     // -----------------------------------------
     // User parameters
     [Named(Description = "The returned token will contain an 'amr' claim matching the injected value")]

@@ -99,6 +99,8 @@ public class Program
                 ClientId = options.clientId != null ? options.clientId.ToString()! : string.Empty,
                 ClientName = options.clientName.GetEmptyStringIfNotSet(),
                 Scope = options.scope.GetListWithMultipleParameters(),
+                CnfJkt = options.cnfJkt.GetEmptyStringIfNotSet(),
+                CnfPublicKey = options.cnfPublicKey.GetEmptyStringIfNotSet(),
             },
             UserClaimsParameters = new UserClaimsParameters
             {

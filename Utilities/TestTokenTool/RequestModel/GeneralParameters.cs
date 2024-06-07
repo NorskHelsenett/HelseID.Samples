@@ -26,4 +26,8 @@ public class GeneralParameters
     public string ClientName { get; set; } = string.Empty;
     // jti
     public string Jti { get; set; } = string.Empty;
+    // Cnf (hash)
+    public string CnfJkt { get; set; } = string.Empty;
+    // Cnf (public key)
+    public string CnfPublicKey { get; set; } = string.Empty;
 }
