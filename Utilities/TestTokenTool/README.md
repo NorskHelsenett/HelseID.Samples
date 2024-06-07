@@ -170,6 +170,7 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen) med DPoP:
 
   --scope                                    <TEXT>             []
   The returned token will contain a 'scope' claim matching the injected value. Use quotes and spaces to insert several scopes.
+
 ```
 ### Brukerparametre: for å justere claim som beskriver en (fiktiv) bruker
 ```
@@ -304,6 +305,20 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen) med DPoP:
   --invalidDPoPProof                         <INVALIDDPOPPROOFPARAMETERS>
   If this value is set, an invalid DPoP proof will we returned
   Allowed values: None, DontSetHtuClaimValue, DontSetHtmClaimValue, SetIatValueInThePast, SetIatValueInTheFuture, DontSetAthClaimValue, DontSetAlgHeader, DontSetJwkHeader, DontSetJtiClaim, SetAlgHeaderToASymmetricAlgorithm, SetPrivateKeyInJwkHeader, SetInvalidTypHeaderValue, SetAnInvalidSignature   
+
+```
+### Parametre for å lage et 'cnf'-claim (DPoP) i tokenet
+
+Disse brukes hvis du vil lage DPoP-beviset selv, og derfor trenger et 'cnf'-claim i tokenet. 
+```
+
+  --cnfJkt                                   <TEXT>                        []
+  The returned token will contain a 'cnf' claim matching the injected value
+
+  --cnfPublicKey                             <TEXT>                        []
+  The returned token will contain a 'cnf' claim with a hash matching the injected value
+
+
 ```
 
 ### Brukerparametre: for å legge til et API-spesifikt claim
