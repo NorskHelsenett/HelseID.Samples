@@ -331,3 +331,5 @@ ASALocalRun/
 
 .DS_Store
 *.sln.Dotsettings
+
+.vscode

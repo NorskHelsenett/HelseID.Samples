@@ -44,10 +44,60 @@ public class HomeController : Controller
     }
 
     // Starts the configured authentication scheme when the user clicks Login
-    [Authorize(Startup.SecurityLevelClaimPolicy)] 
+    [Authorize(Startup.SecurityLevelClaimPolicy)]
     public async Task<IActionResult> Login()
     {
-        return View(await _viewModelCreator.GetApiResponseViewModel(claimsPrincipal: HttpContext.User));
+        var responseViewModel = await _viewModelCreator.GetApiResponseViewModel(claimsPrincipal: HttpContext.User);
+
+        // Pre-login functionality for multi-tenant pattern:
+        if (_settings.ClientType == ClientType.ApiAccessForMultiTenantClient)
+        {
+            if (string.IsNullOrEmpty(responseViewModel.UserSessionData.SessionId))
+            {
+                // Not a logged on user; redirect to login
+                return Challenge(OpenIdConnectDefaults.AuthenticationScheme);
+            }
+            if (responseViewModel.UserSessionData.SelectedOrganization.IsEmpty)
+            {
+                // The user must choose an organization
+                return RedirectToAction(nameof(SelectOrganizationForMultiTenantPattern));
+            }
+        }
+
+        // Standard login
+        return View(responseViewModel);
+    }
+
+    [Authorize(Startup.SecurityLevelClaimPolicy)]
+    public async Task<IActionResult> SelectOrganizationForMultiTenantPattern()
+    {
+        try
+        {
+            var responseViewModel = await _viewModelCreator.GetApiResponseViewModel(claimsPrincipal: HttpContext.User);
+
+            return View(responseViewModel);
+        } catch (SessionIdDoesNotExistException)
+        {
+            // The user's session was not found in the token store -- log in the user:
+            return Challenge(OpenIdConnectDefaults.AuthenticationScheme);
+        }
+    }
+
+    [Authorize(Startup.SecurityLevelClaimPolicy)]
+    [HttpPost]
+    public async Task<IActionResult> SelectOrganizationForMultiTenantPattern(int organizationId)
+    {
+        try
+        {
+            var organization = OrganizationStore.GetOrganization(organizationId);
+            await _accessTokenUpdater.SetOrganizationAndDeleteTokens(HttpContext.User, organization!);
+
+            return RedirectToAction(nameof(Login));
+        } catch (SessionIdDoesNotExistException)
+        {
+            // The user's session was not found in the token store -- log in the user:
+            return Challenge(OpenIdConnectDefaults.AuthenticationScheme);
+        }
     }
 
     [Route("home/call-api-1-with-resource-indicators")]
@@ -87,7 +137,6 @@ public class HomeController : Controller
         {
             ApiAudience = _settings.ApiAudience1,
         };
-
         return await CallApi(apiIndicators, apiUrl);
     }
 
@@ -100,7 +149,7 @@ public class HomeController : Controller
             var accessToken = await _accessTokenUpdater.GetValidAccessToken(httpClient, HttpContext.User, apiIndicators);
 
             // We use the token to call the API endpoint
-            var apiResponse = await _apiConsumer.CallApi(httpClient, apiUrl, accessToken);
+            var apiResponse = await _apiConsumer.CallApiWithDPoPToken(httpClient, apiUrl, accessToken);
 
             return View("Login", await _viewModelCreator.GetApiResponseViewModel(
                 claimsPrincipal: HttpContext.User,
@@ -109,12 +158,12 @@ public class HomeController : Controller
         }
         catch (SessionIdDoesNotExistException)
         {
-            // The user's session was not found in the token store -- log in the user: 
+            // The user's session was not found in the token store -- log in the user:
             return Challenge(OpenIdConnectDefaults.AuthenticationScheme);
         }
         catch (RefreshTokenExpiredException)
         {
-            // The refresh token has expired -- log in the user: 
+            // The refresh token has expired -- log in the user:
             return Challenge(OpenIdConnectDefaults.AuthenticationScheme);
         }
         catch (HttpRequestException e)
@@ -128,7 +177,7 @@ public class HomeController : Controller
     public IActionResult Logout()
     {
         return SignOut(CookieAuthenticationDefaults.AuthenticationScheme, OpenIdConnectDefaults.AuthenticationScheme);
-    }    
+    }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

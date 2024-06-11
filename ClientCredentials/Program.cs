@@ -10,31 +10,31 @@ static class Program
     static async Task Main(string[] args)
     {
         // The Main method uses the System.Commandline library to parse the command line parameters:
+        var useMultiTenantPattern = new Option<bool>(
+            aliases: new [] {"--use-multi-tenant", "-mt"},
+            description: "If set, the application will use a client set up for multi-tenancy, i.e. it makes use of an organization number that is connected to the client.",
+            getDefaultValue: () => false);
+
         var useChildOrgNumberOption = new Option<bool>(
             aliases: new [] {"--use-child-org-number", "-uc"},
             description: "If set, the application will request an child organization (underenhet) claim for the access token.",
             getDefaultValue: () => false);
 
-        var useClientInfoEndpointOption = new Option<bool>(
-            aliases: new [] {"--use-client-info-endpoint", "-ci"},
-            description: "If set, the application will use the access token to access the client info endpoint on the HelseID service.",
-            getDefaultValue: () => false);
-
         var rootCommand = new RootCommand("A client credentials usage sample")
         {
-            useChildOrgNumberOption, useClientInfoEndpointOption
+            useChildOrgNumberOption, useMultiTenantPattern
         };
 
-        rootCommand.SetHandler(async (useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue) =>
+        rootCommand.SetHandler(async (useChildOrgNumberOptionValue, useMultiTenantPatternOptionValue) =>
         {
             var clientConfigurator = new ClientConfigurator();
-            var client = clientConfigurator.ConfigureClient(useChildOrgNumberOptionValue, useClientInfoEndpointOptionValue);
+            var client = clientConfigurator.ConfigureClient(useChildOrgNumberOptionValue, useMultiTenantPatternOptionValue);
             var repeatCall = true;
             while (repeatCall)
             {
                 repeatCall = await CallApiWithToken(client);
             }
-        }, useChildOrgNumberOption, useClientInfoEndpointOption);
+        }, useChildOrgNumberOption, useMultiTenantPattern);
 
         await rootCommand.InvokeAsync(args);
     }

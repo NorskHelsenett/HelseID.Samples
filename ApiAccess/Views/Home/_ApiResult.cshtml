@@ -6,8 +6,8 @@
 
             <h6 class="card-subtitle mb-2 text-muted">The user has successfully accessed the API</h6>
             <p class="card-text">Greeting from the API: @Model.ApiResponse.Greeting</p>
-            @if (@Model.ApiResponse.OrganizationNumber != null) {
-                <p class="card-text">Organization number returned from the API: @Model.ApiResponse.OrganizationNumber</p>
+            @if (@Model.ApiResponse.ParentOrganizationNumber != null) {
+                <p class="card-text">Organization number returned from the API: @Model.ApiResponse.ParentOrganizationNumber</p>
             }
             @if (@Model.ApiResponse.ChildOrganizationNumber != null) {
                 <p class="card-text">Child organization number returned from the API: @Model.ApiResponse.ChildOrganizationNumber</p>

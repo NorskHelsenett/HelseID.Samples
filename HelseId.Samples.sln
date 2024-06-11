@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelseId.Samples.SampleApi",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelseId.Samples.SampleApiForTokenExchange", "SampleApiForTokenExchange\HelseId.Samples.SampleApiForTokenExchange.csproj", "{8F6B8902-A09D-450A-80FE-0E3D555EF34B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestTokenProxy", "TestTokenProxy\TestTokenProxy.csproj", "{3B21B749-5002-42B6-8CD3-DBA8C8698E67}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{8F6B8902-A09D-450A-80FE-0E3D555EF34B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F6B8902-A09D-450A-80FE-0E3D555EF34B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F6B8902-A09D-450A-80FE-0E3D555EF34B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B21B749-5002-42B6-8CD3-DBA8C8698E67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B21B749-5002-42B6-8CD3-DBA8C8698E67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B21B749-5002-42B6-8CD3-DBA8C8698E67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B21B749-5002-42B6-8CD3-DBA8C8698E67}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

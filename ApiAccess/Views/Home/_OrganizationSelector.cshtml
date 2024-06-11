@@ -1,0 +1,26 @@
+@model HelseId.Samples.ApiAccess.ViewModels.ApiResponseViewModel
+<div class="col-md">
+    <div class="card mt-3">
+        <div class="card-body">
+            @if (Model.UserSessionData.SelectedOrganization.IsEmpty == false)
+            {
+                <p>Select the organization you want to represent:</p>
+            }
+            <form class="row" asp-controller="Home" asp-action="SelectOrganizationForMultiTenantPattern" method="post">
+                <div class="col-sm">
+                    <select onchange="this.form.submit()" class="form-select-sm" name="organizationId" aria-label="Default select example">
+                        @if (Model.UserSessionData.SelectedOrganization.IsEmpty)
+                        {
+                            <option>Select the organization you want to represent:</option>
+                        }
+                        @foreach (var organization in Model.SelectableOrganizations)
+                        {
+                            
+                            <option value="@organization.Id" selected="@(Model.UserSessionData.SelectedOrganization.Id == organization.Id)">@organization.Name</option>
+                        }
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

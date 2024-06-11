@@ -15,7 +15,7 @@ namespace HelseId.Core.BFF.Sample.Api.Services
 
         public CurrentHttpUser(IHttpContextAccessor httpContextAccessor)
         {
-            _httpContext = httpContextAccessor.HttpContext;
+            _httpContext = httpContextAccessor.HttpContext!;
         }
 
         public string? Id => _httpContext.User.Claims.FirstOrDefault(x => x.Type == IdentityClaims.Pid)?.Value;

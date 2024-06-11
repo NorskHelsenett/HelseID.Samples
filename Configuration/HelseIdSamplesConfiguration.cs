@@ -7,13 +7,13 @@ namespace HelseID.Samples.Configuration;
 /// </summary>
 public class HelseIdSamplesConfiguration : HelseIdConfiguration
 {
-    public HelseIdSamplesConfiguration(
-                SecurityKey rsaPrivateKeyJwk,
+    private HelseIdSamplesConfiguration(
+                SecurityKey privateKeyJwk,
                 string clientId,
                 string scope,
                 List<string>? resourceIndicators = null) :
             base(
-                rsaPrivateKeyJwk,
+                privateKeyJwk,
                 clientId,
                 scope,
                 ConfigurationValues.StsUrl,
@@ -33,6 +33,13 @@ public class HelseIdSamplesConfiguration : HelseIdConfiguration
             ConfigurationValues.ClientCredentialsWithChildOrgNumberSampleClientId,
             ConfigurationValues.ClientCredentialsSampleScope);
 
+    // Configuration for the client credentials application with multi-tenancy
+    public static HelseIdSamplesConfiguration ClientCredentialsSampleForMultiTenantClient =>
+        new(
+            ConfigurationValues.ClientCredentialsSampleForMultiTenantPrivateKeyJwk,
+            ConfigurationValues.ClientCredentialsSampleForMultiTenantClientId,
+            ConfigurationValues.ClientCredentialsSampleScope);
+
     // The configuration for the ApiAccess project in logon only (no API access) mode
     public static HelseIdSamplesConfiguration UserAuthenticationClient =>
         new(
@@ -45,22 +52,29 @@ public class HelseIdSamplesConfiguration : HelseIdConfiguration
         new(
             ConfigurationValues.ApiAccessSampleRsaPrivateKeyJwk,
             ConfigurationValues.ApiAccessSampleClientId,
-            ConfigurationValues.ApiAccessSampleScope);            
+            ConfigurationValues.ApiAccessSampleScope);
 
     // The configuration for the ApiAccess project with request objects (accessing the sample API)
     public static HelseIdSamplesConfiguration ApiAccessWithRequestObject =>
         new(
             ConfigurationValues.ApiAccessWithRequestObjectSampleRsaPrivateKeyJwk,
             ConfigurationValues.ApiAccessSampleClientIdWithRequestObject,
-            ConfigurationValues.ApiAccessWithRequestObjectSampleScope); 
-            
+            ConfigurationValues.ApiAccessWithRequestObjectSampleScope);
+
+    // Configuration for the ApiAccess project with multi-tenancy
+    public static HelseIdSamplesConfiguration ApiAccessForMultiTenantClient =>
+        new(
+            ConfigurationValues.ApiAccessSampleForMultiTenantPrivateKeyJwk,
+            ConfigurationValues.ApiAccessSampleClientIdForMultiTenantApp,
+            ConfigurationValues.ApiAccessSampleScopeForMultiTenantApp);
+
     // The configuration for the ApiAccess project (accessing the token exchange client)
     public static HelseIdSamplesConfiguration ApiAccessWithTokenExchange =>
         new(
             ConfigurationValues.TokenExchangeSubjectRsaPrivateKeyJwk,
             ConfigurationValues.TokenExchangeSubjectClientId,
-            ConfigurationValues.TokenExchangeSubjectClientScope);            
-    
+            ConfigurationValues.TokenExchangeSubjectClientScope);
+
     // The configuration for the the ApiAccess project with resource indicators
     // We add the audiences for the two APIs that this project will use as resource indicators
     public static HelseIdSamplesConfiguration ResourceIndicatorsClient =>
@@ -77,7 +91,7 @@ public class HelseIdSamplesConfiguration : HelseIdConfiguration
     // The configuration for the SampleApiForTokenExchange project (used for accessing the SampleApi with the token exchange grant)
     public static HelseIdSamplesConfiguration TokenExchangeClient =>
         new(
-            ConfigurationValues.TokenExchangActorRsaPrivateKeyJwk,
+            ConfigurationValues.TokenExchangeActorRsaPrivateKeyJwk,
             ConfigurationValues.TokenExchangeActorClientId,
             ConfigurationValues.TokenExchangeActorClientScope);
 }

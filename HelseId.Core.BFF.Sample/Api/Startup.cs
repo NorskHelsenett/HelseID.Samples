@@ -1,17 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using HelseId.Core.BFF.Sample.Api.Authorization;
-using HelseId.Core.BFF.Sample.Api.Identity;
+using HelseId.Core.BFF.Sample.Api.DPoP;
 using HelseId.Core.BFF.Sample.Api.Options;
 using HelseId.Core.BFF.Sample.Api.Services;
-using Microsoft.AspNetCore.Authentication;
+using HelseId.Core.BFF.Sample.WebCommon.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +15,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
-using HelseId.Core.BFF.Sample.WebCommon.Middleware;
+using System;
+using System.Text.Json.Serialization;
 
 namespace HelseId.Core.BFF.Sample.Api
 {
@@ -80,9 +76,16 @@ namespace HelseId.Core.BFF.Sample.Api
                             ValidateIssuerSigningKey = true,
                             ValidateAudience = true,
                             ValidateLifetime = true,
+                            AudienceValidator = TokenValidation.ValidateSingleAudience,
                         };
+
+                        DPoPHandler.Handle(options);
                     }
                 );
+
+            services.AddSingleton<IReplayCache, DPoPReplayCache>();
+            services.AddSingleton<DPoPProofValidator>();
+            services.AddDistributedMemoryCache();
 
             services.AddAuthorization(
                 config =>
@@ -92,7 +95,7 @@ namespace HelseId.Core.BFF.Sample.Api
                         .Build();
                     var apiAccessPolicy = new AuthorizationPolicyBuilder()
                         .Combine(authenticatedHidUserPolicy)
-                        .RequireScope(_configuration["HelseId:ApiScope"])
+                        .RequireClaim("scope", _configuration["HelseId:ApiScope"]!)
                         .Build();
 
                     config.DefaultPolicy = apiAccessPolicy;

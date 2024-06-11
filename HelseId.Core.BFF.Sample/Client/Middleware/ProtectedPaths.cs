@@ -33,7 +33,7 @@ namespace HelseId.Core.BFF.Sample.Client.Middleware
             var path = httpContext.Request.Path;
             if (!_excludedPaths.Any(p => path.StartsWithSegments(p)))
             {
-                if (!httpContext.User.Identity.IsAuthenticated)
+                if (!httpContext.User.Identity!.IsAuthenticated)
                 {
                     var redirectUri = httpContext.Request.GetEncodedPathAndQuery();
                     await httpContext.ChallengeAsync(new AuthenticationProperties { RedirectUri = redirectUri });

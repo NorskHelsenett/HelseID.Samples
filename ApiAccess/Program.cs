@@ -5,8 +5,8 @@ using HelseID.Samples.Configuration;
 
 namespace HelseId.Samples.ApiAccess;
 
-// This file is used for bootstrapping the example. Nothing of interest here.
-public class Program
+// This file is used for bootstrapping the example. Nothing of real interest here.
+public static class Program
 {
     public static async Task Main(string[] args)
     {
@@ -31,16 +31,21 @@ public class Program
             description: "If set, the application will use resource indicators in order to call two APIs with different audiences",
             getDefaultValue: () => false);
 
+        var useMultiTenantOption = new Option<bool>(
+            aliases: new [] {"--use-multi-tenant", "-mt"},
+            description: "If set, the application will use a client set up for multi-tenancy, i.e. it makes use of an organization number that is connected to the client.",
+            getDefaultValue: () => false);
+
         var rootCommand = new RootCommand("An authorization code flow usage sample")
         {
-            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption
+            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption
         };
 
-        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators) =>
+        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant) =>
         {
-            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators);
+            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant);
             new Startup(settings).BuildWebApplication().Run();
-        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption);
+        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption);
 
         await rootCommand.InvokeAsync(args);
     }
@@ -49,9 +54,10 @@ public class Program
         bool userLoginOnly,
         bool useTokenExchange,
         bool useRequestObjects,
-        bool useResourceIndicators)
+        bool useResourceIndicators,
+        bool useMultiTenant)
     {
-        var clientType = GetClientType(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators);
+        var clientType = GetClientType(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant);
 
         return new Settings
         {
@@ -68,7 +74,8 @@ public class Program
         bool userLoginOnly,
         bool useTokenExchange,
         bool useRequestObjects,
-        bool useResourceIndicators)
+        bool useResourceIndicators,
+        bool useMultiTenant)
     {
         if (userLoginOnly)
         {
@@ -90,6 +97,11 @@ public class Program
             return ClientType.ApiAccessWithResourceIndicators;
         }
 
+        if (useMultiTenant)
+        {
+            return ClientType.ApiAccessForMultiTenantClient;
+        }
+
         return ClientType.ApiAccess;
     }
 
@@ -99,7 +111,7 @@ public class Program
         {
             ClientType.ApiAccessWithTokenExchange => ConfigurationValues.SampleApiUrlForTokenExchange,
             ClientType.ApiAccessWithResourceIndicators => ConfigurationValues.SampleApiUrlForResourceIndicators1,
-            _ => ConfigurationValues.SampleApiUrl
+            _ => ConfigurationValues.SampleApiUrl,
         };
     }
 
@@ -135,6 +147,7 @@ public class Program
             ClientType.ApiAccessWithRequestObject => HelseIdSamplesConfiguration.ApiAccessWithRequestObject,
             ClientType.ApiAccessWithResourceIndicators => HelseIdSamplesConfiguration.ResourceIndicatorsClient,
             ClientType.UserLoginOnly => HelseIdSamplesConfiguration.UserAuthenticationClient,
+            ClientType.ApiAccessForMultiTenantClient => HelseIdSamplesConfiguration.ApiAccessForMultiTenantClient,
             _ => HelseIdSamplesConfiguration.ApiAccess
         };
     }

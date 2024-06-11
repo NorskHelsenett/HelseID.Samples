@@ -1,4 +1,3 @@
-using HelseId.Samples.Common.Interfaces;
 using HelseId.Samples.Common.Interfaces.ApiConsumers;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Interfaces.TokenExpiration;
@@ -18,13 +17,10 @@ public class Machine2MachineClient
     private DateTime _persistedAccessTokenExpiresAt = DateTime.MinValue;
     private string _persistedAccessToken = string.Empty;
     private readonly IPayloadClaimsCreatorForClientAssertion _payloadClaimsCreatorForClientAssertion;
-    // Can be used for debugging purposes:
-    private IClientInfoRetriever _clientInfoRetriever;
-    
+
     public Machine2MachineClient(
         IApiConsumer apiConsumer,
         ITokenRequestBuilder tokenRequestBuilder,
-        IClientInfoRetriever clientInfoRetriever,
         IExpirationTimeCalculator expirationTimeCalculator,
         IPayloadClaimsCreatorForClientAssertion payloadClaimsCreatorForClientAssertion,
         ClientCredentialsTokenRequestParameters tokenRequestParameters)
@@ -34,7 +30,6 @@ public class Machine2MachineClient
         // The client info retriever can be used for debugging purposes.
         // When activated, it accesses the client info endpoint on the HelseID service,
         // which returns info about the client that was used to get an access token.
-        _clientInfoRetriever = clientInfoRetriever;
         _expirationTimeCalculator = expirationTimeCalculator;
         _payloadClaimsCreatorForClientAssertion = payloadClaimsCreatorForClientAssertion;
         _tokenRequestParameters = tokenRequestParameters;
@@ -44,13 +39,10 @@ public class Machine2MachineClient
     {
         using var httpClient = new HttpClient();
 
-        // 1: get the token
+        // Get the token
         var accessToken = await GetAccessToken(httpClient);
 
-        // 2: (optional) get information on the client
-        await _clientInfoRetriever.ConsumeClientinfoEndpoint(httpClient, accessToken);
-
-        // 3: consume the API
+        // Consume the API
         await CallApi(httpClient, accessToken);
     }
 
@@ -60,7 +52,7 @@ public class Machine2MachineClient
         {
             var tokenResponse = await GetAccessTokenFromHelseId(httpClient);
             _persistedAccessTokenExpiresAt = _expirationTimeCalculator.CalculateTokenExpirationTimeUtc(tokenResponse.ExpiresIn);
-            _persistedAccessToken = tokenResponse.AccessToken;
+            _persistedAccessToken = tokenResponse.AccessToken!;
         }
         else
         {
@@ -71,29 +63,42 @@ public class Machine2MachineClient
 
     private async Task<TokenResponse> GetAccessTokenFromHelseId(HttpClient httpClient)
     {
-        // The request to HelseID is created:
-        var request = await _tokenRequestBuilder.CreateClientCredentialsTokenRequest(_payloadClaimsCreatorForClientAssertion, _tokenRequestParameters);
-
         // We use the HTTP client to retrieve the response from HelseID:
-        var tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(request);
+        var tokenResponse = await RequestClientCredentialsTokenAsync(httpClient);
 
-        if (tokenResponse.IsError)
+        if (tokenResponse.IsError || tokenResponse.AccessToken == null)
         {
             await WriteErrorToConsole(tokenResponse);
             throw new Exception();
         }
-        
+
         WriteAccessTokenFromTokenResult(tokenResponse);
 
         return tokenResponse;
     }
 
-    private async Task WriteErrorToConsole(TokenResponse tokenResponse) {
+    private async Task<TokenResponse> RequestClientCredentialsTokenAsync(HttpClient httpClient)
+    {
+        // The request to HelseID is created:
+        var request = await _tokenRequestBuilder.CreateClientCredentialsTokenRequest(_payloadClaimsCreatorForClientAssertion, _tokenRequestParameters, null);
+
+        var tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(request);
+
+        if (tokenResponse.IsError && tokenResponse.Error == "use_dpop_nonce" && !string.IsNullOrEmpty(tokenResponse.DPoPNonce))
+        {
+            request = await _tokenRequestBuilder.CreateClientCredentialsTokenRequest(_payloadClaimsCreatorForClientAssertion, _tokenRequestParameters, tokenResponse.DPoPNonce);
+            tokenResponse = await httpClient.RequestClientCredentialsTokenAsync(request);
+        }
+
+        return tokenResponse;
+    }
+
+    private static async Task WriteErrorToConsole(TokenResponse tokenResponse) {
         await Console.Error.WriteLineAsync("An error occured:");
         await Console.Error.WriteLineAsync(tokenResponse.Error);
     }
 
-    private void WriteAccessTokenFromTokenResult(TokenResponse tokenResponse) {
+    private static void WriteAccessTokenFromTokenResult(TokenResponse tokenResponse) {
         Console.WriteLine("The application received this access token from HelseID:");
         Console.WriteLine(tokenResponse.AccessToken);
         Console.WriteLine("Copy/paste the access token string at https://jwt.ms to see the contents");
@@ -105,9 +110,17 @@ public class Machine2MachineClient
         try
         {
             Console.WriteLine("Using the access token to call the sample API");
-            var response = await _apiConsumer.CallApi(httpClient, ConfigurationValues.SampleApiUrlForM2M, accessToken);
+            ApiResponse? response;
+            response = await _apiConsumer.CallApiWithDPoPToken(httpClient, ConfigurationValues.SampleApiUrlForM2M, accessToken);
             var notPresent = "<not present>";
-            Console.WriteLine($"Response from the sample API: {response?.Greeting}, org.nr: {response?.OrganizationNumber}, underenhet: {response?.ChildOrganizationNumber ?? notPresent}");
+            var supplierOrganization = OrganizationStore.GetOrganization(response?.SupplierOrganizationNumber);
+            var parentOrganization = OrganizationStore.GetOrganization(response?.ParentOrganizationNumber);
+            var childOrganization = OrganizationStore.GetOrganizationWithChild(response?.ChildOrganizationNumber);
+            Console.WriteLine($"Response from the sample API:");
+            Console.WriteLine($"{response?.Greeting}");
+            Console.WriteLine($"Supplier organization number (for multitenancy): '{supplierOrganization?.ParentName ?? notPresent}'");
+            Console.WriteLine($"Parent organization number: '{parentOrganization?.ParentName ?? notPresent}'");
+            Console.WriteLine($"Child organization number: '{childOrganization?.ChildName ?? notPresent}'");
         }
         catch (HttpRequestException e)
         {

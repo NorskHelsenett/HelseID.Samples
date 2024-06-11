@@ -1,227 +1,254 @@
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
-using HelseId.Core.BFF.Sample.Client.Infrastructure.AutomaticTokenManagement;
+using Duende.AccessTokenManagement;
+using HelseId.Core.BFF.Sample.Client.Auth;
 using HelseId.Core.BFF.Sample.Client.Middleware;
 using HelseId.Core.BFF.Sample.Client.Services;
+using HelseId.Core.BFF.Sample.Models.Model;
+using HelseId.Core.BFF.Sample.WebCommon.Identity;
+using HelseId.Core.BFF.Sample.WebCommon.Middleware;
+using IdentityModel;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
-using HelseId.Core.BFF.Sample.WebCommon.Identity;
-using HelseId.Core.BFF.Sample.WebCommon.Middleware;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
+using System.Security.Cryptography;
+using System.Text.Json;
+using System.Threading.Tasks;
 
-namespace HelseId.Core.BFF.Sample.Client
+namespace HelseId.Core.BFF.Sample.Client;
+
+public class Startup
 {
-    public class Startup
+    private readonly IConfiguration _configuration;
+    private readonly IHostEnvironment _env;
+
+    public Startup(IConfiguration configuration, IHostEnvironment env)
     {
-        private readonly IConfiguration _configuration;
-        private readonly IHostEnvironment _env;
+        _configuration = configuration;
+        _env = env;
+    }
 
-        public Startup(IConfiguration configuration, IHostEnvironment env)
+    public void ConfigureServices(IServiceCollection services)
+    {
+        // Client used to make calls to the API.
+        // Access token is automatically included and refreshed with 'AddUserAccessTokenHandler'.
+        services.AddHttpClient<IApiClient, ApiClient>(client =>
         {
-            this._configuration = configuration;
-            _env = env;
+            client.BaseAddress = new Uri(_configuration["ApiUrl"]!);
+            client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+        }).AddUserAccessTokenHandler();
+
+        if (_env.IsDevelopment())
+        {
+            IdentityModelEventSource.ShowPII = true;
+        }
+        else
+        {
+            services.AddHttpsRedirection(options =>
+            {
+                // Always use port 443 in prod
+                options.HttpsPort = 443;
+            });
         }
 
-        public void ConfigureServices(IServiceCollection services)
+        services.AddScoped<ICurrentUser, CurrentHttpUser>();
+
+        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
+        var hidConfigSection = _configuration.GetRequiredSection("HelseId");
+        var hidOptions = hidConfigSection.Get<HelseIdAuthOptions>()!;
+        services.AddOptions<HelseIdAuthOptions>()
+            .Bind(hidConfigSection)
+            .ValidateDataAnnotations();
+
+        var apiScope = _configuration["ApiScope"]!;
+
+        services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = "HelseID";
+            })
+            .AddCookie(options =>
+            {
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                options.SlidingExpiration = true;
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+
+                options.AccessDeniedPath = "/Forbidden";
+
+                // NOTE: options.Events must be set in AddAutomaticTokenManagement.
+                // This is because it overrides the events set here.
+            })
+            .AddOpenIdConnect("HelseID", options =>
+            {
+                options.Authority = hidOptions.Authority;
+                options.RequireHttpsMetadata = true;
+                options.ClientId = hidOptions.ClientId;
+                options.ResponseType = OidcConstants.ResponseTypes.Code;
+                options.UsePkce = true;
+                options.TokenValidationParameters.ValidAudience = hidOptions.ClientId;
+                options.CallbackPath = "/signin-oidc";
+                options.SignedOutCallbackPath = "/signout-callback-oidc";
+                options.MapInboundClaims = false;
+
+                options.AccessDeniedPath = "/Forbidden";
+
+                var scopes = hidOptions.Scopes.Split(' ');
+                options.Scope.Clear();
+                foreach (var scope in scopes)
+                {
+                    options.Scope.Add(scope.Trim());
+                }
+
+                options.Scope.Add(apiScope);
+
+                options.SaveTokens = true;
+
+                options.Events.OnRedirectToIdentityProvider = context =>
+                {
+                    if (context.ProtocolMessage.RequestType != OpenIdConnectRequestType.Authentication)
+                    {
+                        return Task.CompletedTask;
+                    }
+
+                    // API requests should get a 401 status instead of being redirected to login
+                    if (context.Request.Path.StartsWithSegments("/api"))
+                    {
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        context.HandleResponse();
+                    }
+
+                    return Task.CompletedTask;
+                };
+            });
+
+        // An instance of IDistributedCache is required by Duende.AccessTokenManagement for nonce caching
+        services.AddDistributedMemoryCache();
+
+        var dpopKey = CreateDPoPJwk();
+        services.AddSingleton(dpopKey);
+
+        // Automatic refresh of access token
+        services.AddOpenIdConnectAccessTokenManagement(options =>
         {
-            services.AddHttpContextAccessor();
-            services.AddHttpClient<IApiClient, ApiClient>(client =>
-            {
-                client.BaseAddress = new Uri(_configuration["ApiUrl"]);
-                client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
-            });
+            options.RefreshBeforeExpiration = TimeSpan.FromSeconds(10);
 
-            if (_env.IsDevelopment())
-            {
-                IdentityModelEventSource.ShowPII = true;
-            }
-            else
-            {
-                services.AddHttpsRedirection(options =>
+            options.DPoPJsonWebKey = dpopKey.Jwk;
+        });
+
+        // Workaround to use Client Assertion and Pushed Authorization Request during logon.
+        services.ConfigureOptions<ConfigureOpenIdConnectOptionsForHelseId>();
+
+        // Use client assertion for automatic refresh of tokens
+        services.AddTransient<IClientAssertionService, ClientAssertionService>();
+
+        var authenticatedHidUserPolicy = new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .RequireClaim(IdentityClaims.SecurityLevel, SecurityLevel.Level4)
+            .Build();
+        var apiScopePolicy = new AuthorizationPolicyBuilder()
+            .Combine(authenticatedHidUserPolicy)
+            .RequireClaim("scope", apiScope)
+            .Build();
+
+        services.AddAuthorization(config =>
+        {
+            config.AddPolicy("HidAuthenticated", authenticatedHidUserPolicy);
+            config.AddPolicy("ApiScope", apiScopePolicy);
+            config.DefaultPolicy = authenticatedHidUserPolicy;
+        });
+
+        services.AddControllers(config => config.Filters.Add(new AuthorizeFilter(authenticatedHidUserPolicy)));
+
+        var razorPagesBuilder = services.AddRazorPages()
+            .AddRazorPagesOptions(
+                options =>
                 {
-                    // Always use port 443 in prod
-                    options.HttpsPort = 443;
-                });
-            }
-
-            services.AddScoped<ICurrentUser, CurrentHttpUser>();
-
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-
-            services.AddAuthentication(options =>
-                {
-                    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = "HelseID";
-                })
-                .AddCookie(options =>
-                {
-                    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-                    options.SlidingExpiration = true;
-                    options.Cookie.HttpOnly = true;
-                    options.Cookie.IsEssential = true;
-                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-
-                    options.AccessDeniedPath = "/Forbidden";
-
-                    // NOTE: options.Events must be set in AddAutomaticTokenManagement.
-                    // This is because it overrides the events set here.
-                })
-                .AddOpenIdConnect("HelseID", options =>
-                {
-                    var hidConfig = _configuration.GetSection("HelseId");
-                    var acrValues = hidConfig["AcrValues"];
-                    var hasAcrValues = !string.IsNullOrWhiteSpace(acrValues);
-
-                    options.Authority = hidConfig["Authority"];
-                    options.RequireHttpsMetadata = true;
-                    options.ClientId = hidConfig["ClientId"];
-                    options.ClientSecret = hidConfig["ClientSecret"];
-                    options.ResponseType = "code";
-                    options.TokenValidationParameters.ValidAudience = hidConfig["ClientId"];
-
-                    options.AccessDeniedPath = "/Forbidden";
-
-                    var scopes = hidConfig["Scopes"].Split(' ');
-                    options.Scope.Clear();
-                    foreach (var scope in scopes)
-                    {
-                        options.Scope.Add(scope.Trim());
-                    }
-
-                    options.SaveTokens = true;
-
-                    options.Events.OnRedirectToIdentityProvider = ctx =>
-                    {
-                        // API requests should get a 401 status instead of being redirected to login
-                        if (ctx.Request.Path.StartsWithSegments("/api"))
-                        {
-                            ctx.Response.Headers["Location"] = ctx.ProtocolMessage.CreateAuthenticationRequestUrl();
-                            ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                            ctx.HandleResponse();
-                        }
-
-                        if (ctx.ProtocolMessage.RequestType == OpenIdConnectRequestType.Authentication && hasAcrValues)
-                        {
-                            ctx.ProtocolMessage.AcrValues = acrValues;
-                        }
-
-                        return Task.CompletedTask;
-                    };
-                })
-                .AddAutomaticTokenManagement(options =>
-                {
-                    options.RefreshBeforeExpiration = TimeSpan.FromMinutes(2);
-                    options.RevokeRefreshTokenOnSignout = true;
-                    options.Scheme = "HelseID";
-
-                    options.CookieEvents.OnRedirectToAccessDenied = ctx =>
-                    {
-                        // API requests should get a 403 status instead of being redirected to access denied page
-                        if (ctx.Request.Path.StartsWithSegments("/api"))
-                        {
-                            ctx.Response.Headers["Location"] = ctx.RedirectUri;
-                            ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
-                        }
-
-                        return Task.CompletedTask;
-                    };
-                });
-
-            var authenticatedHidUserPolicy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .RequireClaim(IdentityClaims.SecurityLevel, SecurityLevel.Level4)
-                .Build();
-            var apiScopePolicy = new AuthorizationPolicyBuilder()
-                .Combine(authenticatedHidUserPolicy)
-                .RequireScope(_configuration["ApiScope"])
-                .Build();
-
-            services.AddAuthorization(config =>
-            {
-                config.AddPolicy("HidAuthenticated", authenticatedHidUserPolicy);
-                config.AddPolicy("ApiScope", apiScopePolicy);
-                config.DefaultPolicy = authenticatedHidUserPolicy;
-            });
-
-            services.AddControllers(config => config.Filters.Add(new AuthorizeFilter(authenticatedHidUserPolicy)));
-
-            var razorPagesBuilder = services.AddRazorPages()
-                .AddRazorPagesOptions(
-                    options =>
-                    {
-                        options.Conventions.AllowAnonymousToPage("/Forbidden");
-                        options.Conventions.AllowAnonymousToPage("/NotFound");
-                        options.Conventions.AllowAnonymousToPage("/ServerError");
-                        options.Conventions.AllowAnonymousToPage("/StatusCode");
-                    }
-                );
+                    options.Conventions.AllowAnonymousToPage("/Forbidden");
+                    options.Conventions.AllowAnonymousToPage("/NotFound");
+                    options.Conventions.AllowAnonymousToPage("/ServerError");
+                    options.Conventions.AllowAnonymousToPage("/StatusCode");
+                }
+            );
 #if DEBUG
-            if (_env.IsDevelopment())
-            {
-                razorPagesBuilder.AddRazorRuntimeCompilation();
-            }
-#endif
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiClient apiClient)
+        if (_env.IsDevelopment())
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseWhen(
-                    context => !context.Request.Path.StartsWithSegments("/api"),
-                    builder => builder.UseRedirectOnException("/ServerError")
-                );
-                app.UseHsts();
-                app.UseForwardedHeaders();
-            }
+            razorPagesBuilder.AddRazorRuntimeCompilation();
+        }
+#endif
+    }
 
-            app.UseUnhandledExceptionLogger();
-            app.UseSerilogRequestLogging();
+    private static DPoPJwk CreateDPoPJwk()
+    {
+        var rsaKey = new RsaSecurityKey(RSA.Create(2048));
+        var jwk = JsonWebKeyConverter.ConvertFromSecurityKey(rsaKey);
+        jwk.Alg = SecurityAlgorithms.RsaSsaPssSha256;
+        string jwkJson = JsonSerializer.Serialize(jwk);
 
+        var dpopKey = new DPoPJwk(jwkJson, jwk.Alg);
+        return dpopKey;
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiClient apiClient)
+    {
+        if (env.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+        }
+        else
+        {
             app.UseWhen(
                 context => !context.Request.Path.StartsWithSegments("/api"),
-                builder => builder.UseStatusCodePagesWithReExecute("/StatusCode", "?code={0}")
+                builder => builder.UseRedirectOnException("/ServerError")
             );
-
-            app.UseHttpsRedirection();
-
-            app.UseRouting();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.UseEndpoints(
-                endpoints =>
-                {
-                    endpoints.MapControllers();
-                    endpoints.MapRazorPages();
-                });
-
-            app.UseProtectPaths(new ProtectPathsOptions("HidAuthenticated", "/Forbidden")
-            {
-                Exclusions = new List<PathString> {"/favicon.ico"}
-            });
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
-
-            app.UseSpa(builder => { });
+            app.UseHsts();
+            app.UseForwardedHeaders();
         }
+
+        app.UseUnhandledExceptionLogger();
+        app.UseSerilogRequestLogging();
+
+        app.UseWhen(
+            context => !context.Request.Path.StartsWithSegments("/api"),
+            builder => builder.UseStatusCodePagesWithReExecute("/StatusCode", "?code={0}")
+        );
+
+        app.UseHttpsRedirection();
+
+        app.UseRouting();
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.UseEndpoints(
+            endpoints =>
+            {
+                endpoints.MapDefaultControllerRoute();
+                endpoints.MapControllers();
+                endpoints.MapRazorPages();
+            });
+
+        app.UseProtectPaths(new ProtectPathsOptions("HidAuthenticated", "/Forbidden")
+        {
+            Exclusions = new List<PathString> { "/favicon.ico" }
+        });
+        app.UseDefaultFiles();
+        app.UseStaticFiles();
+
+        app.UseSpa(builder => { });
     }
 }

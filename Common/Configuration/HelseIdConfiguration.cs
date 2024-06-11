@@ -6,13 +6,13 @@ namespace HelseId.Samples.Common.Configuration;
 public class HelseIdConfiguration
 {
     public HelseIdConfiguration(
-        SecurityKey rsaPrivateKeyJwk,
+        SecurityKey privateKeyJwk,
         string clientId,
         string scope,
         string stsUrl,
         List<string>? resourceIndicators = null)
     {
-        RsaPrivateKeyJwk = rsaPrivateKeyJwk;
+        PrivateKeyJwk = privateKeyJwk;
         ClientId = clientId;
         Scope = scope;
         StsUrl = stsUrl;
@@ -21,13 +21,12 @@ public class HelseIdConfiguration
             ResourceIndicators = resourceIndicators;
         }
     }
-    
-    // The private key MUST be properly secured inside the client. 
-    // TODO: guidelines
-    public SecurityKey RsaPrivateKeyJwk  { get; }
+
+    // The private key MUST be properly secured inside the client.
+    public SecurityKey PrivateKeyJwk  { get; }
 
     public string ClientId { get; }
-    
+
     public string Scope { get;  }
 
     public string StsUrl { get; }

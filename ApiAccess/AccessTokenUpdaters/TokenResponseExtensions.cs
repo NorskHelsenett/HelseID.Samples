@@ -11,6 +11,10 @@ public static class TokenResponseExtensions
 {
     public static int GetRefreshTokenExpiresInValue(this TokenResponse tokenResponse)
     {
+        if (tokenResponse.Raw == null)
+        {
+            throw new Exception($"No valid raw property found in token response");
+        }
         var tokenResponseFragment = JsonSerializer.Deserialize<TokenResponseFragment?>(tokenResponse.Raw);
         if (tokenResponseFragment == null)
         {
