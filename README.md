@@ -109,7 +109,7 @@ Running samples for Persontjenesten API clients that exchange valid tokens with 
 
 Implementations:
 1. [.NET](Persontjenesten.Samples/.NET/PersontjenestenDotNetDemo/README.md)
-2. [Java](Persontjenesten.Samples/Java/demo/README.md)
+2. [Java](Persontjenesten.Samples/Java/README.md)
 
 
 ## <a name="Tooling"></a> Tooling
