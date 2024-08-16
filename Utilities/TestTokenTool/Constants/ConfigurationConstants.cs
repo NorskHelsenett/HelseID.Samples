@@ -7,6 +7,7 @@ public static class ConfigurationConstants
     public const string AuthenticationStsUrl = "Authentication:StsUrl";
     public const string AuthenticationSigningKeyAlgorithm = "Authentication:SigningKeyAlgorithm";
     public const string AuthenticationSaveAccessToken = "Authentication:SaveAccessToken";
+    public const string ApiKey = "Authentication:ApiKey";
 
     public const string TttServiceEndpoint = "TTT:service-endpoint";
 }

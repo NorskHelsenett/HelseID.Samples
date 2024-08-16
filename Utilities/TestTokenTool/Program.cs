@@ -91,6 +91,7 @@ public class Program
             {
                 AuthenticationMethodsReferences = options.clientAmr.GetListWithParameter(),
                 ClientAuthenticationMethodsReferences = options.helseidClientAmr.GetEmptyStringIfNotSet(),
+                Aud = options.aud!,
                 OrgnrParent = options.orgnrParent.GetEmptyStringIfNotSet(),
                 OrgnrChild = options.orgnrChild.GetEmptyStringIfNotSet(),
                 OrgnrSupplier = options.orgnrSupplier.GetEmptyStringIfNotSet(),

@@ -17,10 +17,10 @@ internal static class TokenRetriever
     {
         IConfiguration config = configurationBuilder.Build();
 
-        using var httpClient = await CreateHttpClient(config);
-        
+        using var httpClient = CreateHttpClient(config);
+
         var body = JsonSerializer.Serialize(tokenRequest);
-        
+
         var httpResponse = await httpClient
             .PostAsync(
                 config[ConfigurationConstants.TttServiceEndpoint],
@@ -44,14 +44,14 @@ internal static class TokenRetriever
         return result;
     }
 
-    private static async Task<HttpClient> CreateHttpClient(IConfiguration config)
+    private static HttpClient CreateHttpClient(IConfiguration config)
     {
-        var accessToken = await GetAccessTokenForTtt(config);
         var httpClient = new HttpClient();
-        AuthorizationHeaderExtensions.SetBearerToken(httpClient, accessToken);
+        httpClient.DefaultRequestHeaders.Add("X-Auth-Key", config[ConfigurationConstants.ApiKey]);
         return httpClient;
     }
 
+    /*
     private static async Task<string> GetAccessTokenForTtt(IConfiguration config)
     {
         if (AccessTokenOnFile(config) && GetAccessTokenFromFile(out var savedAccessToken))
@@ -66,10 +66,11 @@ internal static class TokenRetriever
             SaveAccessTokenToFile(tokenResponse);
         }
 
-        // Previously checked for null 
+        // Previously checked for null
         return tokenResponse.AccessToken!;
     }
-
+    */
+/*
     private static async Task<IdentityModel.Client.TokenResponse> GetAccessTokenFromHelseId(IConfiguration config)
     {
         using var tokenAccessClient = new HttpClient();
@@ -81,10 +82,11 @@ internal static class TokenRetriever
         {
             throw new Exception("Could not get an access token from HelseID.");
         }
-        
+
         return tokenResponse;
     }
-
+*/
+/*
     private static void SaveAccessTokenToFile(IdentityModel.Client.TokenResponse tokenResponse)
     {
         File.WriteAllText(FileConstants.AccessTokenFileName, tokenResponse.AccessToken);
@@ -108,16 +110,19 @@ internal static class TokenRetriever
 
         return false;
     }
-
+*/
+/*
     private static bool AccessTokenOnFile(IConfiguration config)
     {
         return ShouldSaveAccessToken(config) &&
                File.Exists(FileConstants.AccessTokenFileName) &&
                File.Exists(FileConstants.AccessTokenExpirationFileName);
     }
-
+*/
+/*
     private static bool ShouldSaveAccessToken(IConfiguration config)
     {
         return config[ConfigurationConstants.AuthenticationSaveAccessToken] == "true";
     }
+    */
 }

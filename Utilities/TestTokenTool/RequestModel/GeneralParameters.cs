@@ -3,6 +3,8 @@ namespace TestTokenTool.RequestModel;
 public class GeneralParameters
 {
     // iss (not applicable for general users)
+    public string Aud { get; set; } = string.Empty;
+    // iss (not applicable for general users)
     public string Issuer { get; set; } = string.Empty;
     // scope
     public IList<string> Scope { get; set; } = new List<string>();

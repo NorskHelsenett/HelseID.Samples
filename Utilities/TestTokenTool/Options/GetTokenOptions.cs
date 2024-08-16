@@ -37,6 +37,8 @@ public class GetTokenOptions : IArgumentModel
     public string? typHeader { get; set; } = string.Empty;
     // -----------------------------------------
     // General parameters
+    [Named(Description = "The returned token will contain an audience claim that matches the injected value. If this is not set, the audience will be set as 'nhn:some:api'.")]
+    public string? aud { get; set; } = "nhn:some:api";
     [Named(Description = "The returned token will contain an issuer claim that matches the injected value")]
     public IssuerEnvironment issuerEnvironment { get; set; } = IssuerEnvironment.Test;
     [Named(Description = "The returned token will contain a 'client_amr' claim matching the injected value")]
