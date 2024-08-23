@@ -1,7 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Unicode;
 using TestTokenTool.Configuration;
 using TestTokenTool.Constants;
 using TokenResponse = TestTokenTool.ResponseModel.TokenResponse;

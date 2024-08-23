@@ -3,6 +3,8 @@ namespace TestTokenTool.RequestModel;
 
 public class TokenRequest
 {
+    public string Audience { get; set; } = String.Empty;
+    
     public ParametersGeneration GeneralClaimsParametersGeneration { get; set; }
     
     public ParametersGeneration UserClaimsParametersGeneration { get; set; }

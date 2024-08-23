@@ -1,4 +1,3 @@
-using System.Collections;
 using CommandDotNet;
 using CommandDotNet.Help;
 using Microsoft.Extensions.Configuration;
@@ -51,14 +50,9 @@ public class Program
     [Command("getToken", Description = "Get a token from the test token service")]
     public async Task GetToken(GetTokenOptions options)
     {
-
-        if (!File.Exists(FileConstants.JwkFileName))
-        {
-            Console.WriteLine("Ooops! The private key for usage with HelseID is missing. [Read the README.md file for how to create this key and use its public equivalent in HelseID Selvbetjening.]");
-            return;
-        }
         var tokenRequest = new TokenRequest
         {
+            Audience = options.audience!,
             // Invalid output from TTT
             SignJwtWithInvalidSigningKey =      options.signJwtWithInvalidSigningKey,
             SetInvalidIssuer =                  options.setInvalidIssuer,
@@ -91,7 +85,6 @@ public class Program
             {
                 AuthenticationMethodsReferences = options.clientAmr.GetListWithParameter(),
                 ClientAuthenticationMethodsReferences = options.helseidClientAmr.GetEmptyStringIfNotSet(),
-                Aud = options.aud!,
                 OrgnrParent = options.orgnrParent.GetEmptyStringIfNotSet(),
                 OrgnrChild = options.orgnrChild.GetEmptyStringIfNotSet(),
                 OrgnrSupplier = options.orgnrSupplier.GetEmptyStringIfNotSet(),
@@ -166,12 +159,6 @@ public class Program
         TokenPrinter.WriteResponse(tokenResponse, parameters);
         IApiCaller apiCaller = new ApiCaller();
         await apiCaller.CallApi(tokenResponse, parameters);
-    }
-
-    [Command("createKeys", Description = "Create a new public/private key pair for authentication with HelseID")]
-    public async Task CreateKeys()
-    {
-        await JwkGenerator.GenerateKey();
     }
 
     private static ApiSpecificClaim[]? AddApiSpecificClaims(string type, string value)
