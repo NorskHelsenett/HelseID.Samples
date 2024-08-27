@@ -65,9 +65,9 @@ public class Program
             GetHprNumberFromHprregisteret =     options.getHprNumberFromHprregisteret,
             // Usage of parameters
             IssuerEnvironment =                 options.issuerEnvironment,
-            WithoutDefaultGeneralClaims =       options.withoutDefaultGeneralClaims,
+            WithoutDefaultClientClaims =        options.withoutDefaultClientClaims,
             WithoutDefaultUserClaims =          options.withoutDefaultUserClaims,
-            GeneralClaimsParametersGeneration = options.generalClaimsCreation.ToParametersGeneration(),
+            ClientClaimsParametersGeneration =  options.clientClaimsCreation.ToParametersGeneration(),
             UserClaimsParametersGeneration =    options.userClaimsCreation.ToParametersGeneration(),
             CreateTillitsrammeverkClaims =      options.createTillitsrammeverkClaims,
             CreateDPoPTokenWithDPoPProof =      options.createDPoPTokenWithDPoPProof,
@@ -81,7 +81,7 @@ public class Program
             {
                 Typ = options.typHeader.GetEmptyStringIfNotSet(),
             },
-            GeneralClaimsParameters = new GeneralParameters
+            ClientClaimsParameters = new ClientClaimsParameters
             {
                 AuthenticationMethodsReferences = options.clientAmr.GetListWithParameter(),
                 ClientAuthenticationMethodsReferences = options.helseidClientAmr.GetEmptyStringIfNotSet(),

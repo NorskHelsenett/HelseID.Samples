@@ -6,32 +6,10 @@ Test-token-tjenesten er satt opp som et REST-API, og finnes på endepunktet [htt
 
 Denne applikasjonen viser hvordan Test-token-tjenesten kan konsumeres, og kan eksempelvis også brukes i forbindelse med skripting av uttrekk av test-token.
 
-For å ta applikasjonen i bruk, må du
+For å ta applikasjonen i bruk, må du 
 
-  * Generere et nøkkelpar (privatnøkkel og offentlig nøkkel)
-  * Opprette en klientkonfigurasjon i [HelseID Selvbetjening TEST](https://selvbetjening.test.nhn.no/) som gir deg tilgang til TTT (se under).
-    * Dette fordrer at du har brukertilgang i HelseID Selvbetjening TEST
-  
-
-### Generere et nøkkelpar
-
-Bruk kommandoen `dotnet run createKeys` for å generere et nøkkelpar. Privatnøkkelen vil bli lagt i fila `jwk.json`, og den offentlige nøkkelen vil bli lagt i fila `jwk_pub.json`.
-Denne siste fila må du senere laste opp til HelseID selvbetjening. 
-
-### Framgangsmåte i [HelseID Selvbetjening TEST](https://selvbetjening.test.nhn.no/):
-
-1. Velg «Ta i bruk HelseID»
-2. Klikk på «Ny klientkonfigurasjon»
-3. Under «Søk etter fagsystem», søk på «HelseID»
-4. Velg «HelseID TTT-klient»
-5. Huk av for «Test-token-tjeneste…» og skriv inn navnet på audience du vil bruke test-token mot
-6. Klikk på «Gå videre»
-7. Klikk på «Nøkkelpar (avansert)»
-8. Klikk på «Laste opp en offentlig nøkkel»
-9. Bruk «Last opp fil», og legg til fila `jwk_pub.json` fra forrige steg
-10. Slå opp klientkonfigurasjonen du har laget, og kopier verdien for Klient-ID
-11. Putt denne klient-ID-en inn i konfigurasjonsfila `config.json` under parameteret `Authentication:ClientId`
-12. Klientkonfigurasjonen krever (foreløpig) en godkjenning; du må vente på denne før du kan ta i bruk klienten.
+* Få en API-nøkkel fra [HelseID Selvbetjening TEST](https://selvbetjening.test.nhn.no/).
+* Legge denne nøkkelen i konfigurasjonsfila `config.json` under parameteret `Authentication:ApiKey`
 
 ## Bruk av applikasjonen for å hente ut et token
 
@@ -62,13 +40,13 @@ For å liste ut alle parametrene som kan brukes med `getToken`-kommandoen:
 `dotnet run getToken -- --help`
 
 
-For å få skrevet ut et token i JSON-format som inneholder kun obligatoriske claim:
+For å få skrevet ut et token i JSON-format som inneholder kun obligatoriske claim (altså ikke claim som beskriver en klient og en bruker):
 
-`dotnet run getToken --prettyPrintToken --withoutDefaultGeneralClaims --withoutDefaultUserClaims`
+`dotnet run getToken --prettyPrintToken --withoutDefaultClientClaims --withoutDefaultUserClaims`
 
 For å hente ut navn fra Persontjenesten og HPR-nummer fra HPR-registeret:
 
-`dotnet run getToken --prettyPrintToken --withoutDefaultGeneralClaims --withoutDefaultUserClaims --pid 16858399649 --getPersonFromPersontjenesten --getHprNumberFromHprregisteret`
+`dotnet run getToken --prettyPrintToken --withoutDefaultClientClaims --withoutDefaultUserClaims --pid 16858399649 --getPersonFromPersontjenesten --getHprNumberFromHprregisteret`
 
 
 For å få en liste over alle parametrene, kan du bruke kommandoen
@@ -95,14 +73,14 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen) med DPoP:
 ### Metaparametre: brukes for å beskrive bruken av enkelte av parametrene nedenfor
 ```
   
-  --withoutDefaultGeneralClaims              <BOOLEAN>          [False]
-  No default general claims are created
+  --withoutDefaultClientClaims              <BOOLEAN>          [False]
+  No default client claims are created
   
   --withoutDefaultUserClaims                 <BOOLEAN>          [False]
   No default user claims are created
   
-  --generalClaimsCreation                    <CLAIMGENERATION>  [DefaultWithParameterValues]
-  Instructs how common claims are created
+  --clientClaimsCreation                    <CLAIMGENERATION>  [DefaultWithParameterValues]
+  Instructs how client claims are created
   Allowed values: None, Default, ParameterValues, DefaultWithParameterValues
 
   --userClaimsCreation                       <CLAIMGENERATION>  [DefaultWithParameterValues]

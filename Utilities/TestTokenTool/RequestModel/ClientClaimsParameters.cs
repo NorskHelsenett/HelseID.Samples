@@ -1,9 +1,7 @@
 namespace TestTokenTool.RequestModel;
 
-public class GeneralParameters
+public class ClientClaimsParameters
 {
-    // iss (not applicable for general users)
-    public string Issuer { get; set; } = string.Empty;
     // scope
     public IList<string> Scope { get; set; } = new List<string>();
     // client_id

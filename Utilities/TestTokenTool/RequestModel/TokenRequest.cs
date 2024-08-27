@@ -5,11 +5,11 @@ public class TokenRequest
 {
     public string Audience { get; set; } = String.Empty;
     
-    public ParametersGeneration GeneralClaimsParametersGeneration { get; set; }
+    public ParametersGeneration ClientClaimsParametersGeneration { get; set; }
     
     public ParametersGeneration UserClaimsParametersGeneration { get; set; }
     
-    public bool WithoutDefaultGeneralClaims { get; set; }
+    public bool WithoutDefaultClientClaims { get; set; }
     
     public bool WithoutDefaultUserClaims { get; set; }
 
@@ -39,7 +39,7 @@ public class TokenRequest
 
     public HeaderParameters HeaderParameters { get; set; } = new();
     
-    public GeneralParameters GeneralClaimsParameters { get; set; } = new();
+    public ClientClaimsParameters ClientClaimsParameters { get; set; } = new();
     
     public UserClaimsParameters UserClaimsParameters { get; set; } = new ();
 
