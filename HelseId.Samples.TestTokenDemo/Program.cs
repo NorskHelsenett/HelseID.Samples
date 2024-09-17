@@ -85,7 +85,6 @@ internal abstract class Program
                 Scope = ["nhn:hgd-persontjenesten-api/read-no-legal-basis"],
                 ClientId = "fake",
                 OrgnrParent = "123123123",
-                SfmJournalId = "abc",
             },
 
             // Test different invalid token cases:
