@@ -10,20 +10,20 @@ public static class ConfigurationValues
     public static string StsUrl { get;  } = StsFromEnvironment ?? "https://helseid-sts.test.nhn.no";
 
     // Audience and scopes for using the 'regular' sample API:
-    public const string SampleApiNameAudience = "nhn:helseid-public-samplecode";
+    public const string SampleApiNameAudience = "nhn:test-public-samplecode";
 
     public const string ClientCredentialsScopeForSampleApi = $"{SampleApiNameAudience}/client-credentials";
 
     public const string AuthorizationCodeScopeForSampleApi = $"{SampleApiNameAudience}/authorization-code";
 
     // Audience and scope for using the sample API that uses token exchange:
-    public const string SampleTokenExchangeApiAudience = "nhn:helseid-public-samplecode-for-token-exchange";
+    public const string SampleTokenExchangeApiAudience = "nhn:test-public-samplecode-for-token-exchange";
 
     public const string TokenExchangeApiScope = $"{SampleTokenExchangeApiAudience}/token-exhange-endpoint";
 
     // Audiences and scopes for using the sample API for the resource indicator sample:
-    public const string SampleApiForResourceIndicators1Audience = "nhn:helseid-public-sample-api-1";
-    public const string SampleApiForResourceIndicators2Audience = "nhn:helseid-public-sample-api-2";
+    public const string SampleApiForResourceIndicators1Audience = "nhn:test-public-sample-api-1";
+    public const string SampleApiForResourceIndicators2Audience = "nhn:test-public-sample-api-2";
 
     public const string SampleApiForResourceIndicators1Scope = $"{SampleApiForResourceIndicators1Audience}/some-scope";
     public const string SampleApiForResourceIndicators2Scope = $"{SampleApiForResourceIndicators2Audience}/some-scope";
