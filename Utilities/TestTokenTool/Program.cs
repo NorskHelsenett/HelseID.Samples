@@ -5,7 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 using TestTokenTool.ApiCalls;
 using TestTokenTool.Commands;
 using TestTokenTool.Configuration;
-using TestTokenTool.Constants;
 using TestTokenTool.InputParameters;
 using TestTokenTool.Options;
 using TestTokenTool.RequestModel;

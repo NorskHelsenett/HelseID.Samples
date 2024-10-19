@@ -12,7 +12,7 @@ public class ApiCaller : IApiCaller
         {
             return;
         }
-        
+
         var accessToken = tokenResponse.SuccessResponse.AccessTokenJwt;
         using var httpClient = new HttpClient();
 
@@ -23,19 +23,19 @@ public class ApiCaller : IApiCaller
             {
                 throw new Exception("No DPoP proof received");
             }
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, "https://localhost:5081/machine-clients/dpop-greetings");
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, "https://localhost:5081/user-login-clients/greetings");
             requestMessage.SetDPoPToken(accessToken, tokenResponse.SuccessResponse.DPoPProof);
-            
+
             var httpResponse = await httpClient.SendAsync(requestMessage);
-            
+
             Console.WriteLine(await httpResponse.Content.ReadAsStringAsync());
         }
         else
         {
             httpClient.SetBearerToken(accessToken);
-            
+
             var httpResponse = await httpClient.GetStringAsync("https://localhost:5081/machine-clients/greetings");
             Console.WriteLine(httpResponse);
-        }        
+        }
     }
 }

@@ -57,13 +57,15 @@ public  class Startup
             // Adds the authentication scheme to be used for DPoP tokens:
             .AddJwtBearer(DPoPTokenAuthenticationScheme, options =>
             {
-                options.RequireHttpsMetadata = true;
+                // "Authority" is the address for the HelseID server
                 options.Authority = _settings.Authority;
+                // "Audience": the name for this API (as set in HelseID Selvbetjening)
                 options.Audience = _settings.Audience;
+                // The following parameters (and a few others) are all true by default, but set to true here for instructive purposes:
+                options.RequireHttpsMetadata = true;
 
                 // Validation parameters are in agreement with HelseIDs requirements:
-                // https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/284229708/Guidelines+for+using+JSON+Web+Tokens+JWTs
-                // The following parameters (and a few others) are all true by default, but set to true here for instructive purposes:
+                // https://utviklerportal.nhn.no/informasjonstjenester/helseid/protokoller-og-sikkerhetsprofil/sikkerhetsprofil/docs/vedlegg/validering_av_access_token_enmd/
                 options.TokenValidationParameters.ValidateLifetime = true;
                 options.TokenValidationParameters.ValidateIssuer = true;
                 options.TokenValidationParameters.ValidateAudience = true;
@@ -75,7 +77,9 @@ public  class Startup
 
                 options.Events.OnMessageReceived = context =>
                 {
-                    // Per HelseID's security profile, an API endpoint can accept *either*
+                    // Per HelseID's security profile,
+                    // https://utviklerportal.nhn.no/informasjonstjenester/helseid/protokoller-og-sikkerhetsprofil/sikkerhetsprofil/docs/sikkerhetsprofil_enmd/#requirements-for-apis-protected-by-helseid
+                    // an API endpoint can accept *either*
                     // a DPoP access token *or* a Bearer access token, but not both.
 
                     // This ensures that the received access token is a DPoP token:
@@ -98,21 +102,10 @@ public  class Startup
                         // This functionality validates the DPoP proof
                         // https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-16.html#name-checking-dpop-proofs
 
-                        // Get the DPoP proof:
-                        var request = tokenValidatedContext.HttpContext.Request;
-                        if (!request.GetDPoPProof(out var dPopProof))
+                        if (!GetTokenAndDpopProofFromRequest(tokenValidatedContext, out var data))
                         {
-                            tokenValidatedContext.Fail("Missing DPoP proof");
                             return;
                         }
-
-                        // Get the access token:
-                        request.GetDPoPAccessToken(out var accessToken);
-
-                        // Get the cnf claim from the access token:
-                        var cnfClaimValue = tokenValidatedContext.Principal!.FindFirstValue(JwtClaimTypes.Confirmation);
-
-                        var data = new DPoPProofValidationData(request, dPopProof!, accessToken!, cnfClaimValue);
 
                         var dPopProofValidator = tokenValidatedContext.HttpContext.RequestServices.GetRequiredService<DPoPProofValidator>();
                         var validationResult = await dPopProofValidator.Validate(data);
@@ -145,6 +138,29 @@ public  class Startup
                     policy.RequireClaim("scope", _settings.ClientCredentialsApiScopeForSampleApi);
                 });
         });
+    }
+
+    private static bool GetTokenAndDpopProofFromRequest(
+        TokenValidatedContext tokenValidatedContext,
+        out DPoPProofValidationData data)
+    {
+        // Get the DPoP proof:
+        var request = tokenValidatedContext.HttpContext.Request;
+        if (!request.GetDPoPProof(out var dPopProof))
+        {
+            tokenValidatedContext.Fail("Missing DPoP proof");
+            data = null!;
+            return false;
+        }
+
+        // Get the access token:
+        request.GetDPoPAccessToken(out var accessToken);
+
+        // Get the cnf claim from the access token:
+        var cnfClaimValue = tokenValidatedContext.Principal!.FindFirstValue(JwtClaimTypes.Confirmation);
+
+        data = new DPoPProofValidationData(request, dPopProof!, accessToken!, cnfClaimValue);
+        return true;
     }
 
     private void SetUpKestrel(WebApplicationBuilder webApplicationBuilder)
