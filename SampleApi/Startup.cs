@@ -3,15 +3,18 @@ using HelseId.SampleApi.Configuration;
 using HelseId.SampleAPI.Controllers;
 using HelseId.SampleApi.Interfaces;
 using HelseId.Samples.Common.ApiDPoPValidation;
+using HelseId.Samples.Common.AudienceValidation;
 using HelseID.Samples.Configuration;
 using IdentityModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HelseId.SampleAPI;
 
 public  class Startup
 {
     private readonly Settings _settings;
+    private readonly AudienceValidatorForSingleAudience _audienceValidator;
 
     public const string DPoPTokenAuthenticationScheme = "dpop_token_authentication_scheme";
     public const string AuthCodePolicy = "auth_code_policy";
@@ -20,6 +23,7 @@ public  class Startup
     public Startup(Settings settings)
     {
         _settings = settings;
+        _audienceValidator = new AudienceValidatorForSingleAudience(_settings.Audience);
     }
 
     public WebApplication BuildWebApplication()
@@ -59,8 +63,7 @@ public  class Startup
             {
                 // "Authority" is the address for the HelseID server
                 options.Authority = _settings.Authority;
-                // "Audience": the name for this API (as set in HelseID Selvbetjening)
-                options.Audience = _settings.Audience;
+
                 // The following parameters (and a few others) are all true by default, but set to true here for instructive purposes:
                 options.RequireHttpsMetadata = true;
 
@@ -72,6 +75,8 @@ public  class Startup
                 options.TokenValidationParameters.RequireSignedTokens = true;
                 options.TokenValidationParameters.RequireExpirationTime = true;
                 options.TokenValidationParameters.RequireAudience = true;
+
+                options.TokenValidationParameters.AudienceValidator = _audienceValidator.AudienceValidation;
 
                 options.Events ??= new JwtBearerEvents();
 
