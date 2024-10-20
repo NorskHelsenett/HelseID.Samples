@@ -285,7 +285,7 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen) med DPoP:
 
   --invalidDPoPProof                         <INVALIDDPOPPROOFPARAMETERS>
   If this value is set, an invalid DPoP proof will we returned
-  Allowed values: None, DontSetHtuClaimValue, DontSetHtmClaimValue, SetIatValueInThePast, SetIatValueInTheFuture, DontSetAthClaimValue, DontSetAlgHeader, DontSetJwkHeader, DontSetJtiClaim, SetAlgHeaderToASymmetricAlgorithm, SetPrivateKeyInJwkHeader, SetInvalidTypHeaderValue, SetAnInvalidSignature   
+  Allowed values: None, DontSetHtuClaimValue, DontSetHtmClaimValue, SetIatValueInThePast, SetIatValueInTheFuture, DontSetAthClaimValue, DontSetAlgHeader, DontSetJwkHeader, DontSetJtiClaim, SetAlgHeaderToASymmetricAlgorithm, SetPrivateKeyInJwkHeader, SetInvalidTypHeaderValue, SetAnInvalidSignature, SetAnInvalidJktValueInToken   
 
 ```
 ### Parametre for å lage et 'cnf'-claim (DPoP) i tokenet

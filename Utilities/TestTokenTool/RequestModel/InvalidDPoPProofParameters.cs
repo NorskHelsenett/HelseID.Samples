@@ -15,4 +15,5 @@ public enum InvalidDPoPProofParameters
     SetPrivateKeyInJwkHeader = 10,
     SetInvalidTypHeaderValue = 11,
     SetAnInvalidSignature = 12,
+    SetAnInvalidJktValueInToken = 13,
 }
