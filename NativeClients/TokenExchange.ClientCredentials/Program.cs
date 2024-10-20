@@ -74,7 +74,7 @@ public class Program
         {
             Address = _discoveryDocument.TokenEndpoint,
             ClientId = SubjectClientId,
-            Scope = "nhn:helseid-public-samplecode-for-token-exchange/token-exhange-endpoint",
+            Scope = "nhn:test-public-samplecode-for-token-exchange/token-exhange-endpoint",
             ClientAssertion = new ClientAssertion
             {
                 Value = clientAssertion,
@@ -110,7 +110,7 @@ public class Program
             },
             ClientCredentialStyle = ClientCredentialStyle.PostBody,
             ClientId = ActorClientId,
-            Scope = "nhn:helseid-public-sample-api-1/some-scope",
+            Scope = "nhn:test-public-sample-api-1/some-scope",
             SubjectToken = subjectToken,
             SubjectTokenType = OidcConstants.TokenTypeIdentifiers.AccessToken
         };

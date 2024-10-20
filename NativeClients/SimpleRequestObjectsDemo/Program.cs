@@ -53,7 +53,7 @@ class Program
     private static readonly string RedirectUrl = $"http://localhost:{LocalhostPort.ToString()}/callback";
 
     // This is the scope of the API you want to call (get an access token for)
-    private const string ApiScopes = "nhn:helseid-public-samplecode/authorization-code";
+    private const string ApiScopes = "nhn:test-public-samplecode/authorization-code";
 
     // These scopes indicate that you want an ID-token ("openid"), and what information about the user you want the ID-token to contain
     private const string IdentityScopes = "openid profile offline_access helseid://scopes/identity/pid helseid://scopes/identity/security_level";

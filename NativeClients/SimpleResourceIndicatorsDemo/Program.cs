@@ -73,8 +73,8 @@ public class Program
     // These scopes indicate that you want an ID-token ("openid"), and what information about the user you want the ID-token to contain
     private const string IdentityScopes = "openid profile offline_access helseid://scopes/identity/security_level";
 
-    private const string FirstResource = "nhn:helseid-public-sample-api-1";
-    private const string SecondResource = "nhn:helseid-public-sample-api-2";
+    private const string FirstResource = "nhn:test-public-sample-api-1";
+    private const string SecondResource = "nhn:test-public-sample-api-2";
 
     static async Task Main()
     {
