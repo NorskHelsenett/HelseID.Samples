@@ -15,7 +15,7 @@ public  class Startup
 {
     private readonly Settings _settings;
     private readonly AudienceValidatorForSingleAudience _audienceValidator;
-
+ 
     public const string DPoPTokenAuthenticationScheme = "dpop_token_authentication_scheme";
     public const string AuthCodePolicy = "auth_code_policy";
     public const string ClientCredentialsPolicy = "client_credentials_policy";
@@ -53,7 +53,7 @@ public  class Startup
         webApplicationBuilder.Services.AddControllers();
         webApplicationBuilder.Services.AddEndpointsApiExplorer();
 
-        webApplicationBuilder.Services.AddSingleton<IReplayCache, DummyReplayCache>();
+        webApplicationBuilder.Services.AddSingleton<IReplayCache, SimpleReplayCache>();
         webApplicationBuilder.Services.AddSingleton<DPoPProofValidator>();
 
         webApplicationBuilder.Services

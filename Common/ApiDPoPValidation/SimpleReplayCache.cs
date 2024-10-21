@@ -2,13 +2,13 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace HelseId.Samples.Common.ApiDPoPValidation;
 
-public class DummyReplayCache : IReplayCache
+public class SimpleReplayCache : IReplayCache
 {
     private const string Prefix = "DummyReplayCache-";
 
     private readonly IDistributedCache _cache;
 
-    public DummyReplayCache(IDistributedCache cache)
+    public SimpleReplayCache(IDistributedCache cache)
     {
         _cache = cache;
     }

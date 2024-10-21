@@ -75,7 +75,7 @@ public class Startup
         webApplicationBuilder.Services.AddControllers();
         webApplicationBuilder.Services.AddEndpointsApiExplorer();
 
-        webApplicationBuilder.Services.AddSingleton<IReplayCache, DummyReplayCache>();
+        webApplicationBuilder.Services.AddSingleton<IReplayCache, SimpleReplayCache>();
         webApplicationBuilder.Services.AddSingleton<DPoPProofValidator>();
 
         // Adds the authentication scheme to be used for bearer tokens
@@ -159,6 +159,7 @@ public class Startup
         TokenValidatedContext tokenValidatedContext,
         out DPoPProofValidationData data)
     {
+        // TODO: invalidate a DPoP proof that is too long
         // Get the DPoP proof:
         var request = tokenValidatedContext.HttpContext.Request;
         if (!request.GetDPoPProof(out var dPopProof))
