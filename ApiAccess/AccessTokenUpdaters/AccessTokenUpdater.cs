@@ -9,7 +9,6 @@ using HelseId.Samples.Common.Interfaces.TokenRequests;
 using HelseId.Samples.Common.Models;
 using HelseID.Samples.Configuration;
 using IdentityModel.Client;
-using Microsoft.IdentityModel.Tokens;
 
 namespace HelseId.Samples.ApiAccess.AccessTokenUpdaters;
 

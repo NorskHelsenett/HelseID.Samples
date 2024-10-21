@@ -8,7 +8,7 @@ Denne applikasjonen viser hvordan Test-token-tjenesten kan konsumeres, og kan ek
 
 For å ta applikasjonen i bruk, må du 
 
-* Få en API-nøkkel fra [HelseID Selvbetjening TEST](https://selvbetjening.test.nhn.no/).
+* Få en API-nøkkel fra [HelseID Selvbetjening TEST](https://selvbetjening.test.nhn.no/) (bruk knappen «Integrasjonstesting»).
 * Legge denne nøkkelen i konfigurasjonsfila `config.json` under parameteret `Authentication:ApiKey`
 
 ## Bruk av applikasjonen for å hente ut et token

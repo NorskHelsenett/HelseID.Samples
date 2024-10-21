@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using HelseId.SampleApi.Configuration;
 using HelseId.SampleApi.Interfaces;
 using HelseId.Samples.Common.Models;
 

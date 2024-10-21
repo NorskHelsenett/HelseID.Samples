@@ -7,7 +7,7 @@ using HelseId.Samples.Common.AudienceValidation;
 using HelseID.Samples.Configuration;
 using IdentityModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Logging;
 
 namespace HelseId.SampleAPI;
 
@@ -63,6 +63,7 @@ public  class Startup
             {
                 // "Authority" is the address for the HelseID server
                 options.Authority = _settings.Authority;
+                
 
                 // The following parameters (and a few others) are all true by default, but set to true here for instructive purposes:
                 options.RequireHttpsMetadata = true;
@@ -195,5 +196,9 @@ public  class Startup
         webApplication.UseAuthentication();
         webApplication.UseAuthorization();
         webApplication.MapControllers();
+
+        // Use these only in a test environment:
+        IdentityModelEventSource.ShowPII = true;
+        IdentityModelEventSource.LogCompleteSecurityArtifact = true;
     }
 }
