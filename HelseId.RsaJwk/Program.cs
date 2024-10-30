@@ -58,7 +58,7 @@ static (JsonWebKey privateJwk, JsonWebKey publicJwk) GenerateRsaKey(Options opti
 
     var jwk = JsonWebKeyConverter.ConvertFromRSASecurityKey(securityKey);
     jwk.Use = "sig";
-    jwk.Alg = options.Alg ?? SecurityAlgorithms.RsaSha512;
+    jwk.Alg = options.Alg ?? SecurityAlgorithms.RsaSsaPssSha512;
 
     var privateJwk = new JsonWebKey
     {
@@ -98,7 +98,7 @@ static (JsonWebKey privateJwk, JsonWebKey publicJwk) GenerateEcdsaKey(Options op
 
     var jwk = JsonWebKeyConverter.ConvertFromECDsaSecurityKey(securityKey);
     jwk.Use = "sig";
-    jwk.Alg = options.Alg ?? SecurityAlgorithms.EcdsaSha256;
+    jwk.Alg = options.Alg ?? SecurityAlgorithms.EcdsaSha512;
 
     var privateJwk = new JsonWebKey
     {
