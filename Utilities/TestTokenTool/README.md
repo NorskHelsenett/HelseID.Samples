@@ -115,7 +115,7 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen) med DPoP:
 ```
 ### Generelle parametre: for å justere standard-claim som beskriver aspekter med en (fiktiv) klient
 ```
-  --aud                                <TEXT>             []
+  --audience                                 <TEXT>             []
   The returned token will contain an audience claim that matches the injected value. If this is not set, the audience will be set as 'nhn:some:api'.
 
   --issuerEnvironment
