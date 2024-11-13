@@ -16,26 +16,48 @@ public class ApiCaller : IApiCaller
         var accessToken = tokenResponse.SuccessResponse.AccessTokenJwt;
         using var httpClient = new HttpClient();
 
-        Console.WriteLine("Return from API:");
         if (parameters.UseDPoP)
         {
             if (tokenResponse.SuccessResponse.DPoPProof == null)
             {
                 throw new Exception("No DPoP proof received");
             }
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, "https://localhost:5081/user-login-clients/greetings");
-            requestMessage.SetDPoPToken(accessToken, tokenResponse.SuccessResponse.DPoPProof);
 
-            var httpResponse = await httpClient.SendAsync(requestMessage);
+            await CallApiWithDpopProof(tokenResponse, accessToken, httpClient);
 
-            Console.WriteLine(await httpResponse.Content.ReadAsStringAsync());
+            if (parameters.ReuseDPoPProof)
+            {
+                await CallApiWithDpopProof(tokenResponse, accessToken, httpClient);
+            }
         }
         else
         {
-            httpClient.SetBearerToken(accessToken);
-
-            var httpResponse = await httpClient.GetStringAsync("https://localhost:5081/machine-clients/greetings");
-            Console.WriteLine(httpResponse);
+            await CallApiWithBearerToken(httpClient, accessToken);
         }
+    }
+
+    private static async Task ReadToConsole(HttpResponseMessage httpResponse)
+    {
+        Console.WriteLine("-----");
+        Console.WriteLine("Return from API:");
+        Console.WriteLine($"Status code from http response: {httpResponse.StatusCode}");
+        Console.WriteLine(await httpResponse.Content.ReadAsStringAsync());
+    }
+
+    private static async Task CallApiWithDpopProof(TokenResponse tokenResponse, string accessToken, HttpClient httpClient)
+    {
+        var requestMessage = new HttpRequestMessage(HttpMethod.Get, "https://localhost:5081/machine-clients/greetings");
+        requestMessage.SetDPoPToken(accessToken, tokenResponse.SuccessResponse.DPoPProof!);
+        var httpResponse = await httpClient.SendAsync(requestMessage);
+        await ReadToConsole(httpResponse);
+    }
+    
+    private static async Task CallApiWithBearerToken(HttpClient httpClient, string accessToken)
+    {
+        httpClient.SetBearerToken(accessToken);
+
+        var requestMessage = new HttpRequestMessage(HttpMethod.Get, "https://localhost:5081/machine-clients/greetings-without-dpop");
+        var httpResponse = await httpClient.SendAsync(requestMessage);
+        await ReadToConsole(httpResponse);
     }
 }

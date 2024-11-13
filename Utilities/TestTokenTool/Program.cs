@@ -154,6 +154,7 @@ public class Program
             SaveTokenToFile = options.saveTokenToFile,
             UseDPoP = options.createDPoPTokenWithDPoPProof,
             CallApi = options.callApi,
+            ReuseDPoPProof = options.reuseDpopProofForApi,
         };
         TokenPrinter.WriteResponse(tokenResponse, parameters);
         IApiCaller apiCaller = new ApiCaller();

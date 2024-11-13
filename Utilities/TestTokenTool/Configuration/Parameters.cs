@@ -11,4 +11,6 @@ public class Parameters
     public bool CallApi { get; set; }
     
     public bool UseDPoP { get; set; }
+    
+    public bool ReuseDPoPProof { get; set; }
 }

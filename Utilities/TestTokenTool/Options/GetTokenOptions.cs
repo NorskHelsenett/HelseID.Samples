@@ -166,6 +166,8 @@ public class GetTokenOptions : IArgumentModel
     public string htmClaimValue { get; set; } = string.Empty;
     [Named(Description = "If this value is set, an invalid DPoP proof will we returned")]
     public InvalidDPoPProofParameters invalidDPoPProof { get; set; } = InvalidDPoPProofParameters.None;
+    [Named(Description = "When calling an API with a DPoP proof, the API is called twice with the same DPoP proof. This should trigger an error on the second call.")]
+    public bool reuseDpopProofForApi { get; set; } = false;
     [Named(DescriptionLines = new[] {"If set with a valid jwk, the DPoP proof will be signed with this key", "", "API options:"})]
     public string privateKeyForProofCreation { get; set; } = string.Empty;
     [Named(Description = "If this value is set, the application will call the sample API with the returned token")]

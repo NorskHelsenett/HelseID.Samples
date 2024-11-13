@@ -285,8 +285,10 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen) med DPoP:
 
   --invalidDPoPProof                         <INVALIDDPOPPROOFPARAMETERS>
   If this value is set, an invalid DPoP proof will we returned
-  Allowed values: None, DontSetHtuClaimValue, DontSetHtmClaimValue, SetIatValueInThePast, SetIatValueInTheFuture, DontSetAthClaimValue, DontSetAlgHeader, DontSetJwkHeader, DontSetJtiClaim, SetAlgHeaderToASymmetricAlgorithm, SetPrivateKeyInJwkHeader, SetInvalidTypHeaderValue, SetAnInvalidSignature, SetAnInvalidJktValueInToken   
-
+  Allowed values: None, DontSetHtuClaimValue, DontSetHtmClaimValue, SetIatValueInThePast, SetIatValueInTheFuture, DontSetAthClaimValue, DontSetAlgHeader, DontSetJwkHeader, DontSetJtiClaim, SetAlgHeaderToASymmetricAlgorithm, SetPrivateKeyInJwkHeader, SetInvalidTypHeaderValue, SetAnInvalidSignature, SetAnInvalidJktValueInToken
+  
+  --invalidDPoPProof
+  When calling an API with a DPoP proof, the API is called twice with the same DPoP proof. This should trigger an error on the second call.
 ```
 ### Parametre for å lage et 'cnf'-claim (DPoP) i tokenet
 
