@@ -28,9 +28,6 @@ public static class ConfigurationValues
     public const string SampleApiForResourceIndicators1Scope = $"{SampleApiForResourceIndicators1Audience}/some-scope";
     public const string SampleApiForResourceIndicators2Scope = $"{SampleApiForResourceIndicators2Audience}/some-scope";
 
-    // The scope that is needed for access to the clientinfo_endpoint on HelseID (https://helseid.atlassian.net/wiki/spaces/HELSEID/pages/492044292/Client+Info+Endpoint):
-    private const string ClientInfoScope = "helseid://scopes/client/info";
-
     // HelseID security level claim
     public const string HelseIdSecurityLevelClaim = "helseid://claims/identity/security_level";
 
@@ -133,7 +130,7 @@ public static class ConfigurationValues
     // -----------------------------------------------------------------------------------------------------------------
 
     // Sets both the client credential scope (for claims that the sample API needs) and the client info scope for use against the client info endpoint:
-    public const string ClientCredentialsSampleScope = $"{ClientCredentialsScopeForSampleApi} {ClientInfoScope}";
+    public const string ClientCredentialsSampleScope = $"{ClientCredentialsScopeForSampleApi}";
     public const string ApiAccessSampleScope = $"openid profile offline_access {AuthorizationCodeScopeForSampleApi} {GeneralHelseIdScopes}";
     public const string ApiAccessSampleScopeForMultiTenantApp = $"openid profile offline_access {AuthorizationCodeScopeForSampleApi} {GeneralHelseIdScopes}";
     public const string TokenExchangeSubjectClientScope = $"openid profile offline_access {TokenExchangeApiScope} {GeneralHelseIdScopes}";

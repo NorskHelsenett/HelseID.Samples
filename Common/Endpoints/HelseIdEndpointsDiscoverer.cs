@@ -19,15 +19,4 @@ public class HelseIdEndpointsDiscoverer : IHelseIdEndpointsDiscoverer
         var disco = await _discoveryDocumentGetter.GetDiscoveryDocument();
         return disco.TokenEndpoint!;
     }
-    
-    public async Task<string> GetClientInfoEndpointFromHelseId()
-    {
-        var disco = await _discoveryDocumentGetter.GetDiscoveryDocument();
-        var clientInfoUrl = disco.TryGetString(HelseIdConstants.ClientInfoEndpointName);
-        if (string.IsNullOrEmpty(clientInfoUrl))
-        {
-            throw new Exception($"Unable to get the URL of the clientInfo endpoint. Looking for '{HelseIdConstants.ClientInfoEndpointName}'");
-        }
-        return clientInfoUrl;
-    }
 }

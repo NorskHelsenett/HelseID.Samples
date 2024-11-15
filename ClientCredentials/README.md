@@ -27,10 +27,7 @@ By using options on the command line, you can instruct the application to
 * The main folder contains
   * The `Program` class that configures the machine-to-machine client
 * **Client**: this folder contains the application proper; the `Machine2MachineClient`, which orchestrates the actual work
-* **ClientInfoEndpoint**: this folder contains code that consumes the clientinfo endpoint from HelseID (for debugging purposes)
 * **Configuration**: this folder contains code that creates and configures `Machine2MachineClient`
-* **Interfaces**: this folder contains interfaces that are implemented elsewhere in the code
-* **TokenRequests**: this folder contains the code that requests an access token from HelseID
 
 
 ### Requirements
