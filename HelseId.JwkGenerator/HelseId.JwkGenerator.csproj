@@ -9,7 +9,6 @@
     <PublishReadyToRun>true</PublishReadyToRun>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <AssemblyName>helseid-rsajwk</AssemblyName>
-    <RootNamespace>HelseId.RsaJwk</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

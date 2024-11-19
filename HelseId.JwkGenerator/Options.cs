@@ -1,7 +1,7 @@
 
 using CommandLine;
 
-namespace HelseId.RsaJwk;
+namespace HelseId.JwkGenerator;
 
 public class Options
 {

@@ -1,12 +1,12 @@
 ﻿using CommandLine;
-using HelseId.RsaJwk;
+using HelseId.JwkGenerator;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text.Json;
-using JsonWebKey = HelseId.RsaJwk.JsonWebKey;
-using JsonWebKeySet = HelseId.RsaJwk.JsonWebKeySet;
+using JsonWebKey = HelseId.JwkGenerator.JsonWebKey;
+using JsonWebKeySet = HelseId.JwkGenerator.JsonWebKeySet;
 
 new Parser(with =>
     {

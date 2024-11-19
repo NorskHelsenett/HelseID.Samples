@@ -1,4 +1,4 @@
-# HelseId.RsaJwk
+# HelseId.JwkGenerator
 
 ## Introduction
 

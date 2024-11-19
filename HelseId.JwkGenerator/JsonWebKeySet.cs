@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace HelseId.RsaJwk;
+namespace HelseId.JwkGenerator;
 
 internal class JsonWebKeySet
 {

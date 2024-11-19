@@ -1,4 +1,4 @@
-namespace HelseId.RsaJwk;
+namespace HelseId.JwkGenerator;
 
 using System.Text.Json.Serialization;
 
