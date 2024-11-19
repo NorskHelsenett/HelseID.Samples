@@ -17,6 +17,9 @@ public class Options
     [Option('s', "rsa-size", HelpText = "Key size in bits for RSA key. Default 4096. Min 2048.")]
     public int? RsaKeySize { get; set; }
 
+    [Option('c', "curve", HelpText = "Curve used for EC key. Default P-521.")]
+    public string? EcCurve { get; set; }
+
     [Option("jwks", HelpText = "Also write public key as a Json Web Key Set.", Default = false)]
     public bool Jwks { get; set; }
 }

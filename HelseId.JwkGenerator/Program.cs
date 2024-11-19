@@ -92,7 +92,22 @@ static (JsonWebKey privateJwk, JsonWebKey publicJwk) GenerateRsaKey(Options opti
 
 static (JsonWebKey privateJwk, JsonWebKey publicJwk) GenerateEcdsaKey(Options options)
 {
-    var key = ECDsa.Create(ECCurve.NamedCurves.nistP521);
+    ECCurve GetCurveFromName(string curveName)
+    {
+        return curveName switch
+        {
+            "P-256" => ECCurve.NamedCurves.nistP256,
+            "P-384" => ECCurve.NamedCurves.nistP384,
+            "P-521" => ECCurve.NamedCurves.nistP521,
+            _ => throw new Exception($"Unsupported curve '{curveName}'"),
+        };
+    }
+
+    var curve = !string.IsNullOrEmpty(options.EcCurve)
+        ? GetCurveFromName(options.EcCurve)
+        : ECCurve.NamedCurves.nistP521;
+
+    var key = ECDsa.Create(curve);
     var securityKey = new ECDsaSecurityKey(key)
     {
         KeyId = Guid.NewGuid().ToString().Replace("-", string.Empty)
