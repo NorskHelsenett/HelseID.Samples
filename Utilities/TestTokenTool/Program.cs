@@ -114,26 +114,67 @@ public class Program
             },
             TillitsrammeverkClaimsParameters = new TillitsrammeverkClaimsParameters
             {
+                DontSetPractitionerAuthorization = options.dontSetPractitionerAuthorization,
+                DontSetPractitionerDepartment = options.dontSetPractitionerDepartment,
+                DontSetPractitionerHprNr = options.dontSetPractitionerHprNr,
+                DontSetCareRelationshipPurposeOfUseDetails = options.dontSetCareRelationshipPurposeOfUseDetails,
+                DontSetCareRelationshipHealthcareService = options.dontSetCareRelationshipHealthcareService,
+                DontSetPatientsDepartment = options.dontSetPatientsDepartment,
+                DontSetPatientsPointOfCare = options.dontSetPatientsPointOfCare,
+                
+                PractitionerIdentifierSystem = options.practitionerIdentifierSystem,
+                PractitionerIdentifierAuthority = options.practitionerIdentifierAuthority,
+                
+                PractitionerHprNrSystem = options.practitionerHprNrSystem,
+                PractitionerHprNrAuthority = options.practitionerHprNrAuthority,
+                
                 PractitionerAuthorizationCode = options.practitionerAuthorizationCode,
                 PractitionerAuthorizationText = options.practitionerAuthorizationText,
+                PractitionerAuthorizationSystem = options.practitionerAuthorizationSystem,
+                PractitionerAuthorizationAssigner = options.practitionerAuthorizationAssigner, 
+                
                 PractitionerLegalEntityId = options.practitionerLegalEntityId,
                 PractitionerLegalEntityName = options.practitionerLegalEntityName,
+                PractitionerLegalEntitySystem = options.practitionerLegalEntitySystem,
+                PractitionerLegalEntityAuthority = options.practitionerLegalEntityAuthority,
+                
                 PractitionerPointOfCareId = options.practitionerPointOfCareId,
                 PractitionerPointOfCareName = options.practitionerPointOfCareName,
+                PractitionerPointOfCareSystem = options.practitionerPointOfCareSystem,
+                PractitionerPointOfCareAuthority = options.practitionerPointOfCareAuthority,
+                
                 PractitionerDepartmentId  = options.practitionerDepartmentId,
                 PractitionerDepartmentName = options.practitionerDepartmentName,
-
+                PractitionerDepartmentSystem = options.practitionerDepartmentSystem,
+                PractitionerDepartmentAuthority = options.practitionerDepartmentAuthority,
+                
                 CareRelationshipHealthcareServiceCode = options.careRelationshipHealthcareServiceCode,
                 CareRelationshipHealthcareServiceText = options.careRelationshipHealthcareServiceText,
+                CareRelationshipHealthcareSystem = options.careRelationshipHealthcareSystem,
+                CareRelationshipHealthcareAssigner = options.careRelationshipHealthcareAssigner,
+                
                 CareRelationshipPurposeOfUseCode = options.careRelationshipPurposeOfUseCode,
                 CareRelationshipPurposeOfUseText = options.careRelationshipPurposeOfUseText,
+                CareRelationshipPurposeOfUseSystem = options.careRelationshipPurposeOfUseSystem,
+                CareRelationshipPurposeOfUseAssigner = options.careRelationshipPurposeOfUseAssigner,
+                
                 CareRelationshipPurposeOfUseDetailsCode = options.careRelationshipPurposeOfUseDetailsCode,
                 CareRelationshipPurposeOfUseDetailsText = options.careRelationshipPurposeOfUseDetailsText,
-                CareRelationshipTracingRefId = options.careRelationshipTracingRefId,
+                CareRelationshipPurposeOfUseDetailsSystem = options.careRelationshipPurposeOfUseDetailsSystem,
+                CareRelationshipPurposeOfUseDetailsAssigner = options.careRelationshipPurposeOfUseDetailsAssigner,
+                    
+                CareRelationshipDecisionRefId = options.careRelationshipDecisionRefId,
+                CareRelationshipDecisionRefUserSelected = options.careRelationshipDecisionRefUserSelected,
+                
                 PatientsPointOfCareId = options.patientsPointOfCareId,
                 PatientsPointOfCareName = options.patientsPointOfCareName,
+                PatientsPointOfCareSystem = options.patientsPointOfCareSystem,
+                PatientsPointOfCareAuthority = options.patientsPointOfCareAuthority,
+                
                 PatientsDepartmentId = options.patientsDepartmentId,
                 PatientsDepartmentName = options.patientsDepartmentName,
+                PatientsDepartmentSystem = options.patientsDepartmentSystem,
+                PatientsDepartmentAuthority = options.patientsDepartmentAuthority,
             },
             DPoPProofParameters = new DPoPProofParameters
             {

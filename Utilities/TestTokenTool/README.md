@@ -212,61 +212,151 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen) med DPoP:
 ```
 ### Parametre for tillitsrammeverket: brukes for å injisere verdier i en claim-struktur som brukes i forbindelse med tillitsrammeverket (dokumentdeling)
 ```
-  --practitionerAuthorizationCode            <TEXT>                        []
+  --dontSetPractitionerHprNr
   Parameter for use in 'tillitsrammeverk' claims
 
-  --practitionerAuthorizationText            <TEXT>                        []
+  --dontSetPractitionerAuthorization
   Parameter for use in 'tillitsrammeverk' claims
 
-  --practitionerLegalEntityId                <TEXT>                        []
+  --dontSetPractitionerDepartment
   Parameter for use in 'tillitsrammeverk' claims
 
-  --practitionerLegalEntityName              <TEXT>                        []
+  --dontSetCareRelationshipHealthcareService
   Parameter for use in 'tillitsrammeverk' claims
 
-  --practitionerPointOfCareId                <TEXT>                        []
+  --dontSetCareRelationshipPurposeOfUseDetails
   Parameter for use in 'tillitsrammeverk' claims
 
-  --practitionerPointOfCareName              <TEXT>                        []
+  --dontSetPatientsPointOfCare
   Parameter for use in 'tillitsrammeverk' claims
 
-  --practitionerDepartmentId                 <TEXT>                        []
+  --dontSetPatientsDepartment
   Parameter for use in 'tillitsrammeverk' claims
 
-  --practitionerDepartmentName               <TEXT>                        []
+  --practitionerIdentifierSystem                 <TEXT>                        []
   Parameter for use in 'tillitsrammeverk' claims
 
-  --careRelationshipHealthcareServiceCode    <TEXT>                        []
+  --practitionerIdentifierAuthority              <TEXT>                        []
   Parameter for use in 'tillitsrammeverk' claims
 
-  --careRelationshipHealthcareServiceText    <TEXT>                        []
+  --practitionerHprNrSystem                      <TEXT>                        []
   Parameter for use in 'tillitsrammeverk' claims
 
-  --careRelationshipPurposeOfUseCode         <TEXT>                        []
+  --practitionerHprNrAuthority                   <TEXT>                        []
   Parameter for use in 'tillitsrammeverk' claims
 
-  --careRelationshipPurposeOfUseText         <TEXT>                        []
+  --practitionerAuthorizationCode                <TEXT>                        []
   Parameter for use in 'tillitsrammeverk' claims
 
-  --careRelationshipPurposeOfUseDetailsCode  <TEXT>                        []
+  --practitionerAuthorizationText                <TEXT>                        []
   Parameter for use in 'tillitsrammeverk' claims
 
-  --careRelationshipPurposeOfUseDetailsText  <TEXT>                        []
+  --practitionerAuthorizationSystem              <TEXT>                        []
   Parameter for use in 'tillitsrammeverk' claims
 
-  --careRelationshipTracingRefId             <TEXT>                        []
-  Parameter for use in 'tillitsrammeverk' claims
-  
-  --patientsPointOfCareId                    <TEXT>                        []
+  --practitionerAuthorizationAssigner            <TEXT>                        []
   Parameter for use in 'tillitsrammeverk' claims
 
-  --patientsPointOfCareName                  <TEXT>                        []
+  --practitionerLegalEntityId                    <TEXT>                        []
   Parameter for use in 'tillitsrammeverk' claims
 
-  --patientsDepartmentId                     <TEXT>                        []
-    Parameter for use in 'tillitsrammeverk' claims
+  --practitionerLegalEntityName                  <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
 
-  --patientsDepartmentName                   <TEXT>                        []
+  --practitionerLegalEntitySystem                <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --practitionerLegalEntityAuthority             <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --practitionerPointOfCareId                    <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --practitionerPointOfCareName                  <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --practitionerPointOfCareSystem                <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --practitionerPointOfCareAuthority             <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --practitionerDepartmentId                     <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --practitionerDepartmentName                   <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --practitionerDepartmentSystem                 <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --practitionerDepartmentAuthority              <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --careRelationshipHealthcareServiceCode        <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --careRelationshipHealthcareServiceText        <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --careRelationshipHealthcareSystem             <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --careRelationshipHealthcareAssigner           <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --careRelationshipPurposeOfUseCode             <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --careRelationshipPurposeOfUseText             <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --careRelationshipPurposeOfUseSystem           <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --careRelationshipPurposeOfUseAssigner         <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --careRelationshipPurposeOfUseDetailsCode      <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --careRelationshipPurposeOfUseDetailsText      <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --careRelationshipPurposeOfUseDetailsSystem    <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --careRelationshipPurposeOfUseDetailsAssigner  <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --careRelationshipDecisionRefId                <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --careRelationshipDecisionRefUserSelected                                    [True]
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --patientsPointOfCareId                        <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --patientsPointOfCareName                      <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --patientsPointOfCareSystem                    <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --patientsPointOfCareAuthority                 <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --patientsDepartmentId                         <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --patientsDepartmentName                       <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --patientsDepartmentSystem                     <TEXT>                        []
+  Parameter for use in 'tillitsrammeverk' claims
+
+  --patientsDepartmentAuthority                  <TEXT>                        []
   Parameter for use in 'tillitsrammeverk' claims
 ```
 ### Brukerparametre: for å justere claim og bevis for DPoP
