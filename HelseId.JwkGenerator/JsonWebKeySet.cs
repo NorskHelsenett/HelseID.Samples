@@ -5,5 +5,5 @@ namespace HelseId.JwkGenerator;
 
 internal class JsonWebKeySet
 {
-    public List<JsonWebKey> Keys { get; set; }
+    public List<JsonWebKey> Keys { get; set; } = [];
 }

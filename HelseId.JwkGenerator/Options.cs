@@ -9,10 +9,10 @@ public class Options
     public KeyType KeyType { get; set; }
 
     [Option('p', "prefix", HelpText = "Optional prefix for the generated JWK files.")]
-    public string Prefix { get; set; }
+    public string? Prefix { get; set; }
 
     [Option('a', "alg", HelpText = "Algorithm intended for use with the key. Defaults to PS512 for RSA, and ES512 for ECDSA")]
-    public string Alg { get; set; }
+    public string? Alg { get; set; }
 
     [Option('s', "rsa-size", HelpText = "Key size in bits for RSA key. Default 4096. Min 2048.")]
     public int? RsaKeySize { get; set; }

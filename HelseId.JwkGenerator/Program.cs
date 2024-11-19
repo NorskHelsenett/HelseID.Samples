@@ -16,7 +16,7 @@ new Parser(with =>
     })
     .ParseArguments<Options>(args)
     .MapResult(
-        options => GenerateKey(options),
+        GenerateKey,
         errors => 1
     );
 
@@ -53,8 +53,10 @@ static (JsonWebKey privateJwk, JsonWebKey publicJwk) GenerateRsaKey(Options opti
 {
     var keySize = options.RsaKeySize ?? 4096;
     var key = RSA.Create(keySize);
-    var securityKey = new RsaSecurityKey(key);
-    securityKey.KeyId = Guid.NewGuid().ToString().Replace("-", string.Empty);
+    var securityKey = new RsaSecurityKey(key)
+    {
+        KeyId = Guid.NewGuid().ToString().Replace("-", string.Empty)
+    };
 
     var jwk = JsonWebKeyConverter.ConvertFromRSASecurityKey(securityKey);
     jwk.Use = "sig";

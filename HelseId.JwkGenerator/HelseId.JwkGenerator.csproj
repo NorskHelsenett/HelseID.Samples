@@ -8,7 +8,8 @@
     <TrimMode>partial</TrimMode>
     <PublishReadyToRun>true</PublishReadyToRun>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-    <AssemblyName>helseid-rsajwk</AssemblyName>
+    <AssemblyName>helseid-jwkgenerator</AssemblyName>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
