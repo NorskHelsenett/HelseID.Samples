@@ -70,15 +70,11 @@ static int GenerateKey(Options options)
 static (JsonWebKey privateJwk, JsonWebKey publicJwk) GenerateRsaKey(Options options)
 {
     var key = RSA.Create(options.RsaKeySize);
-    var securityKey = new RsaSecurityKey(key)
-    {
-        KeyId = Guid.NewGuid().ToString().Replace("-", string.Empty)
-    };
+    var securityKey = new RsaSecurityKey(key);
 
     var jwk = JsonWebKeyConverter.ConvertFromRSASecurityKey(securityKey);
     jwk.Use = "sig";
     jwk.Alg = options.Alg ?? SecurityAlgorithms.RsaSsaPssSha512;
-
     jwk.Kid = CreateKid(jwk);
 
     var privateJwk = new JsonWebKey
