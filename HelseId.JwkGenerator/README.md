@@ -14,7 +14,7 @@ The [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) is requ
 dotnet run -- --key-type rsa|ec --prefix <file-prefix>
 ```
 
-Replace `<file-prefix>` with a descriptive name of your key. It will be part of the filenames. For example, `dotnet run -- --key-type rsa --prefix test` will create two files: 'test_jwk.json' and 'test_jwk_pub.json'. The first file contains the whole key pair (including the private key), while the second file only contains the public key.
+Replace `<file-prefix>` with a descriptive name of your key. It will be part of the filenames. For example, `dotnet run -- --key-type ec --prefix test` will create two files: 'test_jwk.json' and 'test_jwk_pub.json'. The first file contains the key pair (including the private key), while the second file only contains the public key.
 
 ## Build exe
 

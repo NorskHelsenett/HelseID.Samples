@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text.Json;
+using AlgorithmValidator = HelseId.JwkGenerator.AlgorithmValidator;
 using JsonWebKey = HelseId.JwkGenerator.JsonWebKey;
 using JsonWebKeySet = HelseId.JwkGenerator.JsonWebKeySet;
 
@@ -24,24 +25,41 @@ static int GenerateKey(Options options)
 {
     if (options.RsaKeySize < 2048)
     {
-        Console.WriteLine("RSA key size must be at least 2048");
+        Logger.Error("RSA key size must be at least 2048");
         return 1;
     }
 
     var keyType = options.KeyType;
 
     JsonWebKey privateJwk, publicJwk;
-    switch (keyType)
+
+    try
     {
-        case KeyType.Rsa:
-            (privateJwk, publicJwk) = GenerateRsaKey(options);
-            break;
-        case KeyType.Ec:
-            (privateJwk, publicJwk) = GenerateEcdsaKey(options);
-            break;
-        default:
-            Console.WriteLine($"Unsupported key type '{keyType}'");
-            return 1;
+        switch (keyType)
+        {
+            case KeyType.Rsa:
+                (privateJwk, publicJwk) = GenerateRsaKey(options);
+                break;
+
+            case KeyType.Ec:
+                (privateJwk, publicJwk) = GenerateEcdsaKey(options);
+                break;
+
+            default:
+                Logger.Error($"Unsupported key type '{keyType}'");
+                return 1;
+        }
+    }
+    catch (Exception ex)
+    {
+        Logger.Error(ex.Message);
+        return 1;
+    }
+
+    if (!string.IsNullOrWhiteSpace(options.Alg)
+        && !AlgorithmValidator.IsValidAlgorithm(options.Alg, options.KeyType))
+    {
+        Logger.Warning($"Algorithm '{options.Alg}' is not approved by HelseID for key type '{options.KeyType.ToString().ToUpperInvariant()}'");
     }
 
     WriteKeyPair(privateJwk, publicJwk, options);
@@ -51,8 +69,7 @@ static int GenerateKey(Options options)
 
 static (JsonWebKey privateJwk, JsonWebKey publicJwk) GenerateRsaKey(Options options)
 {
-    var keySize = options.RsaKeySize ?? 4096;
-    var key = RSA.Create(keySize);
+    var key = RSA.Create(options.RsaKeySize);
     var securityKey = new RsaSecurityKey(key)
     {
         KeyId = Guid.NewGuid().ToString().Replace("-", string.Empty)
@@ -61,6 +78,8 @@ static (JsonWebKey privateJwk, JsonWebKey publicJwk) GenerateRsaKey(Options opti
     var jwk = JsonWebKeyConverter.ConvertFromRSASecurityKey(securityKey);
     jwk.Use = "sig";
     jwk.Alg = options.Alg ?? SecurityAlgorithms.RsaSsaPssSha512;
+
+    jwk.Kid = CreateKid(jwk);
 
     var privateJwk = new JsonWebKey
     {
@@ -108,14 +127,12 @@ static (JsonWebKey privateJwk, JsonWebKey publicJwk) GenerateEcdsaKey(Options op
         : ECCurve.NamedCurves.nistP521;
 
     var key = ECDsa.Create(curve);
-    var securityKey = new ECDsaSecurityKey(key)
-    {
-        KeyId = Guid.NewGuid().ToString().Replace("-", string.Empty)
-    };
+    var securityKey = new ECDsaSecurityKey(key);
 
     var jwk = JsonWebKeyConverter.ConvertFromECDsaSecurityKey(securityKey);
     jwk.Use = "sig";
     jwk.Alg = options.Alg ?? SecurityAlgorithms.EcdsaSha512;
+    jwk.Kid = CreateKid(jwk);
 
     var privateJwk = new JsonWebKey
     {
@@ -144,23 +161,26 @@ static (JsonWebKey privateJwk, JsonWebKey publicJwk) GenerateEcdsaKey(Options op
 
 static void WriteKeyPair(JsonWebKey privateJwk, JsonWebKey publicJwk, Options options)
 {
-    var jwkFileName = "jwk.json";
+    var privateJwkFileName = "jwk.json";
     var publicJwkFileName = "jwk_pub.json";
     var jwksFileName = "jwks.json";
 
     var prefix = options.Prefix;
-    if (prefix != null)
+
+    if (!string.IsNullOrWhiteSpace(prefix))
     {
-        jwkFileName = $"{prefix}_{jwkFileName}";
+        privateJwkFileName = $"{prefix}_{privateJwkFileName}";
         publicJwkFileName = $"{prefix}_{publicJwkFileName}";
         jwksFileName = $"{prefix}_{jwksFileName}";
     }
 
-    File.WriteAllText(jwkFileName, JsonSerializer.Serialize(privateJwk, SourceGenerationContext.Default.JsonWebKey));
-    Console.WriteLine($"Wrote JWK to {jwkFileName}");
+    Logger.Info($"Key type is {(options.KeyType == KeyType.Rsa ? $"RSA with a key length of {options.RsaKeySize} bits" : $"ECDSA {nameof(ECCurve.NamedCurves.nistP521)}")}");
+
+    File.WriteAllText(privateJwkFileName, JsonSerializer.Serialize(privateJwk, SourceGenerationContext.Default.JsonWebKey));
+    Logger.Success($"Wrote private JWK to {privateJwkFileName}");
 
     File.WriteAllText(publicJwkFileName, JsonSerializer.Serialize(publicJwk, SourceGenerationContext.Default.JsonWebKey));
-    Console.WriteLine($"Wrote public JWK to {publicJwkFileName}");
+    Logger.Success($"Wrote public JWK to {publicJwkFileName}");
 
     if (options.Jwks)
     {
@@ -170,6 +190,11 @@ static void WriteKeyPair(JsonWebKey privateJwk, JsonWebKey publicJwk, Options op
         };
 
         File.WriteAllText(jwksFileName, JsonSerializer.Serialize(jwks, SourceGenerationContext.Default.JsonWebKeySet));
-        Console.WriteLine($"Wrote JWKS to {jwksFileName}");
+        Logger.Success($"Wrote JWKS to {jwksFileName}");
     }
+}
+
+static string CreateKid(Microsoft.IdentityModel.Tokens.JsonWebKey jwk)
+{
+    return Base64UrlEncoder.Encode(jwk.ComputeJwkThumbprint());
 }
