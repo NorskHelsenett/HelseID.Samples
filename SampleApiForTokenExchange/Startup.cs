@@ -57,7 +57,7 @@ public class Startup
         webApplicationBuilder.Services.AddSingleton<IDiscoveryDocumentGetter>(new DiscoveryDocumentGetter(ConfigurationValues.StsUrl));
         webApplicationBuilder.Services.AddSingleton<IHelseIdEndpointsDiscoverer, HelseIdEndpointsDiscoverer>();
         webApplicationBuilder.Services.AddSingleton<IPayloadClaimsCreatorForClientAssertion, ClientAssertionPayloadClaimsCreator>();
-        webApplicationBuilder.Services.AddSingleton<IJwtPayloadCreator, JwtPayloadCreator>();
+        webApplicationBuilder.Services.AddSingleton<IJwtClaimsCreator, JwtClaimsCreator>();
         webApplicationBuilder.Services.AddSingleton<ISigningTokenCreator, SigningTokenCreator>();
         webApplicationBuilder.Services.AddSingleton<IDPoPProofCreator, DPoPProofCreator>();
         // Two builder classes are used for creating the token exchange request to HelseID

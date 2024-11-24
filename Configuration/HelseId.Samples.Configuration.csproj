@@ -20,7 +20,6 @@
     <PackageReference Include="Microsoft.IdentityModel.Abstractions" Version="8.2.1" />
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.2.1" />
     <PackageReference Include="Microsoft.IdentityModel.Logging" Version="8.2.1" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
   </ItemGroup>
 
 </Project>

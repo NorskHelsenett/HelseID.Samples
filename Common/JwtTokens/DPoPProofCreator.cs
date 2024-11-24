@@ -1,4 +1,4 @@
-using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Cryptography;
 using System.Text;
 using HelseId.Samples.Common.Configuration;
@@ -45,25 +45,18 @@ public class DPoPProofCreator : IDPoPProofCreator
             _ => throw new InvalidOperationException("Invalid key type for DPoP proof.")
         };
 
-        var jwtHeader = new JwtHeader(signingCredentials)
+        var claims = new Dictionary<string, object>()
         {
-            [JwtClaimTypes.TokenType] = "dpop+jwt",
-            [JwtClaimTypes.JsonWebKey] = jwk,
-        };
-
-        var payload = new JwtPayload
-        {
-            [JwtClaimTypes.JwtId] = Guid.NewGuid().ToString(),
-            [JwtClaimTypes.DPoPHttpMethod] = httpMethod,
-            [JwtClaimTypes.DPoPHttpUrl] = url,
-            [JwtClaimTypes.IssuedAt] = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+            [JwtRegisteredClaimNames.Jti] = Guid.NewGuid().ToString(),
+            ["htm"] = httpMethod,
+            ["htu"] = url,
         };
 
         // Used when accessing the authentication server (HelseID):
         if (!string.IsNullOrEmpty(dPoPNonce))
         {
             // nonce: A recent nonce provided via the DPoP-Nonce HTTP header.
-            payload[JwtClaimTypes.Nonce] = dPoPNonce;
+            claims[JwtClaimTypes.Nonce] = dPoPNonce;
         }
 
         // Used when accessing an API that requires a DPoP token:
@@ -75,10 +68,25 @@ public class DPoPProofCreator : IDPoPProofCreator
             var hash = sha256.ComputeHash(Encoding.ASCII.GetBytes(accessToken));
             var ath = Base64Url.Encode(hash);
 
-            payload[JwtClaimTypes.DPoPAccessTokenHash] = ath;
+            claims[JwtClaimTypes.DPoPAccessTokenHash] = ath;
         }
 
-        var jwtSecurityToken = new JwtSecurityToken(jwtHeader, payload);
-        return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+        var securityTokenDescriptor = new SecurityTokenDescriptor
+        {
+            AdditionalHeaderClaims = new Dictionary<string, object>()
+            {
+                [JwtClaimTypes.TokenType] = "dpop+jwt",
+                [JwtClaimTypes.JsonWebKey] = jwk,
+            },
+            Claims = claims,
+            SigningCredentials = signingCredentials,
+            IssuedAt = DateTime.Now,
+        };
+
+        var tokenHandler = new JsonWebTokenHandler
+        {
+            SetDefaultTimesOnTokenCreation = false
+        };
+        return tokenHandler.CreateToken(securityTokenDescriptor);
     }
 }
