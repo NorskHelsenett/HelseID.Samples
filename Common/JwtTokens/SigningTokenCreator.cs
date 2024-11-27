@@ -1,8 +1,8 @@
-using System.IdentityModel.Tokens.Jwt;
 using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Interfaces.JwtTokens;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Models;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
 namespace HelseId.Samples.Common.JwtTokens;
@@ -13,40 +13,40 @@ namespace HelseId.Samples.Common.JwtTokens;
 /// </summary>
 public class SigningTokenCreator : ISigningTokenCreator
 {
-    private readonly IJwtPayloadCreator _jwtPayloadCreator;
+    private readonly IJwtClaimsCreator _jwtClaimsCreator;
     private readonly HelseIdConfiguration _configuration;
-    
+
     public SigningTokenCreator(
-        IJwtPayloadCreator jwtPayloadCreator,
+        IJwtClaimsCreator jwtClaimsCreator,
         HelseIdConfiguration configuration)
     {
-        _jwtPayloadCreator = jwtPayloadCreator;
+        _jwtClaimsCreator = jwtClaimsCreator;
         _configuration = configuration;
     }
-    
+
     public string CreateSigningToken(IPayloadClaimsCreator payloadClaimsCreator, PayloadClaimParameters payloadClaimParameters)
     {
-        var header = CreateJwtHeaderWithSigningCredentials();
-        var payload = _jwtPayloadCreator.CreateJwtPayload(payloadClaimsCreator, payloadClaimParameters, _configuration);
+        var claims = _jwtClaimsCreator.CreateJwtClaims(payloadClaimsCreator, payloadClaimParameters, _configuration);
+        var signingCredentials = GetClientAssertionSigningCredentials();
 
-        // The JwtSecurityToken class is part of the System.IdentityModel library.
-        var jwtSecurityToken = new JwtSecurityToken(header, payload);
+        var securityTokenDescriptor = new SecurityTokenDescriptor
+        {
+            Claims = claims,
+            SigningCredentials = signingCredentials,
+        };
 
         // This creates a (signed) jwt token which is used for the client assertion.
-        // The JwtSecurityTokenHandler class is part of the System.IdentityModel library.
-        return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+        var tokenHandler = new JsonWebTokenHandler
+        {
+            SetDefaultTimesOnTokenCreation = false
+        };
+
+        return tokenHandler.CreateToken(securityTokenDescriptor);
     }
 
     /// <summary>
-    /// This method uses our (secure) private key to sign the token which is used for the client assertion 
+    /// This method uses our (secure) private key to sign the token which is used for the client assertion
     /// </summary>
-    private JwtHeader CreateJwtHeaderWithSigningCredentials()
-    {
-        var signingCredentials = GetClientAssertionSigningCredentials();
-        // The JwtHeader class is part of the System.IdentityModel library.
-        return new JwtHeader(signingCredentials);
-    }
-
     private SigningCredentials GetClientAssertionSigningCredentials()
     {
         var securityKey = new JsonWebKey(_configuration.PrivateKeyJwk.JwkValue);

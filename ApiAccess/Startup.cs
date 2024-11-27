@@ -1,4 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
 using HelseId.Samples.ApiAccess.AccessTokenUpdaters;
 using HelseId.Samples.ApiAccess.Configuration;
 using HelseId.Samples.ApiAccess.Interfaces.AccessTokenUpdaters;
@@ -26,6 +25,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace HelseId.Samples.ApiAccess;
 
@@ -69,7 +69,7 @@ public class Startup
     {
         // Disables default namespaces added by ASP.NET Core, and uses the exact claims created with the OpenID Server instead,
         // e.g. 'given_name' gets converted to 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'
-        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+        JsonWebTokenHandler.DefaultInboundClaimTypeMap.Clear();
     }
 
     private void ConfigureServices(IServiceCollection services)
@@ -124,7 +124,7 @@ public class Startup
         }
 
         // Builder for client assertions payloads
-        services.AddTransient<IJwtPayloadCreator, JwtPayloadCreator>();
+        services.AddTransient<IJwtClaimsCreator, JwtClaimsCreator>();
         // Builder for JWT tokens used for client assertions
         services.AddSingleton<ISigningTokenCreator, SigningTokenCreator>();
         // Builder for DPoP proofs

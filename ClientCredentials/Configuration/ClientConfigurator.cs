@@ -46,16 +46,17 @@ public class ClientConfigurator
     private static ITokenRequestBuilder CreateTokenRequestBuilder(HelseIdConfiguration configuration, IHelseIdEndpointsDiscoverer endpointsDiscoverer)
     {
         // This sets up the building of a token request for the client credentials grant
-        var jwtPayloadCreator = new JwtPayloadCreator();
-        var signingJwtTokenCreator = new SigningTokenCreator(jwtPayloadCreator, configuration);
+        var jwtClaimsCreator = new JwtClaimsCreator();
+        var signingJwtTokenCreator = new SigningTokenCreator(jwtClaimsCreator, configuration);
         // Two builder classes are used
         //   * A ClientAssertionsBuilder, which creates a client assertion that will be used
-        //     inside the token request to HelseID in order to authenticate this client
-        //   * A TokenRequestBuilder, which creates the token request that is used against
+        //     inside the request to the PAR and token endpoints to HelseID in order to
+        //     authenticate this client
+        //   * A TokenRequestBuilder, which creates any token request that is used against
         //     the HelseID service, and also finds the token endpoint for this request
         //  Also, we need a payloadClaimsCreator that sets the claims for the client assertion token.
         //  The instance of this may or may not create a structured claim for the purpose of
-        //  getting back an access token with an underenhet (child organization).
+        //  getting back an access token with an "underenhet" (child organization).
         var clientAssertionsBuilder = new ClientAssertionsBuilder(signingJwtTokenCreator);
         var dPopProofCreator = new DPoPProofCreator(configuration);
         return new TokenRequestBuilder(clientAssertionsBuilder, endpointsDiscoverer, configuration, dPopProofCreator);
@@ -88,11 +89,10 @@ public class ClientConfigurator
             // Sets up payload configuration (for the client assertion) for a client that implements a
             // multi-tenancy pattern.
             // This is done when the '--use-multi-tenant' option is used on the command line.
-            return new CompositePayloadClaimsCreator(new List<IPayloadClaimsCreator>
-            {
+            return new CompositePayloadClaimsCreator([
                 tokenRequestPayloadClaimsCreator,
-                new PayloadClaimsCreatorForMultiTenantClient(),
-            });
+                new PayloadClaimsCreatorForMultiTenantClient()
+            ]);
         }
 
         if (useChildOrganizationNumberOptionValue)
@@ -100,11 +100,10 @@ public class ClientConfigurator
             // Sets up payload configuration (for the client assertion) for a client that requests an underenhet
             // (child organization) number for the access token.
             // This is done when the '--use-child-org-number' option is used on the command line.
-            return new CompositePayloadClaimsCreator(new List<IPayloadClaimsCreator>
-            {
+            return new CompositePayloadClaimsCreator([
                 tokenRequestPayloadClaimsCreator,
-                new PayloadClaimsCreatorWithChildOrgNumber(),
-            });
+                new PayloadClaimsCreatorWithChildOrgNumber()
+            ]);
         }
 
         // Sets up payload configuration (for the client assertion) for a "normal" client

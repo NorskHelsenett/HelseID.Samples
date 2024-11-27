@@ -8,26 +8,26 @@ namespace HelseId.Samples.ApiAccess.Stores;
 public class MemoryUserSessionDataStore : IUserSessionDataStore
 {
     // Slight hack to make the token store available for all instances
-    private static readonly Dictionary<string, UserSessionData> _userSessions = new Dictionary<string, UserSessionData>();
+    private static readonly Dictionary<string, UserSessionData> UserSessions = new();
 
     public Task UpsertUserSessionData(string sessionIdValue, UserSessionData userSessionData)
     {
-        _userSessions[sessionIdValue] = userSessionData;
+        UserSessions[sessionIdValue] = userSessionData;
         return Task.CompletedTask;
     }
 
     public Task<UserSessionData> GetUserUserSessionData(string sessionIdValue)
     {
-        if (!_userSessions.ContainsKey(sessionIdValue))
+        if (!UserSessions.ContainsKey(sessionIdValue))
         {
             throw new SessionIdDoesNotExistException();
         }
-        return Task.FromResult(_userSessions[sessionIdValue]);
+        return Task.FromResult(UserSessions[sessionIdValue]);
     }
 
     public Task ClearUserSession(string sessionIdValue)
     {
-        _userSessions.Remove(sessionIdValue);
+        UserSessions.Remove(sessionIdValue);
         return Task.CompletedTask;
     }
 }

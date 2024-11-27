@@ -34,16 +34,4 @@ public class ApiConsumer : IApiConsumer
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             });
     }
-
-    private static async Task<ApiResponse?> CallApi(HttpClient httpClient, string apiUrl)
-    {
-        var response = await httpClient.GetStringAsync(apiUrl);
-
-        return JsonSerializer.Deserialize<ApiResponse>(
-            response,
-            new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            });
-    }
 }

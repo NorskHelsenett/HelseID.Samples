@@ -1,5 +1,4 @@
 using HelseId.Samples.Common.Interfaces.Endpoints;
-using HelseId.Samples.Common.Models;
 
 namespace HelseId.Samples.Common.Endpoints;
 
