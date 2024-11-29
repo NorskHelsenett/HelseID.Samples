@@ -1,8 +1,9 @@
-using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using TestTokenTool.Configuration;
 using TestTokenTool.Constants;
+using Microsoft.IdentityModel.JsonWebTokens;
 using TokenResponse = TestTokenTool.ResponseModel.TokenResponse;
 
 namespace TestTokenTool.Commands;
@@ -70,8 +71,8 @@ internal static class TokenPrinter
     private static void PrettyPrintToken(string jwtInput, bool isDPoPProof = false)
     {
         var previousColour = Console.ForegroundColor;
-        var jwtHandler = new JwtSecurityTokenHandler();
-        var readableToken = jwtHandler.CanReadToken(jwtInput);
+        var jsonWebTokenHandler = new JsonWebTokenHandler();
+        var readableToken = jsonWebTokenHandler.CanReadToken(jwtInput);
 
         if (!readableToken)
         {
@@ -88,20 +89,28 @@ internal static class TokenPrinter
             Console.WriteLine("Token response in JSON format:");
         }
 
-        var token = jwtHandler.ReadJwtToken(jwtInput);
-
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.Write(JsonPrettify(token.Header.SerializeToJson()));
+        var token = jsonWebTokenHandler.ReadToken(jwtInput) as JsonWebToken;
         
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.Write(JsonPrettify(DecodeBase64DataFromJwt(token!.EncodedHeader)));
+       
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.Write(".");
-        Console.Write(JsonPrettify(token.Payload.SerializeToJson()));
+        Console.Write(JsonPrettify(DecodeBase64DataFromJwt(token.EncodedPayload)));
+
         Console.ForegroundColor = ConsoleColor.Green;
         Console.Write(".[Signature]");
         
         Console.ForegroundColor = previousColour;
         Console.WriteLine();
         Console.WriteLine();
+    }
+
+    private static string DecodeBase64DataFromJwt(string encodedString)
+    {
+        encodedString = encodedString.PadRight(encodedString.Length + (encodedString.Length * 3) % 4, '=');  // add padding
+        var data = Convert.FromBase64String(encodedString);
+        return Encoding.UTF8.GetString(data);
     }
 
     private static string JsonPrettify(string json)

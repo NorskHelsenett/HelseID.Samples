@@ -204,7 +204,7 @@ public class Program
 
     private static ApiSpecificClaim[]? AddApiSpecificClaims(string type, string value)
     {
-        if (!type.IsNullOrEmpty() && !value.IsNullOrEmpty())
+        if (!string.IsNullOrEmpty(type) && !string.IsNullOrEmpty(value))
         {
             return [new ApiSpecificClaim{Value = value, Type = type}];
         }
