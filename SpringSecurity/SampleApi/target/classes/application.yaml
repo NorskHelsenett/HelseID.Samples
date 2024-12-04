@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: SampleApi
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://helseid-sts.test.nhn.no
+          audiences: nhn:test-api
+
+#spring.security.oauth2.resourceserver.jwt.jws-algorithms=
+
+logging:
+  level:
+    root: info
+
+server:
+  port: 5081
+  ssl:
+    key-store: localhost.p12
+    key-store-password: changeit
+
+
+
