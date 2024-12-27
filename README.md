@@ -27,7 +27,7 @@ Please be advised that the sample code does not in any way represent working cod
 
 These samples use either machine-to-machine or user logon authentication methods.
 
-### Sample API
+### Sample API (C# / ASP.NET Core)
 
 The code can be found in the `SampleAPI` folder.
 
@@ -35,13 +35,21 @@ Most of the HelseID samples demonstrate how a client can access an API. Therefor
 
 See [SampleApi/README.md](SampleApi/README.md) for more information.
 
+### Sample API (Java / Spring)
+
+The code can be found in the `SpringSecurity` folder.
+
+Most of the HelseID samples demonstrate how a client can access an API. Therefore, a sample API has been created such that other HelseID samples can access it. The API requires authentication before the client is granted access. The API should be run locally before trying to connect through another HelseID sample.
+
+This version of the API is set up with the use of [Spring Security](https://docs.spring.io/spring-security/reference/index.html) for authorization. The code is also set up to use Nimbus OAuth SDK for the usage of [DPoP](https://connect2id.com/products/nimbus-oauth-openid-connect-sdk/examples/oauth/dpop).
+
 ### Grant types
 
 HelseID supports the use of several grants, that is, the resource owner's (user or enterprise) authorization used by the client to obtain an access token. Code samples are provided for different scenarios, and each will use at least one grant type. The following grants are provided:
 
 All these samples are configured to request a DPoP (Demonstrating Proof-of-Possession)-bound token.
 
-### Machine-to-machine sample
+### Machine-to-machine sample (C# / .NET)
 
 The code can be found in the `ClientCredentials` folder.
 
@@ -53,7 +61,7 @@ When using this sample, you will also need to start the [sample API](./SampleApi
 
 See [ClientCredentials/README.md](ClientCredentials/README.md) for more information.
 
-### User authentication/API access sample
+### User authentication/API access sample (C# / ASP.NET Core)
 
 The code can be found in the `SampleApi` folder.
 
@@ -67,7 +75,7 @@ This sample also exhibits the use of the [Refresh Token Grant](https://www.rfc-e
 
 See [APIAccess/README.md](ApiAccess/README.md) for more information.
 
-### Token exchange sample
+### Token exchange sample (C# / .NET)
 
 The code can be found in the `SampleApiForTokenExchange` folder.
 
@@ -79,7 +87,7 @@ If you wish to use this sample, you will need to start both
 
  See [SampleApiForTokenExchange/README.md](./SampleApiForTokenExchange/README.md) for more information.
 
-## Native clients
+## Native clients (C# / .NET)
 
 For use in "native clients", i.e. applications that does not run in a web client, we have created a set of simple examples for the use of a system browser for login against HelseID. These examples can be found in the `NativeClients`folder.
 
@@ -117,7 +125,7 @@ Implementations:
 We have included some tools to enable a smoother developing experience
 
 
-### <a name="RsaJwk"></a> Generate a JSON web key (JWK)
+### <a name="RsaJwk"></a> Generate a JSON web key (JWK) (C# / .NET)
 
 A command line program to generate a key pair as a JSON Web Key (JWK). The sample creates two files where the first file contains the whole key pair (including the private key), while the second file only contains the public key. See [HelseId.RsaJwk/README.md](HelseId.RsaJwk/README.md) for a more detailed explanation.
 
