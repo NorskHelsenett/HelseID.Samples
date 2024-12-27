@@ -37,8 +37,8 @@ public class OAuth2ResourceServerSecurityConfiguration  {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/user-login-clients/greetings/**").access(hasScope("message:read:dpop"))
-                        .requestMatchers("/machine-clients/greetings/**").access(hasScope("message:read:dpop"))
+                        .requestMatchers("/user-login-clients/greetings/**").access(hasScope("nhn:test-api/message:read:dpop"))
+                        .requestMatchers("/machine-clients/greetings/**").access(hasScope("nhn:test-api/message:read:dpop"))
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()));
@@ -57,9 +57,7 @@ public class OAuth2ResourceServerSecurityConfiguration  {
 
     @Bean
     BearerTokenResolver defaultBearerTokenResolver() {
-        DefaultNimbusDPoPValidator nimbusDPoPValidation = new DefaultNimbusDPoPValidator();
-        var tokenResolver = new DPoPTokenResolver(nimbusDPoPValidation);
-        return tokenResolver;
+        return new DPoPTokenResolver(new DefaultNimbusDPoPValidator());
     }
 
     @Bean

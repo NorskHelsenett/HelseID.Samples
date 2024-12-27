@@ -17,8 +17,7 @@ public final class DPoPTokenResolver implements BearerTokenResolver {
 
     public static final String DPOPHEADER = "DPoP";
 
-    private static final Pattern authorizationPattern = Pattern.compile("^DPoP (?<token>[a-zA-Z0-9-._~+/]+=*)$",
-            Pattern.CASE_INSENSITIVE);
+    private static final Pattern authorizationPattern = Pattern.compile("^DPoP (?<token>[a-zA-Z0-9-._~+/]+=*)$", Pattern.CASE_INSENSITIVE);
     private final NimbusDPoPValidator nimbusDPoPValidator;
 
     DPoPTokenResolver(NimbusDPoPValidator nimbusDPoPValidator) {
