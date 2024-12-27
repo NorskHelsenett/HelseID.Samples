@@ -21,9 +21,9 @@
     <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="3.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
-    <PackageReference Include="Microsoft.IdentityModel.Abstractions" Version="8.2.1" />
-    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.2.1" />
-    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="8.2.1" />
+    <PackageReference Include="Microsoft.IdentityModel.Abstractions" Version="8.3.0" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.3.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Logging" Version="8.3.0" />
   </ItemGroup>
 
 </Project>
