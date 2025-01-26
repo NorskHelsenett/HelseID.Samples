@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using Duende.AccessTokenManagement;
-using IdentityModel.Client;
+using Duende.IdentityModel.Client;
 using Microsoft.Extensions.Options;
 
 namespace HelseId.Core.BFF.Sample.Client.Auth;

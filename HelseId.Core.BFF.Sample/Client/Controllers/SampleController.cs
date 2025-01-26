@@ -1,7 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using HelseId.Core.BFF.Sample.Client.Services;
-using HelseId.Core.BFF.Sample.Models.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HelseId.Core.BFF.Sample.Client.Controllers

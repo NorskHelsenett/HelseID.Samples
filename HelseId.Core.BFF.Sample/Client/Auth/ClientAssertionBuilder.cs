@@ -1,10 +1,10 @@
 ﻿using IdentityModel;
-using IdentityModel.Client;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Duende.IdentityModel.Client;
 
 namespace HelseId.Core.BFF.Sample.Client.Auth;
 

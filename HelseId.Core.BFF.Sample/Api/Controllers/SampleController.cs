@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Buffers.Text;
-using System.Text;
 using HelseId.Core.BFF.Sample.Models.Model;
 using Microsoft.AspNetCore.Mvc;
 

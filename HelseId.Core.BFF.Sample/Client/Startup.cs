@@ -150,7 +150,7 @@ public class Startup
             options.DPoPJsonWebKey = dpopKey.Jwk;
         });
 
-        // Workaround to use Client Assertion and Pushed Authorization Request during logon.
+        // Workaround to use Client Assertion during logon.
         services.ConfigureOptions<ConfigureOpenIdConnectOptionsForHelseId>();
 
         // Use client assertion for automatic refresh of tokens
