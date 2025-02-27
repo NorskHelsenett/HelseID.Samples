@@ -192,16 +192,12 @@ namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
                 new Claim(JwtClaimTypes.IssuedAt, DateTimeOffset.Now.ToUnixTimeSeconds().ToString()),
                 new Claim(JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N")),
             };
-
-            var credentials =
-                new JwtSecurityToken(
-                    ClientId,
-                    disco.Issuer,
-                    claims,
-                    DateTime.UtcNow,
-                    DateTime.UtcNow.AddSeconds(60),
-                    GetClientAssertionSigningCredentials());
-
+            
+            var payload = new JwtPayload(ClientId, disco.Issuer, claims, DateTime.UtcNow, DateTime.UtcNow.AddSeconds(30));
+            var header = new JwtHeader(GetClientAssertionSigningCredentials(), null,  tokenType: "client-authentication+jwt");
+            
+            var credentials = new JwtSecurityToken(header, payload);
+            
             var tokenHandler = new JwtSecurityTokenHandler();
             return tokenHandler.WriteToken(credentials);
         }

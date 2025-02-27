@@ -128,9 +128,11 @@ public class Program
             new Claim(JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N")),
         };
 
+        var payload = new JwtPayload(clientId, disco.Issuer, claims, DateTime.UtcNow, DateTime.UtcNow.AddSeconds(30));
         var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256);
-        var token = new JwtSecurityToken(clientId, disco.TokenEndpoint, claims, DateTime.UtcNow,
-            DateTime.UtcNow.AddSeconds(60), signingCredentials);
+        var header = new JwtHeader(signingCredentials, null,  tokenType: "client-authentication+jwt");
+            
+        var token = new JwtSecurityToken(header, payload);
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 

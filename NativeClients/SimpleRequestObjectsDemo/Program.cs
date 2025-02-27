@@ -284,9 +284,11 @@ class Program
 
     private static string BuildHelseIdJwt(DiscoveryDocumentResponse disco, List<Claim> extraClaims)
     {
-        var credentials = new JwtSecurityToken(ClientId, disco.Issuer, extraClaims, DateTime.UtcNow,
-            DateTime.UtcNow.AddSeconds(60), GetClientAssertionSigningCredentials());
-
+        var payload = new JwtPayload(ClientId, disco.Issuer, extraClaims, DateTime.UtcNow, DateTime.UtcNow.AddSeconds(30));
+        var header = new JwtHeader(GetClientAssertionSigningCredentials(), null,  tokenType: "client-authentication+jwt");
+            
+        var credentials = new JwtSecurityToken(header, payload);
+        
         var tokenHandler = new JwtSecurityTokenHandler();
         return tokenHandler.WriteToken(credentials);
     }
