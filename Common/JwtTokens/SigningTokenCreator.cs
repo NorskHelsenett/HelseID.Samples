@@ -33,12 +33,13 @@ public class SigningTokenCreator : ISigningTokenCreator
         {
             Claims = claims,
             SigningCredentials = signingCredentials,
+            TokenType = "client-authentication+jwt",
         };
 
         // This creates a (signed) jwt token which is used for the client assertion.
         var tokenHandler = new JsonWebTokenHandler
         {
-            SetDefaultTimesOnTokenCreation = false
+            SetDefaultTimesOnTokenCreation = false,
         };
 
         return tokenHandler.CreateToken(securityTokenDescriptor);
