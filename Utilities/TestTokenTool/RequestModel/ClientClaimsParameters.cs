@@ -16,6 +16,7 @@ public class ClientClaimsParameters
     public string OrgnrSupplier { get; set; } = string.Empty;
     // helseid://claims/client/claims/client_tenancy
     public bool ClientTenancy { get; set; }
+    public ClientTenancyType ClientTenancyType { get; set; }
     // amr
     public IList<string> AuthenticationMethodsReferences { get; set; } = new List<string>();
     // helseid://claims/client/amr

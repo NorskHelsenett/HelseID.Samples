@@ -138,8 +138,11 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen) med DPoP:
   The returned token will contain a 'helseid://claims/client/claims/orgnr_supplier' claim matching the injected value
 
   --clientTenancy
-  The returned token will contain a 'helseid://claims/client/claims/client_tenancy' claim matching the injected value
+  The returned token will contain a 'helseid://claims/client/claims/client_tenancy' claim matching the injected value if 'clientTenancyType' is set
 
+  --clientTenancyType
+  The returned token will contain a 'helseid://claims/client/claims/client_tenancy' claim with either 'none', 'single-tenant', or 'multi-tenant', matching the injected value if 'clientTenancy' is set
+  
   --sfmJournalId                             <GUID>
   The returned token will contain a 'nhn:sfm:journal_id' claim matching the injected value
 

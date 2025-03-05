@@ -88,6 +88,7 @@ public class Program
                 OrgnrChild = options.orgnrChild.GetEmptyStringIfNotSet(),
                 OrgnrSupplier = options.orgnrSupplier.GetEmptyStringIfNotSet(),
                 ClientTenancy = options.clientTenancy,
+                ClientTenancyType = options.clientTenancyType,
                 SfmJournalId = options.sfmJournalId != null ? options.sfmJournalId.ToString()! : string.Empty,
                 ClientId = options.clientId != null ? options.clientId.ToString()! : string.Empty,
                 ClientName = options.clientName.GetEmptyStringIfNotSet(),
