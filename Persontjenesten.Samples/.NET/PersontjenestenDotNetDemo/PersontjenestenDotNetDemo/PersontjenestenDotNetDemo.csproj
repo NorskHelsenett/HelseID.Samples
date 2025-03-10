@@ -1,19 +1,45 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  
+  <ItemGroup>
+	<Content Include="appsettings.json">
+	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</Content>
+  </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IdentityModel.OidcClient" Version="5.1.0" />
-    <PackageReference Include="Microsoft.IdentityModel" Version="7.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Polly" Version="7.2.3" />
-    <PackageReference Include="RestSharp" Version="108.0.2" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.24.0" />
+	<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2" />
+	<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.2" />
+	<PackageReference Include="IdentityModel" Version="7.0.0" />
+	<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.6.1" />
+    <!--
+    Package used to generate model and client,
+    https://github.com/RicoSuter/NSwag
+    -->
+    <PackageReference Include="NSwag.MSBuild" Version="14.2.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
+
+  <!--
+  Build the client and its model based on the Persontjenesten Ekstern Test (External Test) environment.
+  This will run everytime the project is built in debug mode, things to consider;
+   1. Should only be run when you want to regenerate the client and related models
+   2. Should probably have a local cache of the Persontjenesten OpenAPI definition instead of downloading it
+      on every build. This also makes diff-ing between versions easier.
+   3. To change generator options please see `persontjenesten.nswag`
+   4. `NSwagExe_NetYX` should match up to the .NET version you are using
+  -->
+  <Target Name="NSwag" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Debug' ">
+    <Exec WorkingDirectory="$(ProjectDir)" Command="$(NSwagExe_Net90) run persontjenesten.nswag /variables:Configuration=$(Configuration)" IgnoreExitCode="True" />
+    <OnError ExecuteTargets="NSwagErrorMessage" />
+  </Target>
 
 </Project>
