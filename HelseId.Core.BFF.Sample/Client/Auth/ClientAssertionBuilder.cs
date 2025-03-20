@@ -30,14 +30,16 @@ public static class ClientAssertionBuilder
             new(JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N")),
         };
 
-        var credentials =
-            new JwtSecurityToken(
-                clientId,
-                authority,
-                claims,
-                DateTime.UtcNow,
-                DateTime.UtcNow.AddSeconds(60),
-                GetClientAssertionSigningCredentials(jwk));
+        var header = new JwtHeader(GetClientAssertionSigningCredentials(jwk)) { ["typ"] = "client-authentication+jwt" };
+        var payload = new JwtPayload(
+            issuer: clientId,
+            audience: authority,
+            claims: claims,
+            notBefore: DateTime.UtcNow,
+            expires: DateTime.UtcNow.AddSeconds(60)
+        );
+
+        var credentials = new JwtSecurityToken(header, payload);
 
         var tokenHandler = new JwtSecurityTokenHandler();
 
