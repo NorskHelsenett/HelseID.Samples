@@ -1,9 +1,8 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.3.32825.248
+VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersontjenestenDotNetDemo", "PersontjenestenDotNetDemo\PersontjenestenDotNetDemo.csproj", "{F4E8E095-800A-4ECD-9F57-694CEE21E9C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersontjenestenDotNetDemo", "PersontjenestenDotNetDemo\PersontjenestenDotNetDemo.csproj", "{9C52A730-C62D-4C61-9D16-5AA1D3C02070}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +10,12 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F4E8E095-800A-4ECD-9F57-694CEE21E9C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F4E8E095-800A-4ECD-9F57-694CEE21E9C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F4E8E095-800A-4ECD-9F57-694CEE21E9C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F4E8E095-800A-4ECD-9F57-694CEE21E9C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C52A730-C62D-4C61-9D16-5AA1D3C02070}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C52A730-C62D-4C61-9D16-5AA1D3C02070}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C52A730-C62D-4C61-9D16-5AA1D3C02070}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C52A730-C62D-4C61-9D16-5AA1D3C02070}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {0B3463F4-4A5B-4632-974A-1D172DBBA2EF}
 	EndGlobalSection
 EndGlobal
