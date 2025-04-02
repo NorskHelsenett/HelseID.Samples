@@ -1,16 +1,16 @@
+using IdentityModel;
+using IdentityModel.Client;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using IdentityModel.Client;
-using IdentityModel;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.DependencyInjection;
 
 // ReSharper disable once CheckNamespace
-namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten;
+namespace PersontjenestenDotNetDemo;
 
 public sealed class HelseIdOptions
 {

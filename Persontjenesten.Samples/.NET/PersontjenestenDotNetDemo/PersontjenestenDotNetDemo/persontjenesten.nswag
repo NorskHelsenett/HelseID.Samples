@@ -3,7 +3,7 @@
     "defaultVariables": "",
     "documentGenerator": {
       "fromDocument": {
-        "url": "https://et.persontjenesten.test.nhn.no/swagger/v2/swagger.json",
+        "url": "https://et.persontjenesten.test.nhn.no/swagger/v3/swagger.json",
         "output": null,
         "newLineBehavior": "Auto"
       }
