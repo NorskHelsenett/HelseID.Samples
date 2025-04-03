@@ -1,28 +1,56 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using PersontjenestenDotNetDemo;
+using PersontjenestenDotNetDemo.ExternalApi.Persontjenesten;
 
-using Newtonsoft.Json;
-using Org.OpenAPITools.Api;
-using Org.OpenAPITools.Client;
+const string httpClientNamePersontjenesten = "Persontjenesten";
 
-namespace PersontjenestenDotNetDemo
-{
-    internal class Program
+var hostApplicationBuilder = Host.CreateDefaultBuilder(args)
+    .ConfigureAppConfiguration(builder =>
     {
-        static async Task Main(string[] args)
+        builder.AddJsonFile("appsettings.json", optional: false);
+    })
+    .ConfigureServices(serviceCollection =>
+    {
+        serviceCollection
+            .AddOptions<HelseIdOptions>()
+            .BindConfiguration(HelseIdOptions.SectionKey);
+        //System.Net.ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+        serviceCollection
+            .AddHttpClient(httpClientNamePersontjenesten, httpClient =>
+            {
+                httpClient.BaseAddress = new("http://et.persontjenesten.test.nhn.no");
+                httpClient.DefaultRequestHeaders.Add("Api-Version", "3");
+            })
+            .UseHelseIdDPoP();
+
+        serviceCollection.AddSingleton(provider =>
         {
-            //Credentials
-            var clientCredential = new ClientCredentials();
-            var token = await clientCredential.GetJwt();
+            var persontjenestenHttpClient = provider
+                .GetRequiredService<IHttpClientFactory>()
+                .CreateClient(httpClientNamePersontjenesten);
 
-            var apiClient = new ApiClient("https://et.persontjenesten.test.nhn.no");
+            return new Event_withFullAccessClient(persontjenestenHttpClient);
+        });
 
-            //hent event
-            var eventApiLegalBasis = new EventWithLegalBasisApi();
-            eventApiLegalBasis.Client = apiClient;
-            eventApiLegalBasis.Configuration.AccessToken = token;
-            var latestEvent = eventApiLegalBasis.ApiLegalBasisEventLatestGet();
+        serviceCollection.AddHostedService<MySimpleTestService>();
+    });
 
-           Console.WriteLine($"{JsonConvert.SerializeObject(latestEvent)}");
-        }
+await hostApplicationBuilder.Build().RunAsync();
+
+public class MySimpleTestService : BackgroundService
+{
+    private readonly Event_withFullAccessClient _persontjenestenEventClient;
+
+    public MySimpleTestService(Event_withFullAccessClient persontjenestenEventClient)
+    {
+        _persontjenestenEventClient = persontjenestenEventClient;
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        var latestEventDocument = await _persontjenestenEventClient.LatestAsync("3");
+        Console.WriteLine($"Sequence number: {latestEventDocument.SequenceNumber}");
     }
 }
