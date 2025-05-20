@@ -4576,7 +4576,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
     {
         [System.Text.Json.Serialization.JsonConstructor]
 
-        public ContactInformationResource(string @email, string @emailLastUpdated, string @emailLastVerified, string @phoneNumber, string @phoneNumberLastUpdated, string @phoneNumberLastVerified)
+        public ContactInformationResource(string @email, Duplicated? @emailDuplicated, string @emailLastUpdated, string @emailLastValidated, string @emailLastVerified, string @phoneNumber, Duplicated? @phoneNumberDuplicated, string @phoneNumberLastUpdated, string @phoneNumberLastValidated, string @phoneNumberLastVerified)
 
         {
 
@@ -4584,13 +4584,21 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
             this.EmailLastUpdated = @emailLastUpdated;
 
+            this.EmailDuplicated = @emailDuplicated;
+
             this.EmailLastVerified = @emailLastVerified;
+
+            this.EmailLastValidated = @emailLastValidated;
 
             this.PhoneNumber = @phoneNumber;
 
             this.PhoneNumberLastUpdated = @phoneNumberLastUpdated;
 
+            this.PhoneNumberDuplicated = @phoneNumberDuplicated;
+
             this.PhoneNumberLastVerified = @phoneNumberLastVerified;
+
+            this.PhoneNumberLastValidated = @phoneNumberLastValidated;
 
         }    /// <summary>
         /// 
@@ -4612,12 +4620,31 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         /// <summary>
         /// 
+        /// <br/>KRR: epostadresse_duplisert
+        /// <br/>            The Email is registered to one or several other persons in KRR
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("emailDuplicated")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public Duplicated? EmailDuplicated { get; init; }
+
+        /// <summary>
+        /// 
         /// <br/>KRR: epostadresse_sist_verifisert
         /// <br/>            Last time email was verified by person. Confirmed by person at least twice a year
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("emailLastVerified")]
         public string EmailLastVerified { get; init; }
+
+        /// <summary>
+        /// 
+        /// <br/>KRR: epostadresse_sist_validert
+        /// <br/>            Last time email was validated by code sent to the registered email adress
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("emailLastValidated")]
+        public string EmailLastValidated { get; init; }
 
         /// <summary>
         /// 
@@ -4639,12 +4666,31 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         /// <summary>
         /// 
+        /// <br/>KRR: mobiltelefonnummer_duplisert
+        /// <br/>            The phone number is registered to one or several other persons in KRR
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("phoneNumberDuplicated")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public Duplicated? PhoneNumberDuplicated { get; init; }
+
+        /// <summary>
+        /// 
         /// <br/>KRR: mobiltelefonnummer_sist_verifisert
         /// <br/>            Last time the Phone number was verified by person. Confirmed by person at least twice a year
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("phoneNumberLastVerified")]
         public string PhoneNumberLastVerified { get; init; }
+
+        /// <summary>
+        /// 
+        /// <br/>KRR: mobiltelefonnummer_sist_validert
+        /// <br/>            Last time Phone number was validated by code sent to the registered Phone number
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("phoneNumberLastValidated")]
+        public string PhoneNumberLastValidated { get; init; }
 
     }
 
@@ -4882,6 +4928,22 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("verifiedAt")]
         public System.DateTimeOffset? VerifiedAt { get; init; }
+
+    }
+
+    /// <summary>
+    /// 
+    /// <br/>KRR: Duplisert&lt;p&gt;Possible values:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;i&gt;Yes&lt;/i&gt; - KRR: JA&lt;/li&gt;&lt;li&gt;&lt;i&gt;No&lt;/i&gt; - KRR: NEI&lt;/li&gt;&lt;/ul&gt;
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum Duplicated
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Yes")]
+        Yes = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"No")]
+        No = 1,
 
     }
 
@@ -11159,7 +11221,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("FullName")]
         [System.ComponentModel.DataAnnotations.StringLength(600, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FullName { get; init; }
 
         /// <summary>
@@ -11169,7 +11231,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("GivenName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string GivenName { get; init; }
 
         /// <summary>
@@ -11179,7 +11241,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("MiddleName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string MiddleName { get; init; }
 
         /// <summary>
@@ -11189,7 +11251,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("FamilyName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FamilyName { get; init; }
 
         /// <summary>
@@ -11199,7 +11261,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("StreetAddress")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\p{N}]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}\p{N}]+[\p{L}\s\p{N}\-\.\'\,\/]*")]
         public string StreetAddress { get; init; }
 
         /// <summary>
@@ -11219,7 +11281,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("CityName")]
         [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string CityName { get; init; }
 
         /// <summary>
@@ -11308,7 +11370,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("FullName")]
         [System.ComponentModel.DataAnnotations.StringLength(600, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FullName { get; init; }
 
         /// <summary>
@@ -11318,7 +11380,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("GivenName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string GivenName { get; init; }
 
         /// <summary>
@@ -11328,7 +11390,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("MiddleName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string MiddleName { get; init; }
 
         /// <summary>
@@ -11338,7 +11400,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("FamilyName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FamilyName { get; init; }
 
         /// <summary>
@@ -11348,7 +11410,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("StreetAddress")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 5)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\p{N}]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}\p{N}]+[\p{L}\s\p{N}\-\.\'\,\/]*")]
         public string StreetAddress { get; init; }
 
         /// <summary>
@@ -11474,7 +11536,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("FullName")]
         [System.ComponentModel.DataAnnotations.StringLength(600, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FullName { get; init; }
 
         /// <summary>
@@ -11484,7 +11546,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("GivenName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string GivenName { get; init; }
 
         /// <summary>
@@ -11494,7 +11556,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("MiddleName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string MiddleName { get; init; }
 
         /// <summary>
@@ -11504,7 +11566,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("FamilyName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FamilyName { get; init; }
 
         /// <summary>
@@ -11514,7 +11576,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("StreetAddress")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 5)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\p{N}]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}\p{N}]+[\p{L}\s\p{N}\-\.\'\,\/]*")]
         public string StreetAddress { get; init; }
 
         /// <summary>
@@ -11654,7 +11716,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("FullName")]
         [System.ComponentModel.DataAnnotations.StringLength(600, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FullName { get; init; }
 
         /// <summary>
@@ -11664,7 +11726,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("GivenName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string GivenName { get; init; }
 
         /// <summary>
@@ -11674,7 +11736,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("MiddleName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string MiddleName { get; init; }
 
         /// <summary>
@@ -11684,7 +11746,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("FamilyName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FamilyName { get; init; }
 
         /// <summary>
@@ -11694,7 +11756,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("StreetAddress")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\p{N}]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}\p{N}]+[\p{L}\s\p{N}\-\.\'\,\/]*")]
         public string StreetAddress { get; init; }
 
         /// <summary>
@@ -11714,7 +11776,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("CityName")]
         [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string CityName { get; init; }
 
         /// <summary>
@@ -11803,7 +11865,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("FullName")]
         [System.ComponentModel.DataAnnotations.StringLength(600, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FullName { get; init; }
 
         /// <summary>
@@ -11813,7 +11875,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("GivenName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string GivenName { get; init; }
 
         /// <summary>
@@ -11823,7 +11885,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("MiddleName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string MiddleName { get; init; }
 
         /// <summary>
@@ -11833,7 +11895,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("FamilyName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FamilyName { get; init; }
 
         /// <summary>
@@ -11843,7 +11905,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("StreetAddress")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 5)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\p{N}]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}\p{N}]+[\p{L}\s\p{N}\-\.\'\,\/]*")]
         public string StreetAddress { get; init; }
 
         /// <summary>
@@ -11969,7 +12031,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("FullName")]
         [System.ComponentModel.DataAnnotations.StringLength(600, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FullName { get; init; }
 
         /// <summary>
@@ -11979,7 +12041,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("GivenName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string GivenName { get; init; }
 
         /// <summary>
@@ -11989,7 +12051,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("MiddleName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string MiddleName { get; init; }
 
         /// <summary>
@@ -11999,7 +12061,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("FamilyName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FamilyName { get; init; }
 
         /// <summary>
@@ -12009,7 +12071,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("StreetAddress")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 5)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\p{N}]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}\p{N}]+[\p{L}\s\p{N}\-\.\'\,\/]*")]
         public string StreetAddress { get; init; }
 
         /// <summary>

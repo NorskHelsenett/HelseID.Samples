@@ -4,10 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 // ReSharper disable once CheckNamespace
 namespace PersontjenestenDotNetDemo;
@@ -20,6 +19,7 @@ public sealed class HelseIdOptions
     public string ClientId { get; set; } = string.Empty;
     public string TokenEndpoint { get; set; } = string.Empty;
     public string Scopes { get; set; } = string.Empty;
+    public string Authority { get; set; } = string.Empty;
 }
 
 
@@ -44,6 +44,7 @@ public static class HttpClientExtensions
             ArgumentException.ThrowIfNullOrWhiteSpace(settings.ClientId);
             ArgumentException.ThrowIfNullOrWhiteSpace(settings.TokenEndpoint);
             ArgumentException.ThrowIfNullOrWhiteSpace(settings.Scopes);
+            ArgumentException.ThrowIfNullOrWhiteSpace(settings.Authority);
 
             var opt = Options.Create(settings);
             var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
@@ -88,7 +89,7 @@ public class DPoPProofCreator(IOptions<HelseIdOptions> options, ILogger<DPoPProo
         logger.LogDebug("Creating DPoP proof for url {Url} with nonce: {Nonce} ", url, dPoPNonce);
 
         var securityKey = new JsonWebKey(options.Value.PrivateJwk);
-        var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha512);
+        var signingCredentials = new SigningCredentials(securityKey, "RS256");
 
         var jwk = securityKey.Kty switch
         {
@@ -109,26 +110,30 @@ public class DPoPProofCreator(IOptions<HelseIdOptions> options, ILogger<DPoPProo
             _ => throw new InvalidOperationException("Invalid key type for DPoP proof.")
         };
 
-        var jwtHeader = new JwtHeader(signingCredentials)
-        {
-            [JwtClaimTypes.TokenType] = "dpop+jwt",
-            [JwtClaimTypes.JsonWebKey] = jwk,
-        };
-
         var urlWithoutQuery = url.Split('?')[0];
-        var payload = new JwtPayload
+        var tokenDescriptor = new SecurityTokenDescriptor
         {
-            [JwtClaimTypes.JwtId] = Guid.NewGuid().ToString(),
-            [JwtClaimTypes.DPoPHttpMethod] = httpMethod,
-            [JwtClaimTypes.DPoPHttpUrl] = urlWithoutQuery,
-            [JwtClaimTypes.IssuedAt] = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+            SigningCredentials = signingCredentials,
+            AdditionalHeaderClaims = new Dictionary<string, object>
+            {
+                { JwtClaimTypes.JsonWebKey, jwk },
+            },
+
+            Claims = new Dictionary<string, object>
+            {
+                { JwtClaimTypes.JwtId,  Guid.NewGuid().ToString() },
+                { JwtClaimTypes.DPoPHttpMethod, httpMethod },
+                { JwtClaimTypes.DPoPHttpUrl, urlWithoutQuery },
+                { JwtClaimTypes.IssuedAt, DateTimeOffset.UtcNow.ToUnixTimeSeconds() },
+            },
+            TokenType = "dpop+jwt"
         };
 
         // Used when accessing the authentication server (HelseID):
         if (!string.IsNullOrEmpty(dPoPNonce))
         {
             // nonce: A recent nonce provided via the DPoP-Nonce HTTP header.
-            payload[JwtClaimTypes.Nonce] = dPoPNonce;
+            tokenDescriptor.Claims.Add(JwtClaimTypes.Nonce, dPoPNonce);
         }
 
         // Used when accessing an API that requires a DPoP token:
@@ -139,11 +144,10 @@ public class DPoPProofCreator(IOptions<HelseIdOptions> options, ILogger<DPoPProo
             var hash = SHA256.HashData(Encoding.ASCII.GetBytes(accessToken));
             var ath = Base64Url.Encode(hash);
 
-            payload[JwtClaimTypes.DPoPAccessTokenHash] = ath;
+            tokenDescriptor.Claims.Add(JwtClaimTypes.DPoPAccessTokenHash, ath);
         }
 
-        var jwtSecurityToken = new JwtSecurityToken(jwtHeader, payload);
-        return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+        return new JsonWebTokenHandler().CreateToken(tokenDescriptor);
     }
 }
 
@@ -204,19 +208,26 @@ public class TokenService(
         var securityKey = new JsonWebKey(options.Value.PrivateJwk);
         var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha512);
 
-        var claims = new List<Claim>
+        var claims = new Dictionary<string, object>
         {
-            new(JwtClaimTypes.Subject, options.Value.ClientId),
-            new(JwtClaimTypes.IssuedAt, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(),
-                ClaimValueTypes.Integer64),
-            new(JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N"))
+            { JwtClaimTypes.Subject, options.Value.ClientId },
+            { JwtClaimTypes.IssuedAt, new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds() },
+            { JwtClaimTypes.JwtId, Guid.NewGuid().ToString("N") }
         };
 
-        var token = new JwtSecurityToken(options.Value.ClientId, options.Value.TokenEndpoint, claims,
-            DateTime.Now, DateTime.Now.AddMinutes(1), signingCredentials);
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            SigningCredentials = signingCredentials,
+            TokenType = "client-authentication+jwt",
+            Issuer = options.Value.ClientId,
+            Audience = options.Value.Authority,
+            Claims = claims,
+            Expires = DateTime.Now.AddMinutes(1),
+            NotBefore = DateTime.Now,
+        };
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var clientAssertion = tokenHandler.WriteToken(token);
+        var tokenHandler = new JsonWebTokenHandler();
+        var clientAssertion = tokenHandler.CreateToken(tokenDescriptor);
 
         var request = new ClientCredentialsTokenRequest
         {
