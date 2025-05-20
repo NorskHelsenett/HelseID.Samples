@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using IdentityModel.Client;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using PersontjenestenDotNetDemo;
 using PersontjenestenDotNetDemo.ExternalApi.Persontjenesten;
 
@@ -15,8 +17,8 @@ var hostApplicationBuilder = Host.CreateDefaultBuilder(args)
     {
         serviceCollection
             .AddOptions<HelseIdOptions>()
-            .BindConfiguration(HelseIdOptions.SectionKey);
-        //System.Net.ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            .BindConfiguration(HelseIdOptions.SectionKey);  
+
         serviceCollection
             .AddHttpClient(httpClientNamePersontjenesten, httpClient =>
             {
@@ -24,6 +26,13 @@ var hostApplicationBuilder = Host.CreateDefaultBuilder(args)
                 httpClient.DefaultRequestHeaders.Add("Api-Version", "3");
             })
             .UseHelseIdDPoP();
+
+        serviceCollection.AddSingleton<IDiscoveryCache>(serviceProvider =>
+        {
+            var factory = serviceProvider.GetRequiredService<IHttpClientFactory>();
+            var options = serviceProvider.GetRequiredService<IOptions<HelseIdOptions>>();
+            return new DiscoveryCache(options.Value.Authority, () => factory.CreateClient());
+        });
 
         serviceCollection.AddSingleton(provider =>
         {
