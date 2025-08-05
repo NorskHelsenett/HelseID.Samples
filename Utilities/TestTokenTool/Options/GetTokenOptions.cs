@@ -240,4 +240,13 @@ public class GetTokenOptions : IArgumentModel
     public string apiSpecificClaimType { get; set; } = string.Empty;
     [Named(Description = "Value for an API specific claim. Both type and value must be set to obtain an API specific claim.")]
     public string apiSpecificClaimValue { get; set; } = string.Empty;
+
+    [Named(Description = "This will create an 'act' claim in the returned token. You must also set at least one of the following values: 'tokenExchangeIssuer', 'tokenExchangeClientId', 'tokenExchangeOrgnrParent'")] 
+    public bool createTokenExchangeClaim { get; set; } = false;
+    [Named(Description = "Parameter for use in 'act' claims (Token Exchange)")]
+    public string tokenExchangeIssuer { get; set; } = string.Empty; 
+    [Named(Description = "Parameter for use in 'act' claims (Token Exchange)")]
+    public string tokenExchangeClientId { get; set; } = string.Empty; 
+    [Named(Description = "Parameter for use in 'act' claims (Token Exchange)")]
+    public string tokenExchangeOrgnrParent { get; set; } = string.Empty; 
 }
