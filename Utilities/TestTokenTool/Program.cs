@@ -185,6 +185,13 @@ public class Program
                 InvalidDPoPProofParameters = options.invalidDPoPProof,
             },
             ApiSpecificClaims = AddApiSpecificClaims(options.apiSpecificClaimType, options.apiSpecificClaimValue),
+            CreateTokenExchangeClaims = options.createTokenExchangeClaim,
+            TokenExchangeParameters = new TokenExchangeParameters
+            {
+                ClientId = options.tokenExchangeClientId,
+                Issuer = options.tokenExchangeIssuer,
+                OrgnrParent = options.tokenExchangeOrgnrParent,
+            },
         };
 
         var tokenResponse = await TokenRetriever.GetToken(_builder!, tokenRequest);

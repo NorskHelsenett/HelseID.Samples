@@ -40,7 +40,7 @@ var hostApplicationBuilder = Host.CreateDefaultBuilder(args)
                 .GetRequiredService<IHttpClientFactory>()
                 .CreateClient(httpClientNamePersontjenesten);
 
-            return new Event_withFullAccessClient(persontjenestenHttpClient);
+            return new Event_FullAccessClient(persontjenestenHttpClient);
         });
 
         serviceCollection.AddHostedService<MySimpleTestService>();
@@ -50,16 +50,16 @@ await hostApplicationBuilder.Build().RunAsync();
 
 public class MySimpleTestService : BackgroundService
 {
-    private readonly Event_withFullAccessClient _persontjenestenEventClient;
+    private readonly Event_FullAccessClient _persontjenestenEventClient;
 
-    public MySimpleTestService(Event_withFullAccessClient persontjenestenEventClient)
+    public MySimpleTestService(Event_FullAccessClient persontjenestenEventClient)
     {
         _persontjenestenEventClient = persontjenestenEventClient;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var latestEventDocument = await _persontjenestenEventClient.LatestAsync("3");
+        var latestEventDocument = await _persontjenestenEventClient.LatestAsync();
         Console.WriteLine($"Sequence number: {latestEventDocument.SequenceNumber}");
     }
 }
