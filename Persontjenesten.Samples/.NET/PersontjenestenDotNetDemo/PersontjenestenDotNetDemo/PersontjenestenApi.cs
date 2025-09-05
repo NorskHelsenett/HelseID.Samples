@@ -23,7 +23,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
     using System = global::System;
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Event_restrictedAccessClient 
+    public partial class Event_FullAccessClient 
     {
         #pragma warning disable 8618
         private string _baseUrl;
@@ -34,402 +34,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         private System.Text.Json.JsonSerializerOptions _instanceSettings;
 
     #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public Event_restrictedAccessClient(System.Net.Http.HttpClient httpClient)
-    #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        {
-            BaseUrl = "https://et.persontjenesten.test.nhn.no";
-            _httpClient = httpClient;
-            Initialize();
-        }
-
-        private static System.Text.Json.JsonSerializerOptions CreateSerializerSettings()
-        {
-            var settings = new System.Text.Json.JsonSerializerOptions();
-            UpdateJsonSerializerSettings(settings);
-            return settings;
-        }
-
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set
-            {
-                _baseUrl = value;
-                if (!string.IsNullOrEmpty(_baseUrl) && !_baseUrl.EndsWith("/"))
-                    _baseUrl += '/';
-            }
-        }
-
-        protected System.Text.Json.JsonSerializerOptions JsonSerializerSettings { get { return _instanceSettings ?? _settings.Value; } }
-
-        static partial void UpdateJsonSerializerSettings(System.Text.Json.JsonSerializerOptions settings);
-
-        partial void Initialize();
-
-        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, string url);
-        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
-        partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <summary>
-        /// Get the latest event. Returns a search result with the latest available event document
-        /// </summary>
-        /// <remarks>
-        /// &lt;b&gt;Requires HelseId scope:&lt;/b&gt; RequireParentOrgNumber, RestrictedAccess
-        /// </remarks>
-        /// <param name="api_version">The requested API version</param>
-        /// <returns>Event document returned</returns>
-        /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<EventDocument> LatestAsync(string api_version, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
-                    // Operation Path: "api/v3/restricted-access/event/latest"
-                    urlBuilder_.Append("api/v3/restricted-access/event/latest");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<EventDocument>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new PersontjenestenApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 400)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new PersontjenestenApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            throw new PersontjenestenApiException<ProblemDetails>("Bad request", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
-                        }
-                        else
-                        if (status_ == 404)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new PersontjenestenApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            throw new PersontjenestenApiException<ProblemDetails>("Event document not found", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new PersontjenestenApiException("Unauthorized, invalid token", status_, responseText_, headers_, null);
-                        }
-                        else
-                        if (status_ == 403)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new PersontjenestenApiException("Forbidden, invalid scope", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new PersontjenestenApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <summary>
-        /// Get list of specific events by filter options. Returns a search result with max 1000 event documents
-        /// <br/>starting with the specified sequenceNumber
-        /// </summary>
-        /// <remarks>
-        /// Get a list of up to 1000 events from a given sequenceNumber as a starting point. The result list may be
-        /// <br/>further filtered by specifying which event types that should be included in the result.
-        /// <br/>The result list will contain the event for the given sequenceNumber if it exists.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Requires HelseId scope:&lt;/b&gt; RequireParentOrgNumber, RestrictedAccess
-        /// </remarks>
-        /// <param name="api_version">The requested API version</param>
-        /// <param name="sequenceNumber">The lowest sequence number that should be included in the result</param>
-        /// <param name="eventTypes">Which event types that should be included in the result. Supports comma separated values.</param>
-        /// <param name="maxLimit">Maximum number of events to return</param>
-        /// <returns>Event document returned</returns>
-        /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<EventDocumentSearchResult> EventAsync(string api_version, long? sequenceNumber = null, System.Collections.Generic.IEnumerable<EventType> eventTypes = null, int? maxLimit = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
-                    // Operation Path: "api/v3/restricted-access/event"
-                    urlBuilder_.Append("api/v3/restricted-access/event");
-                    urlBuilder_.Append('?');
-                    if (sequenceNumber != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("sequenceNumber")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(sequenceNumber, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (eventTypes != null)
-                    {
-                        foreach (var item_ in eventTypes) { urlBuilder_.Append(System.Uri.EscapeDataString("eventTypes")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture))).Append('&'); }
-                    }
-                    if (maxLimit != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("maxLimit")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(maxLimit, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<EventDocumentSearchResult>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new PersontjenestenApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 400)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new PersontjenestenApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            throw new PersontjenestenApiException<ProblemDetails>("Bad request", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new PersontjenestenApiException("Unauthorized, invalid token", status_, responseText_, headers_, null);
-                        }
-                        else
-                        if (status_ == 403)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new PersontjenestenApiException("Forbidden, invalid scope", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new PersontjenestenApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        protected struct ObjectResponseResult<T>
-        {
-            public ObjectResponseResult(T responseObject, string responseText)
-            {
-                this.Object = responseObject;
-                this.Text = responseText;
-            }
-
-            public T Object { get; }
-
-            public string Text { get; }
-        }
-
-        public bool ReadResponseAsString { get; set; }
-
-        protected virtual async System.Threading.Tasks.Task<ObjectResponseResult<T>> ReadObjectResponseAsync<T>(System.Net.Http.HttpResponseMessage response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.Threading.CancellationToken cancellationToken)
-        {
-            if (response == null || response.Content == null)
-            {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
-            }
-
-            if (ReadResponseAsString)
-            {
-                var responseText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                try
-                {
-                    var typedBody = System.Text.Json.JsonSerializer.Deserialize<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
-                }
-                catch (System.Text.Json.JsonException exception)
-                {
-                    var message = "Could not deserialize the response body string as " + typeof(T).FullName + ".";
-                    throw new PersontjenestenApiException(message, (int)response.StatusCode, responseText, headers, exception);
-                }
-            }
-            else
-            {
-                try
-                {
-                    using (var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                    {
-                        var typedBody = await System.Text.Json.JsonSerializer.DeserializeAsync<T>(responseStream, JsonSerializerSettings, cancellationToken).ConfigureAwait(false);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
-                    }
-                }
-                catch (System.Text.Json.JsonException exception)
-                {
-                    var message = "Could not deserialize the response body stream as " + typeof(T).FullName + ".";
-                    throw new PersontjenestenApiException(message, (int)response.StatusCode, string.Empty, headers, exception);
-                }
-            }
-        }
-
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
-        {
-            if (value == null)
-            {
-                return "";
-            }
-
-            if (value is System.Enum)
-            {
-                var name = System.Enum.GetName(value.GetType(), value);
-                if (name != null)
-                {
-                    var field = System.Reflection.IntrospectionExtensions.GetTypeInfo(value.GetType()).GetDeclaredField(name);
-                    if (field != null)
-                    {
-                        var attribute = System.Reflection.CustomAttributeExtensions.GetCustomAttribute(field, typeof(System.Runtime.Serialization.EnumMemberAttribute)) 
-                            as System.Runtime.Serialization.EnumMemberAttribute;
-                        if (attribute != null)
-                        {
-                            return attribute.Value != null ? attribute.Value : name;
-                        }
-                    }
-
-                    var converted = System.Convert.ToString(System.Convert.ChangeType(value, System.Enum.GetUnderlyingType(value.GetType()), cultureInfo));
-                    return converted == null ? string.Empty : converted;
-                }
-            }
-            else if (value is bool) 
-            {
-                return System.Convert.ToString((bool)value, cultureInfo).ToLowerInvariant();
-            }
-            else if (value is byte[])
-            {
-                return System.Convert.ToBase64String((byte[]) value);
-            }
-            else if (value is string[])
-            {
-                return string.Join(",", (string[])value);
-            }
-            else if (value.GetType().IsArray)
-            {
-                var valueArray = (System.Array)value;
-                var valueTextArray = new string[valueArray.Length];
-                for (var i = 0; i < valueArray.Length; i++)
-                {
-                    valueTextArray[i] = ConvertToString(valueArray.GetValue(i), cultureInfo);
-                }
-                return string.Join(",", valueTextArray);
-            }
-
-            var result = System.Convert.ToString(value, cultureInfo);
-            return result == null ? "" : result;
-        }
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Event_withFullAccessClient 
-    {
-        #pragma warning disable 8618
-        private string _baseUrl;
-        #pragma warning restore 8618
-
-        private System.Net.Http.HttpClient _httpClient;
-        private static System.Lazy<System.Text.Json.JsonSerializerOptions> _settings = new System.Lazy<System.Text.Json.JsonSerializerOptions>(CreateSerializerSettings, true);
-        private System.Text.Json.JsonSerializerOptions _instanceSettings;
-
-    #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public Event_withFullAccessClient(System.Net.Http.HttpClient httpClient)
+        public Event_FullAccessClient(System.Net.Http.HttpClient httpClient)
     #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             BaseUrl = "https://et.persontjenesten.test.nhn.no";
@@ -472,10 +77,9 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// <remarks>
         /// &lt;b&gt;Requires HelseId scope:&lt;/b&gt; FullAccess, RequireParentOrgNumber
         /// </remarks>
-        /// <param name="api_version">The requested API version</param>
         /// <returns>Event document returned</returns>
         /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<EventDocument> LatestAsync(string api_version, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<EventDocument> LatestAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -483,10 +87,6 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -590,13 +190,12 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// <br/>are specified, all types of events will be returned.
         /// <br/>The result list will contain the event for the given sequenceNumber if it exists.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Requires HelseId scope:&lt;/b&gt; FullAccess, RequireParentOrgNumber
         /// </remarks>
-        /// <param name="api_version">The requested API version</param>
         /// <param name="sequenceNumber">The lowest sequence number that should be included in the result</param>
         /// <param name="eventTypes">Which event types that should be included in the result. Supports comma separated values.</param>
         /// <param name="maxLimit">Maximum number of events to return.</param>
         /// <returns>Event document returned</returns>
         /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<EventDocumentSearchResult> EventAsync(string api_version, long? sequenceNumber = null, System.Collections.Generic.IEnumerable<EventType> eventTypes = null, int? maxLimit = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<EventDocumentSearchResult> EventAsync(long? sequenceNumber = null, System.Collections.Generic.IEnumerable<EventType> eventTypes = null, int? maxLimit = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -604,10 +203,6 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -814,7 +409,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Person_fullAccessClient 
+    public partial class Event_RestrictedAccessClient 
     {
         #pragma warning disable 8618
         private string _baseUrl;
@@ -825,7 +420,392 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         private System.Text.Json.JsonSerializerOptions _instanceSettings;
 
     #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public Person_fullAccessClient(System.Net.Http.HttpClient httpClient)
+        public Event_RestrictedAccessClient(System.Net.Http.HttpClient httpClient)
+    #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        {
+            BaseUrl = "https://et.persontjenesten.test.nhn.no";
+            _httpClient = httpClient;
+            Initialize();
+        }
+
+        private static System.Text.Json.JsonSerializerOptions CreateSerializerSettings()
+        {
+            var settings = new System.Text.Json.JsonSerializerOptions();
+            UpdateJsonSerializerSettings(settings);
+            return settings;
+        }
+
+        public string BaseUrl
+        {
+            get { return _baseUrl; }
+            set
+            {
+                _baseUrl = value;
+                if (!string.IsNullOrEmpty(_baseUrl) && !_baseUrl.EndsWith("/"))
+                    _baseUrl += '/';
+            }
+        }
+
+        protected System.Text.Json.JsonSerializerOptions JsonSerializerSettings { get { return _instanceSettings ?? _settings.Value; } }
+
+        static partial void UpdateJsonSerializerSettings(System.Text.Json.JsonSerializerOptions settings);
+
+        partial void Initialize();
+
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, string url);
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
+        partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Get the latest event. Returns a search result with the latest available event document
+        /// </summary>
+        /// <remarks>
+        /// &lt;b&gt;Requires HelseId scope:&lt;/b&gt; RequireParentOrgNumber, RestrictedAccess
+        /// </remarks>
+        /// <returns>Event document returned</returns>
+        /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<EventDocument> LatestAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "api/v3/restricted-access/event/latest"
+                    urlBuilder_.Append("api/v3/restricted-access/event/latest");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<EventDocument>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new PersontjenestenApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 400)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new PersontjenestenApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new PersontjenestenApiException<ProblemDetails>("Bad request", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 404)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new PersontjenestenApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new PersontjenestenApiException<ProblemDetails>("Event document not found", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new PersontjenestenApiException("Unauthorized, invalid token", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new PersontjenestenApiException("Forbidden, invalid scope", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new PersontjenestenApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <summary>
+        /// Get list of specific events by filter options. Returns a search result with max 1000 event documents
+        /// <br/>starting with the specified sequenceNumber
+        /// </summary>
+        /// <remarks>
+        /// Get a list of up to 1000 events from a given sequenceNumber as a starting point. The result list may be
+        /// <br/>further filtered by specifying which event types that should be included in the result.
+        /// <br/>The result list will contain the event for the given sequenceNumber if it exists.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Requires HelseId scope:&lt;/b&gt; RequireParentOrgNumber, RestrictedAccess
+        /// </remarks>
+        /// <param name="sequenceNumber">The lowest sequence number that should be included in the result</param>
+        /// <param name="eventTypes">Which event types that should be included in the result. Supports comma separated values.</param>
+        /// <param name="maxLimit">Maximum number of events to return</param>
+        /// <returns>Event document returned</returns>
+        /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<EventDocumentSearchResult> EventAsync(long? sequenceNumber = null, System.Collections.Generic.IEnumerable<EventType> eventTypes = null, int? maxLimit = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "api/v3/restricted-access/event"
+                    urlBuilder_.Append("api/v3/restricted-access/event");
+                    urlBuilder_.Append('?');
+                    if (sequenceNumber != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("sequenceNumber")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(sequenceNumber, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    if (eventTypes != null)
+                    {
+                        foreach (var item_ in eventTypes) { urlBuilder_.Append(System.Uri.EscapeDataString("eventTypes")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(item_, System.Globalization.CultureInfo.InvariantCulture))).Append('&'); }
+                    }
+                    if (maxLimit != null)
+                    {
+                        urlBuilder_.Append(System.Uri.EscapeDataString("maxLimit")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(maxLimit, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
+                    }
+                    urlBuilder_.Length--;
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<EventDocumentSearchResult>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new PersontjenestenApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 400)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new PersontjenestenApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new PersontjenestenApiException<ProblemDetails>("Bad request", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new PersontjenestenApiException("Unauthorized, invalid token", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new PersontjenestenApiException("Forbidden, invalid scope", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new PersontjenestenApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        protected struct ObjectResponseResult<T>
+        {
+            public ObjectResponseResult(T responseObject, string responseText)
+            {
+                this.Object = responseObject;
+                this.Text = responseText;
+            }
+
+            public T Object { get; }
+
+            public string Text { get; }
+        }
+
+        public bool ReadResponseAsString { get; set; }
+
+        protected virtual async System.Threading.Tasks.Task<ObjectResponseResult<T>> ReadObjectResponseAsync<T>(System.Net.Http.HttpResponseMessage response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.Threading.CancellationToken cancellationToken)
+        {
+            if (response == null || response.Content == null)
+            {
+                return new ObjectResponseResult<T>(default(T), string.Empty);
+            }
+
+            if (ReadResponseAsString)
+            {
+                var responseText = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                try
+                {
+                    var typedBody = System.Text.Json.JsonSerializer.Deserialize<T>(responseText, JsonSerializerSettings);
+                    return new ObjectResponseResult<T>(typedBody, responseText);
+                }
+                catch (System.Text.Json.JsonException exception)
+                {
+                    var message = "Could not deserialize the response body string as " + typeof(T).FullName + ".";
+                    throw new PersontjenestenApiException(message, (int)response.StatusCode, responseText, headers, exception);
+                }
+            }
+            else
+            {
+                try
+                {
+                    using (var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
+                    {
+                        var typedBody = await System.Text.Json.JsonSerializer.DeserializeAsync<T>(responseStream, JsonSerializerSettings, cancellationToken).ConfigureAwait(false);
+                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                    }
+                }
+                catch (System.Text.Json.JsonException exception)
+                {
+                    var message = "Could not deserialize the response body stream as " + typeof(T).FullName + ".";
+                    throw new PersontjenestenApiException(message, (int)response.StatusCode, string.Empty, headers, exception);
+                }
+            }
+        }
+
+        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        {
+            if (value == null)
+            {
+                return "";
+            }
+
+            if (value is System.Enum)
+            {
+                var name = System.Enum.GetName(value.GetType(), value);
+                if (name != null)
+                {
+                    var field = System.Reflection.IntrospectionExtensions.GetTypeInfo(value.GetType()).GetDeclaredField(name);
+                    if (field != null)
+                    {
+                        var attribute = System.Reflection.CustomAttributeExtensions.GetCustomAttribute(field, typeof(System.Runtime.Serialization.EnumMemberAttribute)) 
+                            as System.Runtime.Serialization.EnumMemberAttribute;
+                        if (attribute != null)
+                        {
+                            return attribute.Value != null ? attribute.Value : name;
+                        }
+                    }
+
+                    var converted = System.Convert.ToString(System.Convert.ChangeType(value, System.Enum.GetUnderlyingType(value.GetType()), cultureInfo));
+                    return converted == null ? string.Empty : converted;
+                }
+            }
+            else if (value is bool) 
+            {
+                return System.Convert.ToString((bool)value, cultureInfo).ToLowerInvariant();
+            }
+            else if (value is byte[])
+            {
+                return System.Convert.ToBase64String((byte[]) value);
+            }
+            else if (value is string[])
+            {
+                return string.Join(",", (string[])value);
+            }
+            else if (value.GetType().IsArray)
+            {
+                var valueArray = (System.Array)value;
+                var valueTextArray = new string[valueArray.Length];
+                for (var i = 0; i < valueArray.Length; i++)
+                {
+                    valueTextArray[i] = ConvertToString(valueArray.GetValue(i), cultureInfo);
+                }
+                return string.Join(",", valueTextArray);
+            }
+
+            var result = System.Convert.ToString(value, cultureInfo);
+            return result == null ? "" : result;
+        }
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class Person_FullAccessClient 
+    {
+        #pragma warning disable 8618
+        private string _baseUrl;
+        #pragma warning restore 8618
+
+        private System.Net.Http.HttpClient _httpClient;
+        private static System.Lazy<System.Text.Json.JsonSerializerOptions> _settings = new System.Lazy<System.Text.Json.JsonSerializerOptions>(CreateSerializerSettings, true);
+        private System.Text.Json.JsonSerializerOptions _instanceSettings;
+
+    #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        public Person_FullAccessClient(System.Net.Http.HttpClient httpClient)
     #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             BaseUrl = "https://et.persontjenesten.test.nhn.no";
@@ -870,11 +850,10 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// </remarks>
         /// <param name="id">The Person id</param>
         /// <param name="informationParts">Which information parts that should be included in the result</param>
-        /// <param name="api_version">The requested API version</param>
         /// <param name="includeHistory">Flag to indicate if response should include historic information, defaults to false</param>
         /// <returns>Person returned</returns>
         /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Person> PersonAsync(string id, System.Collections.Generic.IEnumerable<InformationPart> informationParts, string api_version, bool? includeHistory = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Person> PersonAsync(string id, System.Collections.Generic.IEnumerable<InformationPart> informationParts, bool? includeHistory = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -888,10 +867,6 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -1011,11 +986,10 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// <br/>Historic NINs are supported. This is a POST request to avoid including NIN as part of the URL.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Requires HelseId scope:&lt;/b&gt; FullAccess, RequireParentOrgNumber
         /// </remarks>
         /// <param name="informationParts">Which information parts that should be included in the result</param>
-        /// <param name="api_version">The requested API version</param>
         /// <param name="includeHistory">Flag to indicate if response should include historic information, defaults to false</param>
         /// <returns>Person returned</returns>
         /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Person> GetByNinAsync(System.Collections.Generic.IEnumerable<InformationPart> informationParts, string api_version, bool? includeHistory = null, Body body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Person> GetByNinAsync(System.Collections.Generic.IEnumerable<InformationPart> informationParts, bool? includeHistory = null, Body body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (informationParts == null)
                 throw new System.ArgumentNullException("informationParts");
@@ -1026,10 +1000,6 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
                     var dictionary_ = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, string>>(json_, JsonSerializerSettings);
                     var content_ = new System.Net.Http.FormUrlEncodedContent(dictionary_);
@@ -1142,11 +1112,10 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// Does not support nin&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Requires HelseId scope:&lt;/b&gt; FullAccess, RequireParentOrgNumber
         /// </remarks>
         /// <param name="informationParts">Which information parts that should be included in the result</param>
-        /// <param name="api_version">The requested API version</param>
         /// <param name="includeHistory">Flag to indicate if response should include historic information, defaults to false</param>
         /// <returns>Person documents returned</returns>
         /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Person>> BulkByIdAsync(System.Collections.Generic.IEnumerable<InformationPart> informationParts, string api_version, bool? includeHistory = null, Body2 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Person>> BulkByIdAsync(System.Collections.Generic.IEnumerable<InformationPart> informationParts, bool? includeHistory = null, Body2 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (informationParts == null)
                 throw new System.ArgumentNullException("informationParts");
@@ -1157,10 +1126,6 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
                     var dictionary_ = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, string>>(json_, JsonSerializerSettings);
                     var content_ = new System.Net.Http.FormUrlEncodedContent(dictionary_);
@@ -1272,11 +1237,10 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// <br/>&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Requires HelseId scope:&lt;/b&gt; FullAccess, RequireParentOrgNumber
         /// </remarks>
         /// <param name="informationParts">Which information parts that should be included in the result</param>
-        /// <param name="api_version">The requested API version</param>
         /// <param name="includeHistory">Flag to indicate if response should include historic information, defaults to false</param>
         /// <returns>Person documents returned</returns>
         /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Person>> BulkByNinAsync(System.Collections.Generic.IEnumerable<InformationPart> informationParts, string api_version, bool? includeHistory = null, Body3 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Person>> BulkByNinAsync(System.Collections.Generic.IEnumerable<InformationPart> informationParts, bool? includeHistory = null, Body3 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (informationParts == null)
                 throw new System.ArgumentNullException("informationParts");
@@ -1287,10 +1251,6 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
                     var dictionary_ = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, string>>(json_, JsonSerializerSettings);
                     var content_ = new System.Net.Http.FormUrlEncodedContent(dictionary_);
@@ -1495,7 +1455,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Person_restrictedAccessClient 
+    public partial class Person_RestrictedAccessClient 
     {
         #pragma warning disable 8618
         private string _baseUrl;
@@ -1506,7 +1466,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         private System.Text.Json.JsonSerializerOptions _instanceSettings;
 
     #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public Person_restrictedAccessClient(System.Net.Http.HttpClient httpClient)
+        public Person_RestrictedAccessClient(System.Net.Http.HttpClient httpClient)
     #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             BaseUrl = "https://et.persontjenesten.test.nhn.no";
@@ -1551,11 +1511,10 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// </remarks>
         /// <param name="id">The Person id</param>
         /// <param name="informationParts">Which information parts that should be included in the result</param>
-        /// <param name="api_version">The requested API version</param>
         /// <param name="includeHistory">Flag to indicate if response should include historic information, defaults to false</param>
         /// <returns>Person returned</returns>
         /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Person> PersonAsync(string id, System.Collections.Generic.IEnumerable<InformationPart> informationParts, string api_version, bool? includeHistory = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Person> PersonAsync(string id, System.Collections.Generic.IEnumerable<InformationPart> informationParts, bool? includeHistory = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -1569,10 +1528,6 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -1692,11 +1647,10 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// <br/>Historic NINs are supported. This is a POST request to avoid including NIN as part of the URL.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Requires HelseId scope:&lt;/b&gt; RequireParentOrgNumber, RestrictedAccess
         /// </remarks>
         /// <param name="informationParts">Which information parts that should be included in the result</param>
-        /// <param name="api_version">The requested API version</param>
         /// <param name="includeHistory">Flag to indicate if response should include historic information, defaults to false</param>
         /// <returns>Person returned</returns>
         /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Person> GetByNinAsync(System.Collections.Generic.IEnumerable<InformationPart> informationParts, string api_version, bool? includeHistory = null, Body4 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Person> GetByNinAsync(System.Collections.Generic.IEnumerable<InformationPart> informationParts, bool? includeHistory = null, Body4 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (informationParts == null)
                 throw new System.ArgumentNullException("informationParts");
@@ -1707,10 +1661,6 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
                     var dictionary_ = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, string>>(json_, JsonSerializerSettings);
                     var content_ = new System.Net.Http.FormUrlEncodedContent(dictionary_);
@@ -1823,11 +1773,10 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// Does not support nin&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Requires HelseId scope:&lt;/b&gt; RequireParentOrgNumber, RestrictedAccess
         /// </remarks>
         /// <param name="informationParts">Which information parts that should be included in the result</param>
-        /// <param name="api_version">The requested API version</param>
         /// <param name="includeHistory">Flag to indicate if response should include historic information, defaults to false</param>
         /// <returns>Person documents returned</returns>
         /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Person>> BulkByIdAsync(System.Collections.Generic.IEnumerable<InformationPart> informationParts, string api_version, bool? includeHistory = null, Body5 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Person>> BulkByIdAsync(System.Collections.Generic.IEnumerable<InformationPart> informationParts, bool? includeHistory = null, Body5 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (informationParts == null)
                 throw new System.ArgumentNullException("informationParts");
@@ -1838,10 +1787,6 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
                     var dictionary_ = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, string>>(json_, JsonSerializerSettings);
                     var content_ = new System.Net.Http.FormUrlEncodedContent(dictionary_);
@@ -1953,11 +1898,10 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// <br/>&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Requires HelseId scope:&lt;/b&gt; RequireParentOrgNumber, RestrictedAccess
         /// </remarks>
         /// <param name="informationParts">Which information parts that should be included in the result</param>
-        /// <param name="api_version">The requested API version</param>
         /// <param name="includeHistory">Flag to indicate if response should include historic information, defaults to false</param>
         /// <returns>Person documents returned</returns>
         /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Person>> BulkByNinAsync(System.Collections.Generic.IEnumerable<InformationPart> informationParts, string api_version, bool? includeHistory = null, Body6 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<Person>> BulkByNinAsync(System.Collections.Generic.IEnumerable<InformationPart> informationParts, bool? includeHistory = null, Body6 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (informationParts == null)
                 throw new System.ArgumentNullException("informationParts");
@@ -1968,10 +1912,6 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
                     var dictionary_ = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, string>>(json_, JsonSerializerSettings);
                     var content_ = new System.Net.Http.FormUrlEncodedContent(dictionary_);
@@ -2229,7 +2169,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// </summary>
         /// <returns>Pong</returns>
         /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task PingGetAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task PingAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -2238,75 +2178,6 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
-
-                    var urlBuilder_ = new System.Text.StringBuilder();
-                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
-                    // Operation Path: "ping"
-                    urlBuilder_.Append("ping");
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
-                        foreach (var item_ in response_.Headers)
-                            headers_[item_.Key] = item_.Value;
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new PersontjenestenApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <summary>
-        /// Ping the API
-        /// </summary>
-        /// <returns>Pong</returns>
-        /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task PingPostAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                     if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
@@ -2470,7 +2341,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Search_fullAccessClient 
+    public partial class Search_FullAccessClient 
     {
         #pragma warning disable 8618
         private string _baseUrl;
@@ -2481,7 +2352,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         private System.Text.Json.JsonSerializerOptions _instanceSettings;
 
     #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public Search_fullAccessClient(System.Net.Http.HttpClient httpClient)
+        public Search_FullAccessClient(System.Net.Http.HttpClient httpClient)
     #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             BaseUrl = "https://et.persontjenesten.test.nhn.no";
@@ -2533,12 +2404,11 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// <br/>Some search parameters are also validated individually, see the search parameter description for more details.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Requires HelseId scope:&lt;/b&gt; FullAccess, RequireParentOrgNumber
         /// </remarks>
         /// <param name="informationParts">Which information parts that should be included in the result</param>
-        /// <param name="api_version">The requested API version</param>
         /// <param name="includeHistory">Flag to indicate if response should include historic information, defaults to false</param>
         /// <param name="includeAinResults">flag to determine if search results should include persons with alternate identification numbers</param>
         /// <returns>Search result with a list of person documents</returns>
         /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<PersonSearchResult> PersonAsync(System.Collections.Generic.IEnumerable<InformationPart> informationParts, string api_version, bool? includeHistory = null, bool? includeAinResults = null, Body7 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<PersonSearchResult> PersonAsync(System.Collections.Generic.IEnumerable<InformationPart> informationParts, bool? includeHistory = null, bool? includeAinResults = null, Body7 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (informationParts == null)
                 throw new System.ArgumentNullException("informationParts");
@@ -2549,10 +2419,6 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
                     var dictionary_ = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, string>>(json_, JsonSerializerSettings);
                     var content_ = new System.Net.Http.FormUrlEncodedContent(dictionary_);
@@ -2660,11 +2526,10 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// Search for a set of persons based on current information. Returns a search result with unique person ids, see Person
         /// <br/>together with the results start and end index with can be further used to paginate the potential remainder of the total search result.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Requires HelseId scope:&lt;/b&gt; FullAccess, RequireParentOrgNumber
         /// </remarks>
-        /// <param name="api_version">The requested API version</param>
         /// <param name="includeAinResults">flag to determine if search results should include persons with alternate identification numbers</param>
         /// <returns>Search result with a list of person ids</returns>
         /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<StringSearchResult> PagedMatchListAsync(string api_version, bool? includeAinResults = null, Body8 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<StringSearchResult> PagedMatchListAsync(bool? includeAinResults = null, Body8 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -2672,10 +2537,6 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
                     var dictionary_ = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, string>>(json_, JsonSerializerSettings);
                     var content_ = new System.Net.Http.FormUrlEncodedContent(dictionary_);
@@ -2771,11 +2632,10 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// <remarks>
         /// See documentation for "paged-match-list" for more details.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Requires HelseId scope:&lt;/b&gt; FullAccess, RequireParentOrgNumber
         /// </remarks>
-        /// <param name="api_version">The requested API version</param>
         /// <param name="includeAinResults">flag to determine if search results should include persons with alternate identification numbers</param>
         /// <returns>Search result with a list of person ids</returns>
         /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SearchMatchCountResult> MatchCountAsync(string api_version, bool? includeAinResults = null, Body9 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<SearchMatchCountResult> MatchCountAsync(bool? includeAinResults = null, Body9 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -2783,10 +2643,6 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
                     var dictionary_ = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, string>>(json_, JsonSerializerSettings);
                     var content_ = new System.Net.Http.FormUrlEncodedContent(dictionary_);
@@ -2984,7 +2840,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Search_with_restrictedAccessClient 
+    public partial class Search_RestrictedAccessClient 
     {
         #pragma warning disable 8618
         private string _baseUrl;
@@ -2995,7 +2851,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         private System.Text.Json.JsonSerializerOptions _instanceSettings;
 
     #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public Search_with_restrictedAccessClient(System.Net.Http.HttpClient httpClient)
+        public Search_RestrictedAccessClient(System.Net.Http.HttpClient httpClient)
     #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             BaseUrl = "https://et.persontjenesten.test.nhn.no";
@@ -3047,12 +2903,11 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// <br/>Some search parameters are also validated individually, see the search parameter description for more details.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Requires HelseId scope:&lt;/b&gt; RequireParentOrgNumber, RestrictedAccess
         /// </remarks>
         /// <param name="informationParts">Which information parts that should be included in the result</param>
-        /// <param name="api_version">The requested API version</param>
         /// <param name="includeHistory">Flag to indicate if response should include historic information, defaults to false</param>
         /// <param name="includeAinResults">flag to determine if search results should include persons with alternate identification numbers</param>
         /// <returns>Search result with a list of person documents</returns>
         /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<PersonSearchResult> PersonAsync(System.Collections.Generic.IEnumerable<InformationPart> informationParts, string api_version, bool? includeHistory = null, bool? includeAinResults = null, Body10 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<PersonSearchResult> PersonAsync(System.Collections.Generic.IEnumerable<InformationPart> informationParts, bool? includeHistory = null, bool? includeAinResults = null, Body10 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (informationParts == null)
                 throw new System.ArgumentNullException("informationParts");
@@ -3063,10 +2918,6 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
                     var dictionary_ = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, string>>(json_, JsonSerializerSettings);
                     var content_ = new System.Net.Http.FormUrlEncodedContent(dictionary_);
@@ -3174,11 +3025,10 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// Search for a set of persons based on current information. Returns a search result with unique person ids, see Person
         /// <br/>together with the results start and end index with can be further used to paginate the potential remainder of the total search result.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Requires HelseId scope:&lt;/b&gt; RequireParentOrgNumber, RestrictedAccess
         /// </remarks>
-        /// <param name="api_version">The requested API version</param>
         /// <param name="includeAinResults">flag to determine if search results should include persons with alternate identification numbers</param>
         /// <returns>Search result with a list of person ids</returns>
         /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<StringSearchResult> PagedMatchListAsync(string api_version, bool? includeAinResults = null, Body11 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<StringSearchResult> PagedMatchListAsync(bool? includeAinResults = null, Body11 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -3186,10 +3036,6 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
                     var dictionary_ = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, string>>(json_, JsonSerializerSettings);
                     var content_ = new System.Net.Http.FormUrlEncodedContent(dictionary_);
@@ -3284,11 +3130,10 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// <remarks>
         /// See documentation for "paged-match-list" for more details.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;Requires HelseId scope:&lt;/b&gt; RequireParentOrgNumber, RestrictedAccess
         /// </remarks>
-        /// <param name="api_version">The requested API version</param>
         /// <param name="includeAinResults">flag to determine if search results should include persons with alternate identification numbers</param>
         /// <returns>Search result with a list of person ids</returns>
         /// <exception cref="PersontjenestenApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SearchMatchCountResult> MatchCountAsync(string api_version, bool? includeAinResults = null, Body12 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<SearchMatchCountResult> MatchCountAsync(bool? includeAinResults = null, Body12 body = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -3296,10 +3141,6 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-
-                    if (api_version == null)
-                        throw new System.ArgumentNullException("api_version");
-                    request_.Headers.TryAddWithoutValidation("api-version", ConvertToString(api_version, System.Globalization.CultureInfo.InvariantCulture));
                     var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(body, JsonSerializerSettings);
                     var dictionary_ = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.Dictionary<string, string>>(json_, JsonSerializerSettings);
                     var content_ = new System.Net.Http.FormUrlEncodedContent(dictionary_);
@@ -4260,7 +4101,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
     {
         [System.Text.Json.Serialization.JsonConstructor]
 
-        public CommonContactRegisterInformation(string @certificate, ContactInformationResource @contactInformation, DigitalPostResource @digitalPost, string @language, string @languageLastUpdated, NotificationStatus? @notificationStatus, Reservation? @reservation, string @reservationTime, string @reservationUpdated, Status? @status)
+        public CommonContactRegisterInformation(string @certificate, string @certificateExpireDate, ContactInformationResource @contactInformation, DigitalPostResource @digitalPost, string @language, string @languageLastUpdated, NotificationStatus? @notificationStatus, Reservation? @reservation, string @reservationTime, string @reservationUpdated, Status? @status)
 
         {
 
@@ -4279,6 +4120,8 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             this.DigitalPost = @digitalPost;
 
             this.Certificate = @certificate;
+
+            this.CertificateExpireDate = @certificateExpireDate;
 
             this.Language = @language;
 
@@ -4358,6 +4201,15 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("certificate")]
         public string Certificate { get; init; }
+
+        /// <summary>
+        /// 
+        /// <br/>KRR: sertifikat_utloeper
+        /// <br/>            date when the certificate for the digital post address expires in ISO 8601-format
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("certificateExpireDate")]
+        public string CertificateExpireDate { get; init; }
 
         /// <summary>
         /// 
@@ -4576,7 +4428,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
     {
         [System.Text.Json.Serialization.JsonConstructor]
 
-        public ContactInformationResource(string @email, string @emailLastUpdated, string @emailLastVerified, string @phoneNumber, string @phoneNumberLastUpdated, string @phoneNumberLastVerified)
+        public ContactInformationResource(string @email, Duplicated? @emailDuplicated, string @emailLastUpdated, string @emailLastValidated, string @emailLastVerified, string @phoneNumber, Duplicated? @phoneNumberDuplicated, string @phoneNumberLastUpdated, string @phoneNumberLastValidated, string @phoneNumberLastVerified)
 
         {
 
@@ -4584,13 +4436,21 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
             this.EmailLastUpdated = @emailLastUpdated;
 
+            this.EmailDuplicated = @emailDuplicated;
+
             this.EmailLastVerified = @emailLastVerified;
+
+            this.EmailLastValidated = @emailLastValidated;
 
             this.PhoneNumber = @phoneNumber;
 
             this.PhoneNumberLastUpdated = @phoneNumberLastUpdated;
 
+            this.PhoneNumberDuplicated = @phoneNumberDuplicated;
+
             this.PhoneNumberLastVerified = @phoneNumberLastVerified;
+
+            this.PhoneNumberLastValidated = @phoneNumberLastValidated;
 
         }    /// <summary>
         /// 
@@ -4612,12 +4472,31 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         /// <summary>
         /// 
+        /// <br/>KRR: epostadresse_duplisert
+        /// <br/>            The Email is registered to one or several other persons in KRR
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("emailDuplicated")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public Duplicated? EmailDuplicated { get; init; }
+
+        /// <summary>
+        /// 
         /// <br/>KRR: epostadresse_sist_verifisert
         /// <br/>            Last time email was verified by person. Confirmed by person at least twice a year
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("emailLastVerified")]
         public string EmailLastVerified { get; init; }
+
+        /// <summary>
+        /// 
+        /// <br/>KRR: epostadresse_sist_validert
+        /// <br/>            Last time email was validated by code sent to the registered email adress
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("emailLastValidated")]
+        public string EmailLastValidated { get; init; }
 
         /// <summary>
         /// 
@@ -4639,12 +4518,31 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         /// <summary>
         /// 
+        /// <br/>KRR: mobiltelefonnummer_duplisert
+        /// <br/>            The phone number is registered to one or several other persons in KRR
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("phoneNumberDuplicated")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+        public Duplicated? PhoneNumberDuplicated { get; init; }
+
+        /// <summary>
+        /// 
         /// <br/>KRR: mobiltelefonnummer_sist_verifisert
         /// <br/>            Last time the Phone number was verified by person. Confirmed by person at least twice a year
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("phoneNumberLastVerified")]
         public string PhoneNumberLastVerified { get; init; }
+
+        /// <summary>
+        /// 
+        /// <br/>KRR: mobiltelefonnummer_sist_validert
+        /// <br/>            Last time Phone number was validated by code sent to the registered Phone number
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("phoneNumberLastValidated")]
+        public string PhoneNumberLastValidated { get; init; }
 
     }
 
@@ -4818,13 +4716,15 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
     {
         [System.Text.Json.Serialization.JsonConstructor]
 
-        public DigitalPostResource(string @digitalPostAddress, string @digitalPostVendorAddress)
+        public DigitalPostResource(string @digitalPostAddress, string @digitalPostVendorAddress, string @digitalPostVendorName)
 
         {
 
             this.DigitalPostAddress = @digitalPostAddress;
 
             this.DigitalPostVendorAddress = @digitalPostVendorAddress;
+
+            this.DigitalPostVendorName = @digitalPostVendorName;
 
         }    /// <summary>
         /// 
@@ -4843,6 +4743,15 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("digitalPostVendorAddress")]
         public string DigitalPostVendorAddress { get; init; }
+
+        /// <summary>
+        /// 
+        /// <br/>KRR: navn
+        /// <br/>            Name of the digital post vendor
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("digitalPostVendorName")]
+        public string DigitalPostVendorName { get; init; }
 
     }
 
@@ -4882,6 +4791,22 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("verifiedAt")]
         public System.DateTimeOffset? VerifiedAt { get; init; }
+
+    }
+
+    /// <summary>
+    /// 
+    /// <br/>KRR: Duplisert&lt;p&gt;Possible values:&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;i&gt;Yes&lt;/i&gt; - KRR: JA&lt;/li&gt;&lt;li&gt;&lt;i&gt;No&lt;/i&gt; - KRR: NEI&lt;/li&gt;&lt;/ul&gt;
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum Duplicated
+    {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Yes")]
+        Yes = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"No")]
+        No = 1,
 
     }
 
@@ -11154,12 +11079,15 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// The whole or parts of a person's full name. Only letters are allowed, up to 600 characters.
         /// <br/>The search string will be divided into separate search words, and these words can match
         /// <br/>the start of any part of the person's full name, regardless of the order of search words.
+        /// <br/>Note: The full-text search may tokenize compound words (e.g., "DAGBOK" becomes "DAG" and
+        /// <br/>"BOK"), so a search word may match the start of any tokenized part, not just the start of
+        /// <br/>the full name or a space-separated word.
         /// <br/>Only the first three search words will be used.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("FullName")]
         [System.ComponentModel.DataAnnotations.StringLength(600, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FullName { get; init; }
 
         /// <summary>
@@ -11169,27 +11097,27 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("GivenName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string GivenName { get; init; }
 
         /// <summary>
-        /// The whole or first part of a person's middle name.
+        /// The whole or the first part of a person's middle name.
         /// <br/>Only letters are allowed, up to 200 characters.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MiddleName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string MiddleName { get; init; }
 
         /// <summary>
-        /// The whole or first part of a person's family name.
+        /// The whole or the first part of a person's family name.
         /// <br/>Only letters are allowed, up to 200 characters.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("FamilyName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FamilyName { get; init; }
 
         /// <summary>
@@ -11199,7 +11127,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("StreetAddress")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\p{N}]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}\p{N}]+[\p{L}\s\p{N}\-\.\'\,\/]*")]
         public string StreetAddress { get; init; }
 
         /// <summary>
@@ -11219,7 +11147,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("CityName")]
         [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string CityName { get; init; }
 
         /// <summary>
@@ -11248,7 +11176,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
     {
         [System.Text.Json.Serialization.JsonConstructor]
 
-        public Body8(string @basicStatisticalUnit, string @birthDateFrom, string @birthDateTo, string @familyName, string @fullName, Gender? @gender, string @givenName, int? @indexOffset, string @middleName, string @municipalityNumber, int? @pageSize, System.Collections.Generic.ICollection<PersonStatusType> @personStatuses, string @postalCode, string @streetAddress)
+        public Body8(string @basicStatisticalUnit, string @birthDateFrom, string @birthDateTo, string @deathDateFrom, string @deathDateTo, string @familyName, string @fullName, Gender? @gender, string @givenName, int? @indexOffset, string @middleName, string @municipalityNumber, int? @pageSize, System.Collections.Generic.ICollection<PersonStatusType> @personStatuses, string @postalCode, string @streetAddress)
 
         {
 
@@ -11275,6 +11203,10 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             this.BirthDateFrom = @birthDateFrom;
 
             this.BirthDateTo = @birthDateTo;
+
+            this.DeathDateFrom = @deathDateFrom;
+
+            this.DeathDateTo = @deathDateTo;
 
             this.Gender = @gender;
 
@@ -11303,12 +11235,15 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// The whole or parts of a person's full name. Only letters are allowed, up to 600 characters.
         /// <br/>The search string will be divided into separate search words, and these words can match
         /// <br/>the start of any part of the person's full name, regardless of the order of search words.
+        /// <br/>Note: The full-text search may tokenize compound words (e.g., "DAGBOK" becomes "DAG" and
+        /// <br/>"BOK"), so a search word may match the start of any tokenized part, not just the start of
+        /// <br/>the full name or a space-separated word.
         /// <br/>Only the first three search words will be used.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("FullName")]
         [System.ComponentModel.DataAnnotations.StringLength(600, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FullName { get; init; }
 
         /// <summary>
@@ -11318,27 +11253,27 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("GivenName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string GivenName { get; init; }
 
         /// <summary>
-        /// The whole or first part of a person's middle name.
+        /// The whole or the first part of a person's middle name.
         /// <br/>Only letters are allowed, up to 200 characters.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MiddleName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string MiddleName { get; init; }
 
         /// <summary>
-        /// The whole or first part of a person's family name.
+        /// The whole or the first part of a person's family name.
         /// <br/>Only letters are allowed, up to 200 characters.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("FamilyName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FamilyName { get; init; }
 
         /// <summary>
@@ -11348,7 +11283,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("StreetAddress")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 5)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\p{N}]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}\p{N}]+[\p{L}\s\p{N}\-\.\'\,\/]*")]
         public string StreetAddress { get; init; }
 
         /// <summary>
@@ -11402,6 +11337,28 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         [System.ComponentModel.DataAnnotations.StringLength(10, MinimumLength = 1)]
         [System.ComponentModel.DataAnnotations.RegularExpression(@"^[0-9]{4}[0-9-]{0,6}")]
         public string BirthDateTo { get; init; }
+
+        /// <summary>
+        /// Will return persons with a date of death equal to or higher than the given value.
+        /// <br/>The person's date of death provided as a string, formatted as YYYY-MM-DD
+        /// <br/>Searching only by year (YYYY) or year and month (YYYY-MM) is also allowed.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("DeathDateFrom")]
+        [System.ComponentModel.DataAnnotations.StringLength(10, MinimumLength = 1)]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^[0-9]{4}[0-9-]{0,6}")]
+        public string DeathDateFrom { get; init; }
+
+        /// <summary>
+        /// Will return persons with a date of death equal to or lower than the given value.
+        /// <br/>The person's date of death provided as a string, formatted as YYYY-MM-DD.
+        /// <br/>Searching only by year (YYYY) or year and month (YYYY-MM) is also allowed.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("DeathDateTo")]
+        [System.ComponentModel.DataAnnotations.StringLength(10, MinimumLength = 1)]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^[0-9]{4}[0-9-]{0,6}")]
+        public string DeathDateTo { get; init; }
 
         /// <summary>
         /// The person's gender
@@ -11437,7 +11394,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
     {
         [System.Text.Json.Serialization.JsonConstructor]
 
-        public Body9(string @basicStatisticalUnit, string @birthDateFrom, string @birthDateTo, string @familyName, string @fullName, Gender? @gender, string @givenName, string @middleName, string @municipalityNumber, System.Collections.Generic.ICollection<PersonStatusType> @personStatuses, string @postalCode, string @streetAddress)
+        public Body9(string @basicStatisticalUnit, string @birthDateFrom, string @birthDateTo, string @deathDateFrom, string @deathDateTo, string @familyName, string @fullName, Gender? @gender, string @givenName, string @middleName, string @municipalityNumber, System.Collections.Generic.ICollection<PersonStatusType> @personStatuses, string @postalCode, string @streetAddress)
 
         {
 
@@ -11461,6 +11418,10 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
             this.BirthDateTo = @birthDateTo;
 
+            this.DeathDateFrom = @deathDateFrom;
+
+            this.DeathDateTo = @deathDateTo;
+
             this.Gender = @gender;
 
             this.PersonStatuses = @personStatuses;
@@ -11469,12 +11430,15 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// The whole or parts of a person's full name. Only letters are allowed, up to 600 characters.
         /// <br/>The search string will be divided into separate search words, and these words can match
         /// <br/>the start of any part of the person's full name, regardless of the order of search words.
+        /// <br/>Note: The full-text search may tokenize compound words (e.g., "DAGBOK" becomes "DAG" and
+        /// <br/>"BOK"), so a search word may match the start of any tokenized part, not just the start of
+        /// <br/>the full name or a space-separated word.
         /// <br/>Only the first three search words will be used.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("FullName")]
         [System.ComponentModel.DataAnnotations.StringLength(600, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FullName { get; init; }
 
         /// <summary>
@@ -11484,27 +11448,27 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("GivenName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string GivenName { get; init; }
 
         /// <summary>
-        /// The whole or first part of a person's middle name.
+        /// The whole or the first part of a person's middle name.
         /// <br/>Only letters are allowed, up to 200 characters.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MiddleName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string MiddleName { get; init; }
 
         /// <summary>
-        /// The whole or first part of a person's family name.
+        /// The whole or the first part of a person's family name.
         /// <br/>Only letters are allowed, up to 200 characters.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("FamilyName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FamilyName { get; init; }
 
         /// <summary>
@@ -11514,7 +11478,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("StreetAddress")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 5)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\p{N}]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}\p{N}]+[\p{L}\s\p{N}\-\.\'\,\/]*")]
         public string StreetAddress { get; init; }
 
         /// <summary>
@@ -11568,6 +11532,28 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         [System.ComponentModel.DataAnnotations.StringLength(10, MinimumLength = 1)]
         [System.ComponentModel.DataAnnotations.RegularExpression(@"^[0-9]{4}[0-9-]{0,6}")]
         public string BirthDateTo { get; init; }
+
+        /// <summary>
+        /// Will return persons with a date of death equal to or higher than the given value.
+        /// <br/>The person's date of death provided as a string, formatted as YYYY-MM-DD
+        /// <br/>Searching only by year (YYYY) or year and month (YYYY-MM) is also allowed.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("DeathDateFrom")]
+        [System.ComponentModel.DataAnnotations.StringLength(10, MinimumLength = 1)]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^[0-9]{4}[0-9-]{0,6}")]
+        public string DeathDateFrom { get; init; }
+
+        /// <summary>
+        /// Will return persons with a date of death equal to or lower than the given value.
+        /// <br/>The person's date of death provided as a string, formatted as YYYY-MM-DD.
+        /// <br/>Searching only by year (YYYY) or year and month (YYYY-MM) is also allowed.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("DeathDateTo")]
+        [System.ComponentModel.DataAnnotations.StringLength(10, MinimumLength = 1)]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^[0-9]{4}[0-9-]{0,6}")]
+        public string DeathDateTo { get; init; }
 
         /// <summary>
         /// The person's gender
@@ -11649,12 +11635,15 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// The whole or parts of a person's full name. Only letters are allowed, up to 600 characters.
         /// <br/>The search string will be divided into separate search words, and these words can match
         /// <br/>the start of any part of the person's full name, regardless of the order of search words.
+        /// <br/>Note: The full-text search may tokenize compound words (e.g., "DAGBOK" becomes "DAG" and
+        /// <br/>"BOK"), so a search word may match the start of any tokenized part, not just the start of
+        /// <br/>the full name or a space-separated word.
         /// <br/>Only the first three search words will be used.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("FullName")]
         [System.ComponentModel.DataAnnotations.StringLength(600, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FullName { get; init; }
 
         /// <summary>
@@ -11664,27 +11653,27 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("GivenName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string GivenName { get; init; }
 
         /// <summary>
-        /// The whole or first part of a person's middle name.
+        /// The whole or the first part of a person's middle name.
         /// <br/>Only letters are allowed, up to 200 characters.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MiddleName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string MiddleName { get; init; }
 
         /// <summary>
-        /// The whole or first part of a person's family name.
+        /// The whole or the first part of a person's family name.
         /// <br/>Only letters are allowed, up to 200 characters.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("FamilyName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FamilyName { get; init; }
 
         /// <summary>
@@ -11694,7 +11683,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("StreetAddress")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\p{N}]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}\p{N}]+[\p{L}\s\p{N}\-\.\'\,\/]*")]
         public string StreetAddress { get; init; }
 
         /// <summary>
@@ -11714,7 +11703,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("CityName")]
         [System.ComponentModel.DataAnnotations.StringLength(100, MinimumLength = 1)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string CityName { get; init; }
 
         /// <summary>
@@ -11743,7 +11732,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
     {
         [System.Text.Json.Serialization.JsonConstructor]
 
-        public Body11(string @basicStatisticalUnit, string @birthDateFrom, string @birthDateTo, string @familyName, string @fullName, Gender? @gender, string @givenName, int? @indexOffset, string @middleName, string @municipalityNumber, int? @pageSize, System.Collections.Generic.ICollection<PersonStatusType> @personStatuses, string @postalCode, string @streetAddress)
+        public Body11(string @basicStatisticalUnit, string @birthDateFrom, string @birthDateTo, string @deathDateFrom, string @deathDateTo, string @familyName, string @fullName, Gender? @gender, string @givenName, int? @indexOffset, string @middleName, string @municipalityNumber, int? @pageSize, System.Collections.Generic.ICollection<PersonStatusType> @personStatuses, string @postalCode, string @streetAddress)
 
         {
 
@@ -11770,6 +11759,10 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
             this.BirthDateFrom = @birthDateFrom;
 
             this.BirthDateTo = @birthDateTo;
+
+            this.DeathDateFrom = @deathDateFrom;
+
+            this.DeathDateTo = @deathDateTo;
 
             this.Gender = @gender;
 
@@ -11798,12 +11791,15 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// The whole or parts of a person's full name. Only letters are allowed, up to 600 characters.
         /// <br/>The search string will be divided into separate search words, and these words can match
         /// <br/>the start of any part of the person's full name, regardless of the order of search words.
+        /// <br/>Note: The full-text search may tokenize compound words (e.g., "DAGBOK" becomes "DAG" and
+        /// <br/>"BOK"), so a search word may match the start of any tokenized part, not just the start of
+        /// <br/>the full name or a space-separated word.
         /// <br/>Only the first three search words will be used.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("FullName")]
         [System.ComponentModel.DataAnnotations.StringLength(600, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FullName { get; init; }
 
         /// <summary>
@@ -11813,27 +11809,27 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("GivenName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string GivenName { get; init; }
 
         /// <summary>
-        /// The whole or first part of a person's middle name.
+        /// The whole or the first part of a person's middle name.
         /// <br/>Only letters are allowed, up to 200 characters.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MiddleName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string MiddleName { get; init; }
 
         /// <summary>
-        /// The whole or first part of a person's family name.
+        /// The whole or the first part of a person's family name.
         /// <br/>Only letters are allowed, up to 200 characters.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("FamilyName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FamilyName { get; init; }
 
         /// <summary>
@@ -11843,7 +11839,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("StreetAddress")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 5)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\p{N}]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}\p{N}]+[\p{L}\s\p{N}\-\.\'\,\/]*")]
         public string StreetAddress { get; init; }
 
         /// <summary>
@@ -11897,6 +11893,28 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         [System.ComponentModel.DataAnnotations.StringLength(10, MinimumLength = 1)]
         [System.ComponentModel.DataAnnotations.RegularExpression(@"^[0-9]{4}[0-9-]{0,6}")]
         public string BirthDateTo { get; init; }
+
+        /// <summary>
+        /// Will return persons with a date of death equal to or higher than the given value.
+        /// <br/>The person's date of death provided as a string, formatted as YYYY-MM-DD
+        /// <br/>Searching only by year (YYYY) or year and month (YYYY-MM) is also allowed.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("DeathDateFrom")]
+        [System.ComponentModel.DataAnnotations.StringLength(10, MinimumLength = 1)]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^[0-9]{4}[0-9-]{0,6}")]
+        public string DeathDateFrom { get; init; }
+
+        /// <summary>
+        /// Will return persons with a date of death equal to or lower than the given value.
+        /// <br/>The person's date of death provided as a string, formatted as YYYY-MM-DD.
+        /// <br/>Searching only by year (YYYY) or year and month (YYYY-MM) is also allowed.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("DeathDateTo")]
+        [System.ComponentModel.DataAnnotations.StringLength(10, MinimumLength = 1)]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^[0-9]{4}[0-9-]{0,6}")]
+        public string DeathDateTo { get; init; }
 
         /// <summary>
         /// The person's gender
@@ -11932,7 +11950,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
     {
         [System.Text.Json.Serialization.JsonConstructor]
 
-        public Body12(string @basicStatisticalUnit, string @birthDateFrom, string @birthDateTo, string @familyName, string @fullName, Gender? @gender, string @givenName, string @middleName, string @municipalityNumber, System.Collections.Generic.ICollection<PersonStatusType> @personStatuses, string @postalCode, string @streetAddress)
+        public Body12(string @basicStatisticalUnit, string @birthDateFrom, string @birthDateTo, string @deathDateFrom, string @deathDateTo, string @familyName, string @fullName, Gender? @gender, string @givenName, string @middleName, string @municipalityNumber, System.Collections.Generic.ICollection<PersonStatusType> @personStatuses, string @postalCode, string @streetAddress)
 
         {
 
@@ -11956,6 +11974,10 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
             this.BirthDateTo = @birthDateTo;
 
+            this.DeathDateFrom = @deathDateFrom;
+
+            this.DeathDateTo = @deathDateTo;
+
             this.Gender = @gender;
 
             this.PersonStatuses = @personStatuses;
@@ -11964,12 +11986,15 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         /// The whole or parts of a person's full name. Only letters are allowed, up to 600 characters.
         /// <br/>The search string will be divided into separate search words, and these words can match
         /// <br/>the start of any part of the person's full name, regardless of the order of search words.
+        /// <br/>Note: The full-text search may tokenize compound words (e.g., "DAGBOK" becomes "DAG" and
+        /// <br/>"BOK"), so a search word may match the start of any tokenized part, not just the start of
+        /// <br/>the full name or a space-separated word.
         /// <br/>Only the first three search words will be used.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("FullName")]
         [System.ComponentModel.DataAnnotations.StringLength(600, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FullName { get; init; }
 
         /// <summary>
@@ -11979,27 +12004,27 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("GivenName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string GivenName { get; init; }
 
         /// <summary>
-        /// The whole or first part of a person's middle name.
+        /// The whole or the first part of a person's middle name.
         /// <br/>Only letters are allowed, up to 200 characters.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("MiddleName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string MiddleName { get; init; }
 
         /// <summary>
-        /// The whole or first part of a person's family name.
+        /// The whole or the first part of a person's family name.
         /// <br/>Only letters are allowed, up to 200 characters.
         /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("FamilyName")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 3)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\-]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}]+[\p{L}\s\-\']*")]
         public string FamilyName { get; init; }
 
         /// <summary>
@@ -12009,7 +12034,7 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
 
         [System.Text.Json.Serialization.JsonPropertyName("StreetAddress")]
         [System.ComponentModel.DataAnnotations.StringLength(200, MinimumLength = 5)]
-        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\p{L}\s\p{N}]+")]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"[\s]*[\p{L}\p{N}]+[\p{L}\s\p{N}\-\.\'\,\/]*")]
         public string StreetAddress { get; init; }
 
         /// <summary>
@@ -12063,6 +12088,28 @@ namespace PersontjenestenDotNetDemo.ExternalApi.Persontjenesten
         [System.ComponentModel.DataAnnotations.StringLength(10, MinimumLength = 1)]
         [System.ComponentModel.DataAnnotations.RegularExpression(@"^[0-9]{4}[0-9-]{0,6}")]
         public string BirthDateTo { get; init; }
+
+        /// <summary>
+        /// Will return persons with a date of death equal to or higher than the given value.
+        /// <br/>The person's date of death provided as a string, formatted as YYYY-MM-DD
+        /// <br/>Searching only by year (YYYY) or year and month (YYYY-MM) is also allowed.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("DeathDateFrom")]
+        [System.ComponentModel.DataAnnotations.StringLength(10, MinimumLength = 1)]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^[0-9]{4}[0-9-]{0,6}")]
+        public string DeathDateFrom { get; init; }
+
+        /// <summary>
+        /// Will return persons with a date of death equal to or lower than the given value.
+        /// <br/>The person's date of death provided as a string, formatted as YYYY-MM-DD.
+        /// <br/>Searching only by year (YYYY) or year and month (YYYY-MM) is also allowed.
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("DeathDateTo")]
+        [System.ComponentModel.DataAnnotations.StringLength(10, MinimumLength = 1)]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^[0-9]{4}[0-9-]{0,6}")]
+        public string DeathDateTo { get; init; }
 
         /// <summary>
         /// The person's gender
