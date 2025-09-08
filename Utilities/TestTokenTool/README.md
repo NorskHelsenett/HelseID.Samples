@@ -406,3 +406,17 @@ Disse brukes hvis du vil lage DPoP-beviset selv, og derfor trenger et 'cnf'-clai
   This will set the claim value for the API specific claim. Both type and value must be set in order to get an API specific claim.
  ```
 
+### Brukerparametre: for å legge til et 'act'-claim for Token Exchange
+```
+  --createTokenExchangeClaim
+  This will create an 'act' claim in the returned token. You must also set at least one of the following values: 'tokenExchangeIssuer', 'tokenExchangeClientId', 'tokenExchangeOrgnrParent'
+
+  --tokenExchangeIssuer
+  Parameter for use in 'act' claims (Token Exchange)
+
+  --tokenExchangeClientId
+  Parameter for use in 'act' claims (Token Exchange)
+
+  --tokenExchangeOrgnrParent
+  Parameter for use in 'act' claims (Token Exchange)
+ ```

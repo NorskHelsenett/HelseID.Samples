@@ -48,4 +48,8 @@ public class TokenRequest
     public DPoPProofParameters DPoPProofParameters { get; set; } = new();
 
     public ApiSpecificClaim[]? ApiSpecificClaims { get; set; } = [];
+
+    public bool CreateTokenExchangeClaims { get; set; }
+    
+    public TokenExchangeParameters TokenExchangeParameters { get; set; } = new();
 }

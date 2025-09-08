@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using IdentityModel.Client;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using PersontjenestenDotNetDemo;
 using PersontjenestenDotNetDemo.ExternalApi.Persontjenesten;
 
@@ -15,8 +17,8 @@ var hostApplicationBuilder = Host.CreateDefaultBuilder(args)
     {
         serviceCollection
             .AddOptions<HelseIdOptions>()
-            .BindConfiguration(HelseIdOptions.SectionKey);
-        //System.Net.ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+            .BindConfiguration(HelseIdOptions.SectionKey);  
+
         serviceCollection
             .AddHttpClient(httpClientNamePersontjenesten, httpClient =>
             {
@@ -25,13 +27,20 @@ var hostApplicationBuilder = Host.CreateDefaultBuilder(args)
             })
             .UseHelseIdDPoP();
 
+        serviceCollection.AddSingleton<IDiscoveryCache>(serviceProvider =>
+        {
+            var factory = serviceProvider.GetRequiredService<IHttpClientFactory>();
+            var options = serviceProvider.GetRequiredService<IOptions<HelseIdOptions>>();
+            return new DiscoveryCache(options.Value.Authority, () => factory.CreateClient());
+        });
+
         serviceCollection.AddSingleton(provider =>
         {
             var persontjenestenHttpClient = provider
                 .GetRequiredService<IHttpClientFactory>()
                 .CreateClient(httpClientNamePersontjenesten);
 
-            return new Event_withFullAccessClient(persontjenestenHttpClient);
+            return new Event_FullAccessClient(persontjenestenHttpClient);
         });
 
         serviceCollection.AddHostedService<MySimpleTestService>();
@@ -41,16 +50,16 @@ await hostApplicationBuilder.Build().RunAsync();
 
 public class MySimpleTestService : BackgroundService
 {
-    private readonly Event_withFullAccessClient _persontjenestenEventClient;
+    private readonly Event_FullAccessClient _persontjenestenEventClient;
 
-    public MySimpleTestService(Event_withFullAccessClient persontjenestenEventClient)
+    public MySimpleTestService(Event_FullAccessClient persontjenestenEventClient)
     {
         _persontjenestenEventClient = persontjenestenEventClient;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var latestEventDocument = await _persontjenestenEventClient.LatestAsync("3");
+        var latestEventDocument = await _persontjenestenEventClient.LatestAsync();
         Console.WriteLine($"Sequence number: {latestEventDocument.SequenceNumber}");
     }
 }
