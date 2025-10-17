@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace HelseId.Core.BFF.Sample.Api.DPoP;
+namespace HelseId.Core.BFF.Sample.Api.Validation.DPoP;
 
 public interface IReplayCache
 {

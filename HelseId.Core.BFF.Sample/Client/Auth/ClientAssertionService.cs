@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using Duende.AccessTokenManagement;
 using Duende.IdentityModel.Client;
@@ -14,11 +15,16 @@ public class ClientAssertionService : IClientAssertionService
         _options = options;
     }
 
-    public Task<ClientAssertion?> GetClientAssertionAsync(string? clientName = null, TokenRequestParameters? parameters = null)
+    public Task<ClientAssertion?> GetClientAssertionAsync(
+        ClientCredentialsClientName? clientName = null,
+        TokenRequestParameters? parameters = null,
+        CancellationToken cancellationToken = default
+    )
     {
         var options = _options.CurrentValue;
 
-        var clientAssertion = ClientAssertionBuilder.GetClientAssertion(options.ClientId, options.ClientJwk, options.Authority);
+        var clientAssertion =
+            ClientAssertionBuilder.GetClientAssertion(options.ClientId, options.ClientJwk, options.Authority);
 
         return Task.FromResult<ClientAssertion?>(new ClientAssertion
         {

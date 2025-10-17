@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
-using IdentityModel;
+using Duende.IdentityModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 
-namespace HelseId.Core.BFF.Sample.Api.DPoP;
+namespace HelseId.Core.BFF.Sample.Api.Validation.DPoP;
 
 public class DPoPProofValidationState
 {

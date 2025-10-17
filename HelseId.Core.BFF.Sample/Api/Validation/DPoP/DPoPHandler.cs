@@ -1,10 +1,10 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
-using IdentityModel;
+using Duende.IdentityModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace HelseId.Core.BFF.Sample.Api.DPoP;
+namespace HelseId.Core.BFF.Sample.Api.Validation.DPoP;
 
 public static class DPoPHandler
 {

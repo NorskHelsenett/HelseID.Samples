@@ -1,5 +1,4 @@
 using HelseId.Core.BFF.Sample.Api.Authorization;
-using HelseId.Core.BFF.Sample.Api.DPoP;
 using HelseId.Core.BFF.Sample.Api.Options;
 using HelseId.Core.BFF.Sample.Api.Services;
 using HelseId.Core.BFF.Sample.WebCommon.Middleware;
@@ -17,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System;
 using System.Text.Json.Serialization;
+using HelseId.Core.BFF.Sample.Api.Validation.DPoP;
 
 namespace HelseId.Core.BFF.Sample.Api
 {

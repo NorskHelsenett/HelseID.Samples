@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Distributed;
 
-namespace HelseId.Core.BFF.Sample.Api.DPoP;
+namespace HelseId.Core.BFF.Sample.Api.Validation.DPoP;
 
 public class DPoPReplayCache : IReplayCache
 {

@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using IdentityModel;
+using Duende.IdentityModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 
-namespace HelseId.Core.BFF.Sample.Api.DPoP;
+namespace HelseId.Core.BFF.Sample.Api.Validation.DPoP;
 
 public static class DPoPExtensions
 {

@@ -5,7 +5,6 @@ using HelseId.Core.BFF.Sample.Client.Services;
 using HelseId.Core.BFF.Sample.Models.Model;
 using HelseId.Core.BFF.Sample.WebCommon.Identity;
 using HelseId.Core.BFF.Sample.WebCommon.Middleware;
-using IdentityModel;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -26,6 +25,9 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Duende.AccessTokenManagement.DPoP;
+using Duende.AccessTokenManagement.OpenIdConnect;
+using Duende.IdentityModel;
 
 namespace HelseId.Core.BFF.Sample.Client;
 
@@ -147,7 +149,7 @@ public class Startup
         {
             options.RefreshBeforeExpiration = TimeSpan.FromSeconds(10);
 
-            options.DPoPJsonWebKey = dpopKey.Jwk;
+            options.DPoPJsonWebKey = DPoPProofKey.Parse(dpopKey.Jwk);
         });
 
         // Workaround to use Client Assertion during logon.
