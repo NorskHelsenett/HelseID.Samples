@@ -41,7 +41,6 @@ static class Program
         
         serviceCollection.AddHelseIdClientCredentials(helseIdConfiguration)
             .AddHelseIdMultiTenant()
-           // .AddHelseIdDistributedCaching()
             .AddJwkForClientAuthentication(ConfigurationValues.ClientCredentialsSampleRsaPrivateKeyJwk);
         
         serviceCollection.AddSingleton<IApiConsumer, ApiConsumer>();
