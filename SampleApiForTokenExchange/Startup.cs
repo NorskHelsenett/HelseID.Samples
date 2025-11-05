@@ -54,7 +54,7 @@ public class Startup
         var configuration = HelseIdSamplesConfiguration.TokenExchangeClient;
         webApplicationBuilder.Services.AddSingleton<HelseIdConfiguration>(configuration);
         webApplicationBuilder.Services.AddSingleton<IDateTimeService, DateTimeService>();
-        webApplicationBuilder.Services.AddSingleton<IDiscoveryDocumentGetter>(new DiscoveryDocumentGetter(ConfigurationValues.StsUrl));
+        webApplicationBuilder.Services.AddSingleton<IDiscoveryDocumentGetter>(new DiscoveryDocumentGetter(ConfigurationValues.IssuerUri));
         webApplicationBuilder.Services.AddSingleton<IHelseIdEndpointsDiscoverer, HelseIdEndpointsDiscoverer>();
         webApplicationBuilder.Services.AddSingleton<IPayloadClaimsCreatorForClientAssertion, ClientAssertionPayloadClaimsCreator>();
         webApplicationBuilder.Services.AddSingleton<IJwtClaimsCreator, JwtClaimsCreator>();

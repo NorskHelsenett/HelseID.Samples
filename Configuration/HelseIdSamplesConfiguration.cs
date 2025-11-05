@@ -16,30 +16,9 @@ public class HelseIdSamplesConfiguration : HelseIdConfiguration
                 privateKeyJwk,
                 clientId,
                 scope,
-                ConfigurationValues.StsUrl,
+                ConfigurationValues.IssuerUri,
                 resourceIndicators) {}
-
-    // Configuration for the 'plain' client credentials application
-    public static HelseIdSamplesConfiguration ClientCredentialsClient =>
-        new(
-            ConfigurationValues.ClientCredentialsSampleRsaPrivateKeyJwk,
-            ConfigurationValues.ClientCredentialsSampleClientId,
-            ConfigurationValues.ClientCredentialsSampleScope);
-
-    // Configuration for the client credentials application with child organization number
-    public static HelseIdSamplesConfiguration ClientCredentialsWithChildOrgNumberClient =>
-        new(
-            ConfigurationValues.ClientCredentialsWithChildOrgNumberSamplePrivateKeyJwk,
-            ConfigurationValues.ClientCredentialsWithChildOrgNumberSampleClientId,
-            ConfigurationValues.ClientCredentialsSampleScope);
-
-    // Configuration for the client credentials application with multi-tenancy
-    public static HelseIdSamplesConfiguration ClientCredentialsSampleForMultiTenantClient =>
-        new(
-            ConfigurationValues.ClientCredentialsSampleForMultiTenantPrivateKeyJwk,
-            ConfigurationValues.ClientCredentialsSampleForMultiTenantClientId,
-            ConfigurationValues.ClientCredentialsSampleScope);
-
+    
     // The configuration for the ApiAccess project in logon only (no API access) mode
     public static HelseIdSamplesConfiguration UserAuthenticationClient =>
         new(

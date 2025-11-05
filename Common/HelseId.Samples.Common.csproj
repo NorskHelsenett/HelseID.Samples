@@ -17,4 +17,8 @@
     <PackageReference Include="Microsoft.IdentityModel.Logging" Version="8.14.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\HelseId.Samples.Models\HelseId.Samples.Models.csproj" />
+  </ItemGroup>
+
 </Project>

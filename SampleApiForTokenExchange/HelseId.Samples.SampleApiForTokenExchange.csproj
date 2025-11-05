@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Configuration\HelseId.Samples.Configuration.csproj" />
     <ProjectReference Include="..\Common\HelseId.Samples.Common.csproj" />
+    <ProjectReference Include="..\HelseId.Samples.Models\HelseId.Samples.Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>

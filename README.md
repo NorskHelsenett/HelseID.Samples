@@ -55,8 +55,6 @@ The code can be found in the `ClientCredentials` folder.
 
 This sample use the [Client Credentials Grant](https://www.rfc-editor.org/rfc/rfc6749#section-4.4) in order to request an access token from HelseID. Its intended usage is when you need to connect to an API resource without logging on a user.
 
-This sample also contains a method for adding an underenhet (child organization) to the call to HelseID, as well as a method for accessing the client info endpoint for debug purposes.
-
 When using this sample, you will also need to start the [sample API](./SampleApi/README.md).
 
 See [ClientCredentials/README.md](ClientCredentials/README.md) for more information.
