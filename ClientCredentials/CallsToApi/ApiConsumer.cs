@@ -31,12 +31,11 @@ public class ApiConsumer(IDPoPProofCreatorForApiRequests idPoPProofCreatorForApi
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 });
-
         }
-        catch (Exception e)
+        catch (HttpRequestException e)
         {
             Console.WriteLine(e.Message);
-            throw;
+            return null;
         }
     }
 }

@@ -24,7 +24,7 @@ static class Program
             // IssuerUri = "https://samsvarstesting-sts-test.helseid.sky.nhn.no/fbdb001d-91e6-40b3-802a-3fb191ee4f79",
         };
         
-        // This is a sample application that only sets up a single service collection.
+        // This is a sample application which only sets up a single service collection.
         // In a proper scenario, you will need to set up a builder, as for instance:
         // var builder = Host.CreateApplicationBuilder(args);
         // builder.Services.AddHelseIdClientCredentials(helseIdConfiguration) ...
@@ -45,7 +45,7 @@ static class Program
         
         serviceCollection.AddSingleton<IApiConsumer, ApiConsumer>();
         
-        // Register a service that will call HelseID
+        // Register a service that will call HelseID:
         serviceCollection.AddSingleton<ServiceForTokenAndApiResponses>();
         
         var serviceProvider = serviceCollection.BuildServiceProvider();

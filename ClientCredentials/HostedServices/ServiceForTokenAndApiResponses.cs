@@ -33,7 +33,7 @@ public class ServiceForTokenAndApiResponses (
             logger.LogError(errorResponse.Error + " " + errorResponse.ErrorDescription);
             throw new Exception(errorResponse.Error + " " + errorResponse.ErrorDescription);
         }
-            
+
         var apiResponse = await apiConsumer.CallApiWithDPoPToken(ConfigurationValues.SampleApiUrlForM2M, accessTokenResponse);
         SetResponseInConsole(apiResponse);
 
@@ -42,6 +42,10 @@ public class ServiceForTokenAndApiResponses (
 
     private void SetResponseInConsole(ApiResponse? apiResponse)
     {
+        if (apiResponse == null)
+        {
+            return;
+        }
         Console.WriteLine("Response from the sample API:");
         Console.WriteLine($"{apiResponse?.Greeting}");
         Console.WriteLine($"Supplier organization number (for multitenancy): '{apiResponse?.SupplierOrganizationNumber ?? "not present"}'");
