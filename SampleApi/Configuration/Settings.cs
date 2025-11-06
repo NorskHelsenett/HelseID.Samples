@@ -4,7 +4,7 @@ namespace HelseId.SampleApi.Configuration;
 
 public class Settings
 {
-    public string Authority => ConfigurationValues.StsUrl;
+    public string Authority => ConfigurationValues.IssuerUri;
 
     public string Audience { get; init; } = string.Empty;
     
