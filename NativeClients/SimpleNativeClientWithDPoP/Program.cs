@@ -1,7 +1,3 @@
-using IdentityModel;
-using IdentityModel.Client;
-using IdentityModel.OidcClient;
-using IdentityModel.OidcClient.DPoP;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -11,8 +7,13 @@ using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using IdentityModel.OidcClient.Browser;
+using Duende.IdentityModel;
+using Duende.IdentityModel.Client;
+using Duende.IdentityModel.OidcClient;
+using Duende.IdentityModel.OidcClient.Browser;
+using Duende.IdentityModel.OidcClient.DPoP;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
@@ -77,8 +78,6 @@ namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
                     ClientId = ClientId,
                     RedirectUri = RedirectUrl,
                     FilterClaims = false,
-                    // This validates the identity token (important!):
-                    IdentityTokenValidator = new JwtHandlerIdentityTokenValidator(),
                 };
 
                 // Set the DPoP proof, we can use the same key for this as for the client assertion:
@@ -111,7 +110,7 @@ namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
                 // Create a redirect URI using an available port on the loopback address.
                 var browser = new SystemBrowser(port:LocalhostPort);
 
-                var browserResult = await browser.InvokeAsync(browserOptions, default);
+                var browserResult = await browser.InvokeAsync(browserOptions, CancellationToken.None);
 
                 // We need a new client assertion for the call to the /token endpoint
                 oidcClient.Options.ClientAssertion = GetClientAssertionPayload(disco);

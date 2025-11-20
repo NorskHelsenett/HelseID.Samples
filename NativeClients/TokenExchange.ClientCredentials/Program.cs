@@ -1,7 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using IdentityModel;
-using IdentityModel.Client;
+using Duende.IdentityModel;
+using Duende.IdentityModel.Client;
 using Microsoft.IdentityModel.Tokens;
 
 namespace HelseID.Samples.TokenExchange.ClientCredentials;
@@ -12,7 +12,7 @@ public class Program
     private const string ActorClientId = "token_exchange_actor_client";
     private const string StsUrl = "https://helseid-sts.test.nhn.no/";
 
-    private static DiscoveryDocumentResponse _discoveryDocument = default!;
+    private static DiscoveryDocumentResponse _discoveryDocument = null!;
 
     static async Task Main()
     {
