@@ -1,5 +1,5 @@
 using System.Linq;
-using IdentityModel;
+using Duende.IdentityModel;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 

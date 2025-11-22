@@ -1,5 +1,5 @@
 using System.Linq;
-using IdentityModel;
+using Duende.IdentityModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 

@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
-using IdentityModel;
+using Duende.IdentityModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 

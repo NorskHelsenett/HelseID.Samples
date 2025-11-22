@@ -1,3 +1,4 @@
+using Duende.IdentityModel.Client;
 using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Interfaces.ApiConsumers;
 using HelseId.Samples.Common.Interfaces.JwtTokens;
@@ -5,7 +6,6 @@ using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Interfaces.TokenRequests;
 using HelseId.Samples.Common.Models;
 using HelseID.Samples.Configuration;
-using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

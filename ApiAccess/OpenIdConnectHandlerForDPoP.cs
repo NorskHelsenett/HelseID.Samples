@@ -1,11 +1,11 @@
 using System.Text.Encodings.Web;
+using Duende.IdentityModel;
+using Duende.IdentityModel.Client;
 using HelseId.Samples.Common.Interfaces.Endpoints;
 using HelseId.Samples.Common.Interfaces.JwtTokens;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Interfaces.TokenRequests;
 using HelseId.Samples.Common.Models;
-using IdentityModel;
-using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;

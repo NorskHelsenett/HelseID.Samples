@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Duende.IdentityModel;
 using HelseId.Samples.Common.ApiConsumers;
 using HelseId.Samples.Common.ApiDPoPValidation;
 using HelseId.Samples.Common.ClientAssertions;
@@ -16,7 +17,6 @@ using HelseId.Samples.Common.PayloadClaimsCreators;
 using HelseId.Samples.Common.TokenExpiration;
 using HelseId.Samples.Common.TokenRequests;
 using HelseID.Samples.Configuration;
-using IdentityModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace HelseId.SampleApiForTokenExchange;

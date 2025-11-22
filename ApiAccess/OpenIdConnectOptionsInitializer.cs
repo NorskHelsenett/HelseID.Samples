@@ -1,3 +1,5 @@
+using Duende.IdentityModel;
+using Duende.IdentityModel.Client;
 using HelseId.Samples.ApiAccess.Configuration;
 using HelseId.Samples.ApiAccess.Exceptions;
 using HelseId.Samples.ApiAccess.Interfaces.Stores;
@@ -9,8 +11,6 @@ using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Interfaces.TokenExpiration;
 using HelseId.Samples.Common.Models;
 using HelseID.Samples.Configuration;
-using IdentityModel;
-using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;

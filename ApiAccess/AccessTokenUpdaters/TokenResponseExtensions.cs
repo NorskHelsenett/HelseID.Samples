@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Duende.IdentityModel.Client;
 using HelseId.Samples.Common.Models;
-using IdentityModel.Client;
 
 namespace HelseId.Samples.ApiAccess.AccessTokenUpdaters;
 

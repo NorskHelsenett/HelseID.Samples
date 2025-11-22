@@ -1,4 +1,5 @@
 using System.CommandLine;
+using System.CommandLine.Parsing;
 using HelseId.SampleApi.Configuration;
 using HelseID.Samples.Configuration;
 
@@ -12,6 +13,7 @@ public static class Program
         // The Main method uses the System.Commandline library to parse the command line parameters:
         var useRequestIndiicatorApi1Option = new Option<bool>(
             aliases: new[] {"--use-resource-indicator-api-1", "-a1"},
+            
             description:
             $"If set, the application will expose an endpoint on localhost port {ConfigurationValues.SampleApiForResourceIndicators1Port}",
             getDefaultValue: () => false);

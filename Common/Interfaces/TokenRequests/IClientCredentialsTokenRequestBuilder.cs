@@ -1,6 +1,6 @@
+using Duende.IdentityModel.Client;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Models;
-using IdentityModel.Client;
 
 namespace HelseId.Samples.Common.Interfaces.TokenRequests;
 

@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Duende.IdentityModel.Client;
 using HelseId.Samples.ApiAccess.Exceptions;
 using HelseId.Samples.ApiAccess.Interfaces.AccessTokenUpdaters;
 using HelseId.Samples.ApiAccess.Interfaces.Stores;
@@ -8,7 +9,6 @@ using HelseId.Samples.Common.Interfaces.TokenExpiration;
 using HelseId.Samples.Common.Interfaces.TokenRequests;
 using HelseId.Samples.Common.Models;
 using HelseID.Samples.Configuration;
-using IdentityModel.Client;
 
 namespace HelseId.Samples.ApiAccess.AccessTokenUpdaters;
 

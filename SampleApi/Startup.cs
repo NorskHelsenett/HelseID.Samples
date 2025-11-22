@@ -1,11 +1,11 @@
 using System.Security.Claims;
+using Duende.IdentityModel;
 using HelseId.SampleApi.Configuration;
 using HelseId.SampleAPI.Controllers;
 using HelseId.SampleApi.Interfaces;
 using HelseId.Samples.Common.ApiDPoPValidation;
 using HelseId.Samples.Common.AudienceValidation;
 using HelseID.Samples.Configuration;
-using IdentityModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Logging;
 
@@ -43,6 +43,7 @@ public  class Startup
 
     private void AddServices(WebApplicationBuilder webApplicationBuilder)
     {
+        webApplicationBuilder.Services.AddEndpointsApiExplorer();
         webApplicationBuilder.Services.AddSwaggerGen();
 
         // Create singleton from instance

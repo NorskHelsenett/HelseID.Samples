@@ -1,5 +1,5 @@
+using Duende.IdentityModel.Client;
 using HelseId.Samples.Common.Interfaces.Endpoints;
-using IdentityModel.Client;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace HelseId.Samples.Common.Endpoints;

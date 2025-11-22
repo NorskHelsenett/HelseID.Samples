@@ -1,9 +1,9 @@
+using Duende.IdentityModel;
+using Duende.IdentityModel.Client;
 using HelseId.Samples.Common.Interfaces.ClientAssertions;
 using HelseId.Samples.Common.Interfaces.JwtTokens;
 using HelseId.Samples.Common.Interfaces.PayloadClaimsCreators;
 using HelseId.Samples.Common.Models;
-using IdentityModel;
-using IdentityModel.Client;
 
 namespace HelseId.Samples.Common.ClientAssertions;
 

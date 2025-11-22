@@ -1,7 +1,7 @@
+using Duende.IdentityModel.Client;
 using HelseId.Samples.Common.Interfaces.ApiConsumers;
 using HelseId.Samples.Common.Interfaces.JwtTokens;
 using HelseId.Samples.Common.Models;
-using IdentityModel.Client;
 
 namespace HelseId.Samples.Common.ApiConsumers;
 

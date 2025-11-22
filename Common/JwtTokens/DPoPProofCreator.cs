@@ -1,9 +1,9 @@
 using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Cryptography;
 using System.Text;
+using Duende.IdentityModel;
 using HelseId.Samples.Common.Configuration;
 using HelseId.Samples.Common.Interfaces.JwtTokens;
-using IdentityModel;
 using Microsoft.IdentityModel.Tokens;
 
 namespace HelseId.Samples.Common.JwtTokens;
