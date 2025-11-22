@@ -1,4 +1,4 @@
-using IdentityModel.Client;
+using Duende.IdentityModel.Client;
 using Parameters = TestTokenTool.Configuration.Parameters;
 using TokenResponse = TestTokenTool.ResponseModel.TokenResponse;
 
