@@ -15,6 +15,7 @@ using Duende.IdentityModel.Client;
 using Duende.IdentityModel.OidcClient;
 using Duende.IdentityModel.OidcClient.Browser;
 using Duende.IdentityModel.OidcClient.DPoP;
+using LoopbackListener;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace HelseId.Samples.SimpleResourceIndicatorsDemo;

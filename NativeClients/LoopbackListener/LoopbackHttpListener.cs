@@ -1,10 +1,11 @@
-using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 
-namespace HelseId.Samples.SimpleRequestObjectsDemo;
+namespace LoopbackListener;
+
+// This class opens up the system browser in order to log in a user and get the authorization code back
 
 // This class functions as a makeshift web host, getting the redirect response from the browser.
 // If the status code is 200, the query string containing the authorization code is set on the
@@ -12,17 +13,18 @@ namespace HelseId.Samples.SimpleRequestObjectsDemo;
 public class LoopbackHttpListener : IDisposable
 {
     const int DefaultTimeout = 60 * 5; // 5 mins (in seconds)
-    IWebHost _host;
+    IHost _host;
     TaskCompletionSource<string> _source = new ();
 
     public LoopbackHttpListener(int port)
     {
         var url = $"http://localhost:{port}/";
 
-        _host = new WebHostBuilder()
-            .UseKestrel()
-            .UseUrls(url)
-            .Configure(Configure)
+        _host = new HostBuilder()
+            .ConfigureWebHost(webHostBuilder =>
+            {
+                webHostBuilder.UseKestrel().UseUrls(url).Configure(Configure);
+            })
             .Build();
 
         _host.Start();

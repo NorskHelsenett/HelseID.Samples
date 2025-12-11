@@ -1,13 +1,9 @@
-using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using Duende.IdentityModel.OidcClient.Browser;
 
-namespace HelseId.Samples.SimpleRequestObjectsDemo;
+namespace LoopbackListener;
 
-// This class opens up the system browser in order to log in a user and get the authorization code back
 public class SystemBrowser : IBrowser
 {
     private int Port { get; }

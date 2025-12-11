@@ -14,6 +14,7 @@ using Duende.IdentityModel.Client;
 using Duende.IdentityModel.OidcClient;
 using Duende.IdentityModel.OidcClient.Browser;
 using Duende.IdentityModel.OidcClient.DPoP;
+using LoopbackListener;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
@@ -63,7 +64,7 @@ namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
         private const string ApiScopes = "nhn:test-public-samplecode/authorization-code";
 
         // These scopes indicate that you want an ID-token ("openid"), and what information about the user you want the ID-token to contain
-        private const string IdentityScopes = "openid profile helseid://scopes/identity/pid helseid://scopes/identity/security_level";
+        private const string IdentityScopes = "openid profile offline_access helseid://scopes/identity/pid helseid://scopes/identity/security_level";
 
         static async Task Main(string[] args)
         {
@@ -132,7 +133,7 @@ namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
                 Console.WriteLine($"Identity token from login: {loginResult.IdentityToken}");
                 Console.WriteLine($"DPoP token from login: {loginResult.AccessToken}");
                 // Call the example API
-                await CallApi(loginResult.AccessToken);
+                await CallApi(oidcClient, loginResult.RefreshToken);
 
             }
             catch (Exception ex)
@@ -207,25 +208,16 @@ namespace HelseId.Samples.NativeClientWithUserLoginAndApiCall
             return new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256);
         }
 
-        private static async Task CallApi(string accessToken)
+        private static async Task CallApi(OidcClient oidcClient, string refreshToken)
         {
+            // Set the DPoP proof: https://docs.duendesoftware.com/identitymodel-oidcclient/advanced/dpop/#proof-tokens-for-the-api
+            var proof = oidcClient.CreateDPoPHandler(JwkPrivateKey, refreshToken);
+
+            var httpClient = new HttpClient(proof);
+
             // We need to use the HttpRequestMessage type for this functionality:
             var request = new HttpRequestMessage(HttpMethod.Get, ApiUrl);
 
-            var proofRequest = new DPoPProofRequest
-            {
-                Method = request.Method.ToString(),
-                Url = request.GetDPoPUrl(),
-                // This binds the access token to the DPoP proof:
-                AccessToken = accessToken,
-            };
-
-            // Set the DPoP proof, we use the same key for this as for the client assertion:
-            var proof = new DPoPProofTokenFactory(JwkPrivateKey).CreateProofToken(proofRequest);
-
-            request.SetDPoPToken(accessToken, proof.ProofToken);
-
-            var httpClient = new HttpClient();
             var response = await httpClient.SendAsync(request);
 
             var responseBody = await response.Content.ReadAsStringAsync();
