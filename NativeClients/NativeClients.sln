@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelseId.Samples.SimpleResou
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelseID.Samples.TokenExchange.ClientCredentials", "TokenExchange.ClientCredentials\HelseID.Samples.TokenExchange.ClientCredentials.csproj", "{B9C0F33A-5E08-4B59-AE21-63D6E9D9E206}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoopbackListener", "LoopbackListener\LoopbackListener.csproj", "{FBE30E68-110D-4CD5-BFF0-70C503CBF444}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemBrowser", "SystemBrowser\SystemBrowser.csproj", "{FBE30E68-110D-4CD5-BFF0-70C503CBF444}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
