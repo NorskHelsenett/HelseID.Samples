@@ -12,7 +12,7 @@ There is no guarantee that they will work.
 Install [NSwag](https://github.com/RicoSuter/NSwag) to generate the CSharp client based on the Open API definition.
 
 ```
-dotent tool install -g nswag.consolecore
+dotnet tool install -g nswag.consolecore
 ```
 
 ## 2. Generate the first definition
