@@ -1,3 +1,4 @@
+using System.Buffers.Text;
 using System.Security.Cryptography;
 using System.Text;
 using Duende.IdentityModel;
@@ -24,7 +25,7 @@ public class DPoPProofValidationData
         var bytes = Encoding.UTF8.GetBytes(accessToken);
         var hash = sha.ComputeHash(bytes);
 
-        return Base64Url.Encode(hash);
+        return Base64Url.EncodeToString(hash);
     }
 
     public string Url { get; }

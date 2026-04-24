@@ -1,3 +1,4 @@
+using System.Buffers.Text;
 using System.Linq;
 using Duende.IdentityModel;
 using Microsoft.AspNetCore.Http;
@@ -29,6 +30,6 @@ public static class DPoPExtensions
     
     public static string CreateThumbprint(this JsonWebKey jwk)
     {
-        return Base64Url.Encode(jwk.ComputeJwkThumbprint());
+        return Base64Url.EncodeToString(jwk.ComputeJwkThumbprint());
     }
 }
