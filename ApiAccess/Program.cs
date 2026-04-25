@@ -11,43 +11,48 @@ public static class Program
     public static async Task Main(string[] args)
     {
         // The Main method uses the System.Commandline library to parse the command line parameters:
-        var userLoginOnlyOption = new Option<bool>(
-            aliases: new [] {"--user-login-only", "-ul"},
-            description: "If set, the application will only log on a user with no API call",
-            getDefaultValue: () => false);
-
-        var useTokenExchangeOption = new Option<bool>(
-            aliases: new [] {"--use-token-exchange", "-te"},
-            description: "If set, the application will use a client that can be used for a token exchange flow",
-            getDefaultValue: () => false);
-
-        var useRequsetObjects = new Option<bool>(
-            aliases: new [] {"--use-request-objects", "-ro"},
-            description: "If set, the application will use a request object in the call to the authorization endpoint",
-            getDefaultValue: () => false);
-
-        var useResourceIndicatorsOption = new Option<bool>(
-            aliases: new [] {"--use-resource-indicators", "-ri"},
-            description: "If set, the application will use resource indicators in order to call two APIs with different audiences",
-            getDefaultValue: () => false);
-
-        var useMultiTenantOption = new Option<bool>(
-            aliases: new [] {"--use-multi-tenant", "-mt"},
-            description: "If set, the application will use a client set up for multi-tenancy, i.e. it makes use of an organization number that is connected to the client.",
-            getDefaultValue: () => false);
+        Option<bool> userLoginOnlyOption = new("--user-login-only", "-ul")
+        {
+            Description = "If set, the application will only log on a user with no API call",
+        };
+        
+        Option<bool> useTokenExchangeOption = new("--use-token-exchange", "-te")
+        {
+            Description = "If set, the application will use a client that can be used for a token exchange flow",
+        };
+        
+        Option<bool> useRequestObjects = new("--use-request-objects", "-ro")
+        {
+            Description = "If set, the application will use a request object in the call to the authorization endpoint",
+        };
+        
+        Option<bool> useResourceIndicatorsOption = new("--use-resource-indicators", "-ri")
+        {
+            Description = "If set, the application will use resource indicators in order to call two APIs with different audiences",
+        };
+        
+        Option<bool> useMultiTenantOption = new("--use-multi-tenant", "-mt")
+        {
+            Description = "If set, the application will use a client set up for multi-tenancy, i.e. it makes use of an organization number that is connected to the client.",
+        };
 
         var rootCommand = new RootCommand("An authorization code flow usage sample")
         {
-            userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption
+            userLoginOnlyOption, useTokenExchangeOption, useRequestObjects, useResourceIndicatorsOption, useMultiTenantOption
         };
-
-        rootCommand.SetHandler((userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant) =>
+        
+        rootCommand.SetAction(parseResult =>
         {
-            var settings = CreateSettings(userLoginOnly, useTokenExchange, useRequestObjects, useResourceIndicators, useMultiTenant);
+            var settings = CreateSettings(
+                parseResult.GetValue(userLoginOnlyOption),
+                parseResult.GetValue(useTokenExchangeOption),
+                parseResult.GetValue(useRequestObjects),
+                parseResult.GetValue(useResourceIndicatorsOption),
+                parseResult.GetValue(useMultiTenantOption));
             new Startup(settings).BuildWebApplication().Run();
-        }, userLoginOnlyOption, useTokenExchangeOption, useRequsetObjects, useResourceIndicatorsOption, useMultiTenantOption);
-
-        await rootCommand.InvokeAsync(args);
+        });
+        
+        await rootCommand.Parse(args).InvokeAsync();
     }
 
     private static Settings CreateSettings(
