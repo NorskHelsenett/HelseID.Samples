@@ -19,5 +19,5 @@ This folder contains common code for several of the sample code projects.
 
 ### Requirements
 
-The [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) is required to build the project.
+The [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) is required to build the project.
 

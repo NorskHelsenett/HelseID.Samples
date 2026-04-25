@@ -33,7 +33,7 @@ See [TestTokenProxy README](https://github.com/NorskHelsenett/HelseID.Samples/bl
 
 ### Requirements
 
-The [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) is required to build the program.
+The [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) is required to build the program.
 
 ### Default mode 
 

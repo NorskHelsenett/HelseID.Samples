@@ -28,7 +28,7 @@ the [Sample API](../../SampleAPI/README.md).
 
 ### Requirements
 
-The [.NET 9 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) is required to build the program.
+The [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) is required to build the program.
 
 First, you will need to start the [Sample API project](../SampleAPI/README.md) in a separate terminal. Then, you can run this application, either with or without a request for a child organization number. 
 
