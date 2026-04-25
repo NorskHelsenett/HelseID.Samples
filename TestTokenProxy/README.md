@@ -7,8 +7,9 @@ Most of the code is contained in the `TestAccessTokenController` class. This cod
 
 The Token will be signed by the same key as the test version of HelseID uses to sign its Tokens.
 
-In order to get access to this service, you'll need an API key; one is provided in the `appsettings.json` file, and this key
-gives authorization for creating tokens for the `nhn:helseid-public-samplecode` audience.
+In order to get access to this service, you'll need an API key from [HelseID Selvbetjening test](https://selvbetjening.test.nhn.no/owners/). The `Integration testing`-button will give you an API key for TTT. 
+Set the API-key in the `appsettings.json` file, and this key
+gives authorization for creating tokens for the `nhn:test-public-samplecode` audience.
 
 To run the sample, enter the following on the command line inside this folder:
 ```

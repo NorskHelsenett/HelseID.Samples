@@ -89,9 +89,11 @@ public class TestAccessTokenController : ControllerBase
         }
     }
 
-    private static dynamic CreateBodyForUseAgainstTestTokenService(TokenCreationParameter parameter, string uri)
+    private dynamic CreateBodyForUseAgainstTestTokenService(TokenCreationParameter parameter, string uri)
     {
         dynamic bodyObject = new ExpandoObject();
+        bodyObject.audience = _configuration[AudienceConfig];
+        
         bodyObject.generalClaimsParametersGeneration = 2; // 2: GenerateOnlyFromNonEmptyParameterValues
         // This sets up the DPoP proof:
         bodyObject.createDPoPTokenWithDPoPProof = true;

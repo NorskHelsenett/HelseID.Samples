@@ -4,7 +4,7 @@ This is a sample REST API that is configured to use HelseID to authorize its usa
 
 The API provides one endpoint, `token-exchange-clients/greetings`. 
 
-* The endpoint has been set up with an access policy that requires the scope `nhn:helseid-public-samplecode/client-credentials` from the HelseID access token. 
+* The endpoint has been set up with an access policy that requires the scope `nhn:test-public-samplecode/client-credentials` from the HelseID access token. 
 
 The APIAccess sample is configured to use this API when using the token exchange functionality. While doing this, you must also run the [Sample API](../SampleApi/README.md) as this API consumes it.
 

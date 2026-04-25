@@ -6,10 +6,10 @@ The other HelseID samples are configured to use this API. Have an instance of th
 
 The API provides these endpoints:
 
-* `/machine-clients/greetings`: this endpoint has been set up with an access policy that requires the scope `nhn:helseid-public-samplecode/client-credentials`
+* `/machine-clients/greetings`: this endpoint has been set up with an access policy that requires the scope `nhn:test-public-samplecode/client-credentials`
  
 * `/user-login-clients/greetings`, `/resource-indicator-client-1/greetings` and `resource-indicator-client-2/greetings`: these endpoints have been set up with an access policy that requires the scope
-`nhn:helseid-public-samplecode/authorization-code` from the HelseID access token, as well as
+`nhn:test-public-samplecode/authorization-code` from the HelseID access token, as well as
 claims for a logged on user (`helseid://claims/identity/pid`) and a valid security level (`helseid://claims/identity/security_level`).
 
 All endpoints require the use of a [DPoP](https://www.rfc-editor.org/rfc/rfc9449) Token with an accompanying DPoP proof.
