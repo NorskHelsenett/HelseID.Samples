@@ -17,7 +17,7 @@ The access token and refresh token is then written to the console for each resou
 
 ### Requirements
 
-The [.NET 7 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) is required to build the program.
+The [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) is required to build the program.
 
 #### To run the sample:
 ```
