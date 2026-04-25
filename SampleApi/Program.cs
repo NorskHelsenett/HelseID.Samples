@@ -10,32 +10,30 @@ public static class Program
 {
     public static async Task Main(string[] args)
     {
-        // The Main method uses the System.Commandline library to parse the command line parameters:
-        var useRequestIndiicatorApi1Option = new Option<bool>(
-            aliases: new[] {"--use-resource-indicator-api-1", "-a1"},
-            
-            description:
-            $"If set, the application will expose an endpoint on localhost port {ConfigurationValues.SampleApiForResourceIndicators1Port}",
-            getDefaultValue: () => false);
+        Option<bool> useRequestIndicatorApi1Option = new("--use-resource-indicator-api-1", "-a1")
+        {
+            Description = $"If set, the application will expose an endpoint on localhost port {ConfigurationValues.SampleApiForResourceIndicators1Port}",
+        };
 
-        var useRequestIndiicatorApi2Option = new Option<bool>(
-            aliases: new[] {"--use-resource-indicator-api-2", "-a2"},
-            description:
-            $"If set, the application will expose an endpoint on localhost port {ConfigurationValues.SampleApiForResourceIndicators2Port}",
-            getDefaultValue: () => false);
+        Option<bool> useRequestIndicatorApi2Option = new("--use-resource-indicator-api-2", "-a2")
+        {
+            Description = $"If set, the application will expose an endpoint on localhost port {ConfigurationValues.SampleApiForResourceIndicators2Port}",
+        };
 
         var rootCommand = new RootCommand("An authorization code flow usage sample")
         {
-            useRequestIndiicatorApi1Option, useRequestIndiicatorApi2Option
+            useRequestIndicatorApi1Option, useRequestIndicatorApi2Option
         };
-
-        rootCommand.SetHandler((useRequestIndicatorApi1, useRequestIndicatorApi2) =>
+        
+        rootCommand.SetAction(parseResult =>
         {
-            var settings = CreateSettings(useRequestIndicatorApi1, useRequestIndicatorApi2);
+            var settings = CreateSettings(
+                parseResult.GetValue(useRequestIndicatorApi1Option),
+                parseResult.GetValue(useRequestIndicatorApi2Option));
             new Startup(settings).BuildWebApplication().Run();
-        }, useRequestIndiicatorApi1Option, useRequestIndiicatorApi2Option);
-
-        await rootCommand.InvokeAsync(args);
+        });
+        
+        await rootCommand.Parse(args).InvokeAsync();
     }
     
     private static Settings CreateSettings(
