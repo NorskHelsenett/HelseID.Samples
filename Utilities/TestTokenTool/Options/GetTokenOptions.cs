@@ -21,10 +21,14 @@ public class GetTokenOptions : IArgumentModel
     // Invalid output from TTT
     [Named(Description = "The returned token will be signed with an invalid signing key")]
     public bool signJwtWithInvalidSigningKey { get; set; } = false;
+    [Named(Description = "The returned token will sign the 'alg' header as 'none'")]
+    public bool signJwtWithAlgHeaderAsNone { get; set; } = false;
     [Named(Description = "The returned token will contain an invalid 'iss' claim")]
     public bool setInvalidIssuer { get; set; } = false;
     [Named(Description = "The returned token will contain an invalid 'aud' claim")]
-    public bool setInvalidAudience { get; set; } = false;
+    public bool deleteAudienceClaim { get; set; } = false;
+    [Named(Description = "The returned token will not contain an 'aud' claim")]
+    public bool setNoAudienceClaim { get; set; } = false;
     [Named(Description = "The returned token will contain an expired 'nbf', 'iat', and 'exp' claims")]
     public bool setExpirationTimeAsExpired { get; set; } = false;
     [Named(Description = "The returned token will contain an 'exp' claim matching the set expiration time in seconds")]

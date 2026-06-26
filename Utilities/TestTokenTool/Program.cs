@@ -55,7 +55,9 @@ public class Program
             // Invalid output from TTT
             SignJwtWithInvalidSigningKey =      options.signJwtWithInvalidSigningKey,
             SetInvalidIssuer =                  options.setInvalidIssuer,
-            SetInvalidAudience =                options.setInvalidAudience,
+            DeleteAudienceClaim =               options.deleteAudienceClaim,
+            SetNoAudienceClaim =                options.setNoAudienceClaim,
+            SignJwtWithAlgHeaderAsNone =        options.signJwtWithAlgHeaderAsNone,
             // User parameters
             SetPidPseudonym =                   options.setPidPseudonym,
             SetSubject =                        options.setSubject,

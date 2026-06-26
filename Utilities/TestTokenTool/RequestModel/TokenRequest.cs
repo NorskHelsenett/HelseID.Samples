@@ -20,10 +20,14 @@ public class TokenRequest
     public bool CreateTillitsrammeverkClaims { get; set; }
 
     public bool SignJwtWithInvalidSigningKey { get; set; } 
-
+    
+    public bool SignJwtWithAlgHeaderAsNone { get; set; }
+    
     public bool SetInvalidIssuer { get; set; }
     
-    public bool SetInvalidAudience { get; set; }
+    public bool DeleteAudienceClaim { get; set; }
+    
+    public bool SetNoAudienceClaim { get; set; }
     
     public bool GetPersonFromPersontjenesten { get; set; }
 

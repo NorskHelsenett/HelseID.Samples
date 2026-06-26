@@ -96,11 +96,17 @@ For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen) med DPoP:
   --signJwtWithInvalidSigningKey                                [False]
   The returned token will be signed with an invalid signing key
   
+  --signJwtWithAlgHeaderAsNone                                  [False]
+  The returned token will sign the 'alg' header as 'none'
+    
   --setInvalidIssuer                                            [False]
   The returned token will contain an invalid 'iss' claim
 
-  --setInvalidAudience                                          [False]
+  --deleteAudienceClaim                                         [False]
   The returned token will contain an invalid 'aud' claim
+
+  --setNoAudienceClaim                                          [False]
+  The returned token will not contain an 'aud' claim
 
   --setExpirationTimeAsExpired                                  [False]
   The returned token will contain an expired 'nbf', 'iat', and 'exp' claims
