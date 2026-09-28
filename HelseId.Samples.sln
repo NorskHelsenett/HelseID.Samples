@@ -19,6 +19,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelseId.Samples.Models", "HelseId.Samples.Models\HelseId.Samples.Models.csproj", "{7F1E16BC-F129-48D8-98D7-4E0879E8D8C4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{DA546172-8E0C-4205-B934-81CB48059E28}"
+	ProjectSection(SolutionItems) = preProject
+		.github\dependabot.yml = .github\dependabot.yml
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{EB0FBD3B-30BE-425E-935B-B2FD12ECA406}"
 	ProjectSection(SolutionItems) = preProject
