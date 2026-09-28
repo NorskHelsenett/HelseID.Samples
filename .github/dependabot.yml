@@ -6,14 +6,47 @@
 version: 2
 updates:
   - package-ecosystem: nuget
-    directory: "/HelseId.Core.BFF.Sample"
     schedule:
-      interval: "daily"
-  - package-ecosystem: nuget
-    directory: "/HelseId.RsaJwk"
+      interval: "weekly"
+      commit-message:
+        prefix: "deps:"
+      groups:
+        nuget-patch-and-minor:
+          update-types:
+            - "patch"
+            - "minor"
+        nuget-major:
+          update-types:
+            - "major"
+  - package-ecosystem: maven
     schedule:
-      interval: "daily"
-  - package-ecosystem: nuget
-    directory: "/NativeClients"
+      interval: "weekly"
+      commit-message:
+        prefix: "deps:"
+      groups:
+        nuget-patch-and-minor:
+          update-types:
+            - "patch"
+            - "minor"
+        nuget-major:
+          update-types:
+            - "major"
+  - package-ecosystem: npm
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      commit-message:
+        prefix: "deps:"
+      groups:
+        nuget-patch-and-minor:
+          update-types:
+            - "patch"
+            - "minor"
+        nuget-major:
+          update-types:
+            - "major"
+  - package-ecosystem: github-actions
+    directory: "/.github/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "CI:"
