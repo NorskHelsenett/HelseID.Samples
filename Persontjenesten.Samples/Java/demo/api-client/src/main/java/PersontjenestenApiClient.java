@@ -13,7 +13,7 @@ import org.openapitools.client.auth.HttpBearerAuth;
 import org.openapitools.client.model.EventDocument;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Set;
 
 public class PersontjenestenApiClient {
   public static final String CLIENT_ID = "helseid-sample-client-credentials";
@@ -40,7 +40,7 @@ public class PersontjenestenApiClient {
     ApiClient defaultClient = Configuration.getDefaultApiClient();
     defaultClient.setBasePath("https://et.persontjenesten.test.nhn.no");
 
-    var client = new Client(CLIENT_ID, JWKKeyReference.parse(JWK_PRIVATE_KEY), List.of(SCOPE));
+    var client = new Client(CLIENT_ID, JWKKeyReference.parse(JWK_PRIVATE_KEY), Set.of(SCOPE));
     var clientCredentials = new ClientCredentials.Builder(AUTHORITY)
         .withClient(client)
         .build();
@@ -49,7 +49,7 @@ public class PersontjenestenApiClient {
     TokenResponse tokenResponse = clientCredentials.getAccessToken();
     if (tokenResponse instanceof ErrorResponse errorResponse) {
       System.err.println("Failed to get token:");
-      System.err.println(errorResponse.rawResponse());
+      System.err.println(errorResponse.rawResponseBody());
     }
 
     if (tokenResponse instanceof AccessTokenResponse accessTokenResponse) {
