@@ -54,7 +54,7 @@ For å få en liste over alle parametrene, kan du bruke kommandoen
 
 
 For å kalle SampleAPI-applikasjonen (i ../../SampleApi-katalogen) med DPoP:
-`dotnet run getToken --createDPoPTokenWithDPoPProof --htuClaimValue https://localhost:5081/machine-clients/dpop-greetings --htmClaimValue GET --callApi
+`dotnet run getToken --createDPoPTokenWithDPoPProof --htuClaimValue https://localhost:5081/machine-clients/greetings --htmClaimValue GET --audience nhn:test-public-samplecode --scope "nhn:test-public-samplecode/client-credentials" --callApi
 `
 
 ### Parametre for å beskrive utput
