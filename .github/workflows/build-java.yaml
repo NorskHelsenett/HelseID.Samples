@@ -1,0 +1,36 @@
+name: "Build Java"
+
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+
+jobs:
+  build:
+    if: github.repository == 'NorskHelsenett/HelseID.Samples'
+
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v7
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '23'
+          cache: maven
+          cache-dependency-path: |
+            Persontjenesten.Samples/Java/client/pom.xml
+            Persontjenesten.Samples/Java/demo/pom.xml
+            Persontjenesten.Samples/Java/demo/api-client/pom.xml
+            SpringSecurity/SampleApi/pom.xml
+      - name: Build Persontjenesten client
+        working-directory: Persontjenesten.Samples/Java/client
+        run: mvn -B -ntp clean install
+      - name: Build Persontjenesten demo
+        working-directory: Persontjenesten.Samples/Java/demo
+        run: mvn -B -ntp clean verify
+      - name: Build Spring Security sample
+        working-directory: SpringSecurity/SampleApi
+        run: mvn -B -ntp clean verify
