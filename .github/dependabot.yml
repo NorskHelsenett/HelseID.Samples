@@ -22,7 +22,10 @@ updates:
         update-types:
           - "major"
   - package-ecosystem: maven
-    directory: "/"
+    directories:
+      - "/Persontjenesten.Samples/Java/client"
+      - "/Persontjenesten.Samples/Java/demo"
+      - "/SpringSecurity/SampleApi"
     schedule:
       interval: "weekly"
     commit-message:
