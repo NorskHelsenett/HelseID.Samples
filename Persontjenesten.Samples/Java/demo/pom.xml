@@ -9,7 +9,6 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>helseid-token-exchange</module>
         <module>api-client</module>
     </modules>
 
