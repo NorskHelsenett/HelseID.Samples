@@ -6,46 +6,39 @@
 version: 2
 updates:
   - package-ecosystem: nuget
+    directory: "/"
     schedule:
       interval: "weekly"
-      commit-message:
-        prefix: "deps:"
-      groups:
-        nuget-patch-and-minor:
-          update-types:
-            - "patch"
-            - "minor"
-        nuget-major:
-          update-types:
-            - "major"
+    commit-message:
+      prefix: "deps:"
+    groups:
+      patch-and-minor:
+        patterns: ["*"]
+        update-types:
+          - "patch"
+          - "minor"
+      major:
+        patterns: ["*"]
+        update-types:
+          - "major"
   - package-ecosystem: maven
+    directory: "/"
     schedule:
       interval: "weekly"
-      commit-message:
-        prefix: "deps:"
-      groups:
-        nuget-patch-and-minor:
-          update-types:
-            - "patch"
-            - "minor"
-        nuget-major:
-          update-types:
-            - "major"
-  - package-ecosystem: npm
-    schedule:
-      interval: "weekly"
-      commit-message:
-        prefix: "deps:"
-      groups:
-        nuget-patch-and-minor:
-          update-types:
-            - "patch"
-            - "minor"
-        nuget-major:
-          update-types:
-            - "major"
+    commit-message:
+      prefix: "deps:"
+    groups:
+      patch-and-minor:
+        patterns: ["*"]
+        update-types:
+          - "patch"
+          - "minor"
+      major:
+        patterns: ["*"]
+        update-types:
+          - "major"
   - package-ecosystem: github-actions
-    directory: "/.github/"
+    directory: "/"
     schedule:
       interval: weekly
     commit-message:
