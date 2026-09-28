@@ -1,4 +1,4 @@
-name: "Build"
+name: "Build .NET"
 
 on:
   push:
@@ -21,6 +21,6 @@ jobs:
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
-      - name: "Build Solution"
+      - name: "Build .NET Solution"
         run: |
           dotnet build HelseId.Samples.sln
