@@ -1,0 +1,26 @@
+name: "Build"
+
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+
+jobs:
+  build:
+    if: github.repository == 'NorskHelsenett/HelseID.Samples'
+
+    runs-on: ${{ matrix.platform }}
+    strategy:
+      matrix:
+        platform: [ windows-latest, ubuntu-24.04, macos-14, macos-14-large ]
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+      - name: "Build Solution"
+        run: |
+          dotnet build HelseId.Samples.sln
